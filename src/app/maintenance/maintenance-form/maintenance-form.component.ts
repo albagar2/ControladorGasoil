@@ -47,6 +47,7 @@ export class MaintenanceFormComponent implements OnInit {
     ];
 
     isEditing = false;
+    selectedFile: File | null = null;
     protected readonly Number = Number;
 
     ngOnInit() {
@@ -81,8 +82,38 @@ export class MaintenanceFormComponent implements OnInit {
         this.localMaintenance.tipo = type;
     }
 
+    onFileSelected(event: any) {
+        const file = event.target.files[0];
+        if (file) {
+            this.selectedFile = file;
+        }
+    }
+
     onSubmit() {
-        this.save.emit(this.localMaintenance);
+        // Convert to FormData to support file upload
+        const formData = new FormData();
+
+        // Add all fields from localMaintenance
+        Object.keys(this.localMaintenance).forEach(key => {
+            const value = (this.localMaintenance as any)[key];
+            if (value !== null && value !== undefined) {
+                // If it's a date, ensure ISO string format
+                if (value instanceof Date) {
+                    formData.append(key, value.toISOString());
+                } else if (key === 'fecha' && typeof value === 'string') {
+                    formData.append(key, new Date(value).toISOString());
+                } else {
+                    formData.append(key, value);
+                }
+            }
+        });
+
+        // Add the ticket image if selected
+        if (this.selectedFile) {
+            formData.append('ticket', this.selectedFile);
+        }
+
+        this.save.emit(formData as any);
     }
 
     onCancel() {

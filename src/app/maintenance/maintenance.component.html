@@ -117,99 +117,123 @@
             </div>
         </div>
 
-        <!-- Main Layout: Grid of Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Main Layout: Grouped by Vehicle -->
+        <div class="maintenance-groups">
+            <div *ngFor="let group of groupedMaintenances()" class="vehicle-group"
+                [class.collapsed]="isCollapsed(group.vehicle.id!)">
+                <!-- Vehicle Group Header -->
+                <div class="group-header" (click)="toggleVehicle(group.vehicle.id!)">
+                    <div class="flex items-center gap-4">
+                        <div class="vehicle-pill">
+                            <span class="material-icons">directions_car</span>
+                            <span class="font-bold">{{ group.vehicle.modelo }}</span>
+                            <span class="separator">|</span>
+                            <span class="license">{{ group.vehicle.matricula }}</span>
+                        </div>
+                        <span class="count-badge">{{ group.items.length }} Registros</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="group-summary hidden md:flex">
+                            <span class="label">Total Invertido:</span>
+                            <span class="value">{{ group.totalSpent | currency:'EUR' }}</span>
+                        </div>
+                        <span class="material-icons collapse-icon">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- Group Content -->
+                <div class="group-content" *ngIf="!isCollapsed(group.vehicle.id!)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                        <!-- Maintenance Card -->
+                        <div *ngFor="let m of group.items" class="maintenance-card group">
+                            <!-- Card Header -->
+                            <div class="card-header">
+                                <div class="date-tag">
+                                    <span class="material-icons">event</span>
+                                    {{ m.fecha | date:'dd MMM yyyy' }}
+                                </div>
+                                <div class="card-actions opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button (click)="openModal(m)" class="icon-btn-mini edit" title="Editar">
+                                        <span class="material-icons">edit</span>
+                                    </button>
+                                    <button (click)="deleteMaintenance(m.id!)" class="icon-btn-mini delete"
+                                        title="Eliminar">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="type-badge" [ngClass]="{
+                                        'type-oil': m.tipo === 'Aceite',
+                                        'type-air': m.tipo === 'Aire',
+                                        'type-liquids': m.tipo === 'Liquidos',
+                                        'type-tires': m.tipo === 'Neumaticos',
+                                        'type-battery': m.tipo === 'Bateria',
+                                        'type-dist': m.tipo === 'Distribucion',
+                                        'type-default': !['Aceite', 'Aire', 'Liquidos', 'Neumaticos', 'Bateria', 'Distribucion'].includes(m.tipo)
+                                    }">
+                                        <span class="material-icons text-sm mr-1">
+                                            {{ m.tipo === 'Aceite' ? 'water_drop' :
+                                            m.tipo === 'Aire' ? 'air' :
+                                            m.tipo === 'Liquidos' ? 'opacity' :
+                                            m.tipo === 'Neumaticos' ? 'tire_repair' :
+                                            m.tipo === 'Bateria' ? 'battery_charging_full' :
+                                            m.tipo === 'Distribucion' ? 'settings_suggest' : 'build' }}
+                                        </span>
+                                        {{ m.tipo }}
+                                    </div>
+                                    <div class="provider-pill">
+                                        <span class="material-icons">store</span>
+                                        {{ m.proveedor || 'Sin taller' }}
+                                    </div>
+                                </div>
+
+                                <div class="info-grid">
+                                    <div class="info-cell">
+                                        <span class="label">Kilometraje</span>
+                                        <span class="value text-lg">{{ m.kilometraje | number }}
+                                            <small>km</small></span>
+                                    </div>
+                                    <div class="info-cell text-right">
+                                        <span class="label">Importe</span>
+                                        <span class="value text-lg cost">{{ (toNumber(m.costePieza || 0) +
+                                            toNumber(m.costeTaller || 0)) | currency:'EUR' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="observations-box" *ngIf="m.observaciones">
+                                    <p>{{ m.observaciones }}</p>
+                                </div>
+
+                                <div
+                                    class="card-footer mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                    <div class="ticket-status" *ngIf="m.ticketImageUrl">
+                                        <span class="material-icons text-green-500">receipt_long</span>
+                                        <span class="text-xs font-bold text-green-600">CON TICKET</span>
+                                    </div>
+                                    <div class="driver-tag">
+                                        {{ m.conductor?.nombre }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Empty State -->
-            <div *ngIf="filteredMaintenances().length === 0"
-                class="col-span-full flex flex-col items-center justify-center p-12 text-center bg-white/50 rounded-3xl backdrop-blur-sm border border-white/60 shadow-lg">
+            <div *ngIf="groupedMaintenances().length === 0"
+                class="flex flex-col items-center justify-center p-12 text-center bg-white/50 rounded-3xl backdrop-blur-sm border border-white/60 shadow-lg">
                 <div class="bg-indigo-50 p-6 rounded-full mb-6 animate-pulse">
                     <span class="material-icons text-6xl text-indigo-400">build_circle</span>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">
-                    {{ dataService.maintenances().length === 0 ? 'Sin mantenimientos' : 'No se encontraron resultados'
-                    }}
-                </h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No se encontraron resultados</h3>
                 <p class="text-gray-500 max-w-md mx-auto">
-                    {{ dataService.maintenances().length === 0 ?
-                    'Aún no has registrado ninguna revisión o reparación. Toca el botón + para añadir la primera.' :
-                    'Intenta ajustar los filtros o la búsqueda para ver más resultados.' }}
+                    Intenta ajustar los filtros o la búsqueda para ver más resultados.
                 </p>
-            </div>
-
-            <!-- Maintenance Card -->
-            <div *ngFor="let m of filteredMaintenances()" class="maintenance-card group">
-                <!-- Card Header -->
-                <div class="card-header">
-                    <div class="flex items-center gap-3">
-                        <div class="vehicle-icon">
-                            <span class="material-icons">directions_car</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">{{ m.vehiculo?.modelo }}</h3>
-                            <span class="license-badge">{{ m.vehiculo?.matricula }}</span>
-                        </div>
-                    </div>
-                    <div class="card-actions opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button (click)="openModal(m)" class="icon-btn-mini edit" title="Editar">
-                            <span class="material-icons">edit</span>
-                        </button>
-                        <button (click)="deleteMaintenance(m.id!)" class="icon-btn-mini delete" title="Eliminar">
-                            <span class="material-icons">delete</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="type-badge" [ngClass]="{
-                            'type-oil': m.tipo === 'Aceite',
-                            'type-air': m.tipo === 'Aire',
-                            'type-liquids': m.tipo === 'Liquidos',
-                            'type-tires': m.tipo === 'Neumaticos',
-                            'type-battery': m.tipo === 'Bateria',
-                            'type-dist': m.tipo === 'Distribucion',
-                            'type-default': !['Aceite', 'Aire', 'Liquidos', 'Neumaticos', 'Bateria', 'Distribucion'].includes(m.tipo)
-                        }">
-                            <span class="material-icons text-sm mr-1">
-                                {{ m.tipo === 'Aceite' ? 'water_drop' :
-                                m.tipo === 'Aire' ? 'air' :
-                                m.tipo === 'Liquidos' ? 'opacity' :
-                                m.tipo === 'Neumaticos' ? 'tire_repair' :
-                                m.tipo === 'Bateria' ? 'battery_charging_full' :
-                                m.tipo === 'Distribucion' ? 'settings_suggest' : 'build' }}
-                            </span>
-                            {{ m.tipo }}
-                        </div>
-                        <div class="date-badge">
-                            <span class="material-icons text-xs mr-1">event</span>
-                            {{ m.fecha | date:'dd MMM yyyy' }}
-                        </div>
-                    </div>
-
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="label">Kilometraje</span>
-                            <span class="value">{{ m.kilometraje | number }} km</span>
-                        </div>
-                        <div class="info-item text-right">
-                            <span class="label">Coste Total</span>
-                            <span class="value cost">{{ (toNumber(m.costePieza || 0) + toNumber(m.costeTaller || 0)) |
-                                currency:'EUR' }}</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                        <div class="provider-info">
-                            <span class="material-icons text-xs mr-1 text-gray-400">store</span>
-                            {{ m.proveedor || 'Proveedor desconocido' }}
-                        </div>
-                        <div class="driver-avatar" [title]="m.conductor?.nombre">
-                            {{ m.conductor?.nombre?.charAt(0) || '?' }}
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 

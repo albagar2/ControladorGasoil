@@ -176,12 +176,36 @@ export class ApiService {
         return this.http.get<Maintenance[]>(`${this.apiUrl}/maintenances`);
     }
 
-    createMaintenance(maintenance: Maintenance): Observable<Maintenance> {
-        return this.http.post<Maintenance>(`${this.apiUrl}/maintenances`, maintenance);
+    createMaintenance(maintenance: any): Observable<Maintenance> {
+        // If it's already FormData (from component), send it directly
+        if (maintenance instanceof FormData) {
+            return this.http.post<Maintenance>(`${this.apiUrl}/maintenances`, maintenance);
+        }
+
+        // Otherwise convert it (fallback)
+        const formData = new FormData();
+        Object.keys(maintenance).forEach(key => {
+            const value = (maintenance as any)[key];
+            if (value !== null && value !== undefined) {
+                formData.append(key, value instanceof Date ? value.toISOString() : value);
+            }
+        });
+        return this.http.post<Maintenance>(`${this.apiUrl}/maintenances`, formData);
     }
 
-    updateMaintenance(id: string | number, maintenance: Maintenance): Observable<Maintenance> {
-        return this.http.put<Maintenance>(`${this.apiUrl}/maintenances/${id}`, maintenance);
+    updateMaintenance(id: string | number, maintenance: any): Observable<Maintenance> {
+        if (maintenance instanceof FormData) {
+            return this.http.put<Maintenance>(`${this.apiUrl}/maintenances/${id}`, maintenance);
+        }
+
+        const formData = new FormData();
+        Object.keys(maintenance).forEach(key => {
+            const value = (maintenance as any)[key];
+            if (value !== null && value !== undefined) {
+                formData.append(key, value instanceof Date ? value.toISOString() : value);
+            }
+        });
+        return this.http.put<Maintenance>(`${this.apiUrl}/maintenances/${id}`, formData);
     }
 
     deleteMaintenance(id: string | number): Observable<any> {

@@ -31,12 +31,24 @@ export const emailController = {
                 return res.status(400).json({ message: 'Faltan datos requeridos (to, reportUrl, month).' });
             }
 
+            // Check connection first
+            const isConnected = await emailService.verifyConnection();
+            if (!isConnected) {
+                return res.status(503).json({
+                    message: 'El servicio de correo no está configurado correctamente en el servidor.',
+                    error: 'SMTP Connection failing'
+                });
+            }
+
             await emailService.sendMonthlyReport(to, reportUrl, month);
 
             res.json({ message: 'Informe mensual enviado con éxito.' });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error enviando informe mensual:', error);
-            res.status(500).json({ message: 'Error al enviar el correo.', error });
+            res.status(500).json({
+                message: 'Error al enviar el correo. Verifica tu configuración SMTP.',
+                details: error.message || error
+            });
         }
     }
 };

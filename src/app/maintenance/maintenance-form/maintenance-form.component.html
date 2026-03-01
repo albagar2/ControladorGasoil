@@ -131,6 +131,21 @@
                                 </select>
                             </div>
 
+                            <div class="mb-4">
+                                <label class="input-label">Ticket / Factura (Imagen)</label>
+                                <div class="upload-area" (click)="fileInput.click()" [class.has-file]="selectedFile">
+                                    <span class="material-icons">cloud_upload</span>
+                                    <span class="text-xs font-semibold">{{ selectedFile ? selectedFile.name : 'Subir
+                                        Ticket' }}</span>
+                                    <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*"
+                                        class="hidden">
+                                </div>
+                                <p *ngIf="localMaintenance.ticketImageUrl && !selectedFile"
+                                    class="mt-1 text-xs text-green-600">
+                                    ✅ Ticket ya subido
+                                </p>
+                            </div>
+
                             <div>
                                 <label class="input-label">Observaciones</label>
                                 <textarea [(ngModel)]="localMaintenance.observaciones" name="observaciones" rows="2"

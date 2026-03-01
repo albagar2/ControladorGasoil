@@ -23,20 +23,24 @@ export const createMaintenance = async (req: Request, res: Response) => {
     try {
         const { vehiculoId, conductorId, fecha, tipo, costePieza, costeTaller, observaciones, kilometraje, proveedor } = req.body;
 
-        const vehicle = await vehicleRepository.findOneBy({ id: vehiculoId });
+        const vId = parseInt(vehiculoId);
+        const cId = conductorId ? parseInt(conductorId) : undefined;
+        const km = parseInt(kilometraje) || 0;
+
+        const vehicle = await vehicleRepository.findOneBy({ id: vId });
         if (!vehicle) {
             return res.status(404).json({ message: "Vehicle not found" });
         }
 
         const maintenance = maintenanceRepository.create({
-            vehiculoId,
-            conductorId,
-            fecha,
+            vehiculoId: vId,
+            conductorId: cId,
+            fecha: new Date(fecha),
             tipo,
-            costePieza,
-            costeTaller,
+            costePieza: parseFloat(costePieza) || 0,
+            costeTaller: parseFloat(costeTaller) || 0,
             observaciones,
-            kilometraje,
+            kilometraje: km,
             proveedor,
             ticketImageUrl: req.file ? `/uploads/${req.file.filename}` : undefined
         });
@@ -44,13 +48,20 @@ export const createMaintenance = async (req: Request, res: Response) => {
         await maintenanceRepository.save(maintenance);
 
         // Update vehicle mileage if this maintenance has higher mileage
-        if (kilometraje > vehicle.kilometrajeActual) {
-            vehicle.kilometrajeActual = kilometraje;
+        if (km > vehicle.kilometrajeActual) {
+            vehicle.kilometrajeActual = km;
             await vehicleRepository.save(vehicle);
         }
 
-        res.status(201).json(maintenance);
+        // Return with relations
+        const fullMaintenance = await maintenanceRepository.findOne({
+            where: { id: maintenance.id },
+            relations: ["vehiculo", "conductor"]
+        });
+
+        res.status(201).json(fullMaintenance);
     } catch (error) {
+        console.error('Error creating maintenance:', error);
         res.status(500).json({ message: "Error creating maintenance", error });
     }
 };
@@ -65,14 +76,16 @@ export const updateMaintenance = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Maintenance not found" });
         }
 
-        maintenance.vehiculoId = vehiculoId;
-        maintenance.conductorId = conductorId;
+        const km = parseInt(kilometraje) || 0;
+
+        maintenance.vehiculoId = parseInt(vehiculoId);
+        maintenance.conductorId = conductorId ? parseInt(conductorId) : undefined;
         maintenance.fecha = new Date(fecha);
         maintenance.tipo = tipo;
-        maintenance.costePieza = costePieza;
-        maintenance.costeTaller = costeTaller;
+        maintenance.costePieza = parseFloat(costePieza) || 0;
+        maintenance.costeTaller = parseFloat(costeTaller) || 0;
         maintenance.observaciones = observaciones;
-        maintenance.kilometraje = kilometraje;
+        maintenance.kilometraje = km;
         maintenance.proveedor = proveedor;
 
         if (req.file) {
@@ -81,8 +94,22 @@ export const updateMaintenance = async (req: Request, res: Response) => {
 
         await maintenanceRepository.save(maintenance);
 
-        res.json(maintenance);
+        // Update vehicle mileage if needed
+        const vehicle = await vehicleRepository.findOneBy({ id: maintenance.vehiculoId });
+        if (vehicle && km > vehicle.kilometrajeActual) {
+            vehicle.kilometrajeActual = km;
+            await vehicleRepository.save(vehicle);
+        }
+
+        // Return with relations
+        const fullMaintenance = await maintenanceRepository.findOne({
+            where: { id: maintenance.id },
+            relations: ["vehiculo", "conductor"]
+        });
+
+        res.json(fullMaintenance);
     } catch (error) {
+        console.error('Error updating maintenance:', error);
         res.status(500).json({ message: "Error updating maintenance", error });
     }
 };

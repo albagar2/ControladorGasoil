@@ -58,6 +58,55 @@ export class MaintenanceComponent implements OnInit {
         return filtered;
     });
 
+    // Grouping logic
+    collapsedVehicles = signal<Record<number, boolean>>({});
+
+    groupedMaintenances = computed(() => {
+        const maintenances = this.filteredMaintenances();
+        const vehicles = this.dataService.vehicles();
+
+        const groups: { vehicle: Vehicle, items: Maintenance[], totalSpent: number }[] = [];
+
+        // Group by vehicle
+        vehicles.forEach(v => {
+            const items = maintenances.filter(m => m.vehiculoId === v.id);
+            if (items.length > 0) {
+                const totalSpent = items.reduce((acc, m) => acc + (Number(m.costePieza || 0) + Number(m.costeTaller || 0)), 0);
+                groups.push({
+                    vehicle: v,
+                    items: items.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()),
+                    totalSpent
+                });
+            }
+        });
+
+        // Also handle items with no vehicle (shouldn't happen but good for safety)
+        const orphanItems = maintenances.filter(m => !m.vehiculoId);
+        if (orphanItems.length > 0) {
+            const totalSpent = orphanItems.reduce((acc, m) => acc + (Number(m.costePieza || 0) + Number(m.costeTaller || 0)), 0);
+            groups.push({
+                vehicle: { modelo: 'Sin Vehículo', matricula: 'N/A' } as any,
+                items: orphanItems,
+                totalSpent
+            });
+        }
+
+        return groups;
+    });
+
+    toggleVehicle(vehicleId: number) {
+        if (!vehicleId) return;
+        const current = this.collapsedVehicles();
+        this.collapsedVehicles.set({
+            ...current,
+            [vehicleId]: !current[vehicleId]
+        });
+    }
+
+    isCollapsed(vehicleId: number): boolean {
+        return !!this.collapsedVehicles()[vehicleId];
+    }
+
     // Computed Stats
     stats = computed(() => {
         const maintenances = this.dataService.maintenances();
@@ -125,26 +174,36 @@ export class MaintenanceComponent implements OnInit {
         this.currentMaintenance = undefined;
     }
 
-    onSaveMaintenance(maintenance: Maintenance) {
-        if (!maintenance.vehiculoId || !maintenance.conductorId) {
+    onSaveMaintenance(maintenance: any) {
+        const isFormData = maintenance instanceof FormData;
+
+        // Basic validation
+        if (isFormData) {
+            if (!maintenance.get('vehiculoId') || !maintenance.get('conductorId')) {
+                this.toastService.warning('Datos incompletos.');
+                return;
+            }
+        } else if (!maintenance.vehiculoId || !maintenance.conductorId) {
             this.toastService.warning('Datos incompletos.');
             return;
         }
 
+        const id = isFormData ? maintenance.get('id') : maintenance.id;
+
         this.dataService.loading.set(true);
-        const obs = maintenance.id
-            ? this.apiService.updateMaintenance(maintenance.id, maintenance)
+        const obs = id
+            ? this.apiService.updateMaintenance(id, maintenance)
             : this.apiService.createMaintenance(maintenance);
 
         obs.subscribe({
             next: () => {
-                this.toastService.success(maintenance.id ? 'Mantenimiento actualizado' : 'Mantenimiento registrado');
+                this.toastService.success(id ? 'Mantenimiento actualizado' : 'Mantenimiento registrado');
                 this.dataService.loadAllData();
                 this.closeModal();
             },
             error: (err: any) => {
                 console.error('Error saving maintenance', err);
-                this.toastService.error('Error al guardar el mantenimiento');
+                this.toastService.error('Error al guardar el mantenimiento. Revisa los datos.');
                 this.dataService.loading.set(false);
             }
         });

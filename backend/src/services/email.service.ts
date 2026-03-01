@@ -15,6 +15,17 @@ class EmailService {
         });
     }
 
+    async verifyConnection() {
+        try {
+            await this.transporter.verify();
+            console.log('✅ SMTP Connection verified');
+            return true;
+        } catch (error) {
+            console.error('❌ SMTP Connection failed:', error);
+            return false;
+        }
+    }
+
     async sendMaintenanceAlert(to: string, data: { vehiculo: string, tipo: string, fecha: Date }) {
         const mailOptions = {
             from: '"Garaje Familiar" <' + (process.env.SMTP_USER || 'no-reply@garaje.com') + '>',
