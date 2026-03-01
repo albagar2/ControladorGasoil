@@ -1,0 +1,39 @@
+<div class="search-overlay" *ngIf="searchService.isOpen()" (click)="searchService.close()">
+    <div class="search-container" (click)="$event.stopPropagation()">
+        <div class="search-header">
+            <span class="material-icons">search</span>
+            <input type="text" [(ngModel)]="searchService.query" placeholder="Busca vehículos, conductores, acciones..."
+                autofocus (keydown.esc)="searchService.close()">
+            <div class="search-shortcut">ESC</div>
+        </div>
+
+        <div class="search-results" *ngIf="searchService.results().length > 0">
+            <div class="result-item" *ngFor="let res of searchService.results()"
+                (click)="searchService.selectResult(res)">
+                <span class="material-icons result-icon">{{ res.icon }}</span>
+                <div class="result-info">
+                    <span class="result-title">{{ res.title }}</span>
+                    <span class="result-subtitle" *ngIf="res.subtitle">{{ res.subtitle }}</span>
+                </div>
+                <span class="material-icons result-arrow">chevron_right</span>
+            </div>
+        </div>
+
+        <div class="no-results" *ngIf="searchService.results().length === 0 && searchService.query()">
+            <span class="material-icons">info</span>
+            <p>No se encontraron resultados para "{{ searchService.query() }}"</p>
+        </div>
+
+        <div class="search-footer">
+            <div class="footer-hint">
+                <span class="material-icons">keyboard_return</span>
+                <span>Seleccionar</span>
+            </div>
+            <div class="footer-hint">
+                <span class="material-icons">keyboard_arrow_up</span>
+                <span class="material-icons">keyboard_arrow_down</span>
+                <span>Navegar</span>
+            </div>
+        </div>
+    </div>
+</div>

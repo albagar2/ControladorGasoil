@@ -1,0 +1,162 @@
+<div class="fixed inset-0 z-[10000] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+
+    <!-- Flex Container for Positioning (Top) -->
+    <div class="flex items-start justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+
+        <!-- Overlay -->
+        <div class="fixed inset-0 transition-opacity modal-overlay" aria-hidden="true" (click)="onCancel()"></div>
+
+        <!-- Modal Content -->
+        <!-- Removed inline-block and tricky alignment classes. Used relative to stack over overlay. -->
+        <!-- Modal Content -->
+        <!-- Adjusted relative max-w-lg and max-h-[95vh] for better fit, added mt-10 for top spacing -->
+        <!-- Modal Content -->
+        <!-- Adjusted relative max-w-lg and max-h-[95vh] for better fit, added mt-4 for minimal top margin -->
+        <div
+            class="relative w-full max-w-lg mt-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl modal-content flex flex-col max-h-[90vh]">
+
+            <!-- Premium Header (Fixed) -->
+            <div class="flex-shrink-0 modal-header-premium">
+                <div class="header-content">
+                    <div class="icon-wrapper">
+                        <span class="material-icons">build_circle</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold leading-tight text-white">
+                            {{ isEditing ? 'Editar Mantenimiento' : 'Nueva Entrada' }}
+                        </h3>
+                        <p class="mt-1 text-sm text-blue-100">Registra los detalles del servicio</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- Quick Save Button in Header -->
+                    <button type="submit" form="maintenanceForm" class="header-action-btn save" title="Guardar">
+                        <span class="material-icons">save</span>
+                    </button>
+                    <button class="header-action-btn close" (click)="onCancel()" title="Cerrar">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div class="flex-1 overflow-y-auto bg-gray-50">
+                <div class="px-8 py-6">
+                    <form id="maintenanceForm" (ngSubmit)="onSubmit()">
+
+                        <!-- Section 1: Vehicle & Type -->
+                        <div class="form-section">
+                            <h4 class="section-title">Vehículo y Tipo</h4>
+
+                            <div class="mb-5">
+                                <label class="block mb-2 ml-1 text-sm font-bold text-gray-700">Selecciona el
+                                    Vehículo</label>
+                                <select [(ngModel)]="localMaintenance.vehiculoId" name="vehiculoId"
+                                    class="form-select-lg">
+                                    <option [ngValue]="0" disabled>Seleccione un vehículo</option>
+                                    <option *ngFor="let v of vehicles" [ngValue]="v.id">{{ v.modelo }} - <span
+                                            class="font-mono">{{ v.matricula }}</span></option>
+                                </select>
+                            </div>
+
+                            <label class="block mb-3 ml-1 text-sm font-bold text-gray-700">Tipo de Mantenimiento</label>
+                            <div class="types-grid">
+                                <div *ngFor="let type of maintenanceTypes" class="type-card"
+                                    [class.selected]="localMaintenance.tipo === type.id" (click)="selectType(type.id)">
+                                    <span class="material-icons type-icon"
+                                        [style.color]="localMaintenance.tipo === type.id ? 'white' : ''">{{ type.icon
+                                        }}</span>
+                                    <span class="type-label">{{ type.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Details -->
+                        <div class="mt-6 form-section">
+                            <h4 class="section-title">Detalles del Servicio</h4>
+                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <div>
+                                    <label class="input-label">Fecha</label>
+                                    <input type="date" [ngModel]="localMaintenance.fecha | date:'yyyy-MM-dd'"
+                                        (ngModelChange)="localMaintenance.fecha = $event" name="fecha"
+                                        class="form-input-modern">
+                                </div>
+                                <div>
+                                    <label class="input-label">Kilometraje Actual</label>
+                                    <div class="relative">
+                                        <input type="number" [(ngModel)]="localMaintenance.kilometraje"
+                                            name="kilometraje" class="pl-4 form-input-modern">
+                                        <span class="suffix">km</span>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="input-label">Proveedor / Taller</label>
+                                    <div class="relative">
+                                        <span class="material-icons prefix-icon">store</span>
+                                        <input type="text" [(ngModel)]="localMaintenance.proveedor" name="proveedor"
+                                            class="pl-10 form-input-modern" placeholder="Nombre del taller">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Costs & Driver -->
+                        <div class="mt-6 form-section">
+                            <h4 class="section-title">Costes y Responsable</h4>
+                            <div class="grid grid-cols-2 gap-5 mb-4">
+                                <div>
+                                    <label class="input-label">Coste Piezas</label>
+                                    <div class="relative">
+                                        <span class="prefix">€</span>
+                                        <input type="number" [(ngModel)]="localMaintenance.costePieza" name="costePieza"
+                                            class="pl-8 form-input-modern">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="input-label">Coste Mano de Obra</label>
+                                    <div class="relative">
+                                        <span class="prefix">€</span>
+                                        <input type="number" [(ngModel)]="localMaintenance.costeTaller"
+                                            name="costeTaller" class="pl-8 form-input-modern">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="input-label">Conductor Responsable</label>
+                                <select [(ngModel)]="localMaintenance.conductorId" name="conductorId"
+                                    class="form-select-modern">
+                                    <option [ngValue]="0" disabled>Seleccione conductor</option>
+                                    <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d.nombre }}</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="input-label">Observaciones</label>
+                                <textarea [(ngModel)]="localMaintenance.observaciones" name="observaciones" rows="2"
+                                    class="form-textarea-modern" placeholder="Detalles adicionales..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Fixed Footer -->
+            <div class="flex-shrink-0 px-8 py-4 bg-white border-t border-gray-200 modal-footer-premium">
+                <div class="flex items-center justify-between w-full">
+                    <div class="font-medium text-gray-600 total-cost">
+                        Total: <span class="text-xl font-bold text-gray-900">{{ (Number(localMaintenance.costePieza ||
+                            0) +
+                            Number(localMaintenance.costeTaller || 0)) | currency:'EUR' }}</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" (click)="onCancel()" class="btn-cancel-modern">Cancelar</button>
+                        <button type="submit" form="maintenanceForm" class="btn-save-modern">
+                            {{ isEditing ? 'Guardar Cambios' : 'Registrar' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

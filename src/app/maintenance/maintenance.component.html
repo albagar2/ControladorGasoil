@@ -1,0 +1,226 @@
+<div class="container mx-auto p-4 animate-slide-in">
+    <!-- Header -->
+    <div class="page-header flex justify-between items-center">
+        <div>
+            <h1 class="page-title">Mantenimientos</h1>
+            <p class="text-gray-500 font-medium">Gestiona las revisiones y reparaciones de la flota</p>
+        </div>
+        <button (click)="openModal()" class="btn-new">
+            <span class="material-icons">add_circle</span>
+            <span>Nuevo Registro</span>
+        </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="dataService.loading()" class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!dataService.loading()">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue-100">
+                    <span class="material-icons text-blue-600">euro</span>
+                </div>
+                <div>
+                    <p class="stat-label">Total Gastado</p>
+                    <p class="stat-value">{{ stats().totalSpent | currency:'EUR' }}</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-green-100">
+                    <span class="material-icons text-green-600">event</span>
+                </div>
+                <div>
+                    <p class="stat-label">Último Mantenimiento</p>
+                    <p class="stat-value text-base">{{ stats().mostRecentDate }}</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-orange-100">
+                    <span class="material-icons text-orange-600">directions_car</span>
+                </div>
+                <div>
+                    <p class="stat-label">V. con Más Mantenim.</p>
+                    <p class="stat-value text-base">{{ stats().vehicleWithMostMaintenances }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="filters-container mb-6">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <span class="material-icons">search</span>
+                <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                    placeholder="Buscar por vehículo, tipo o proveedor..." class="search-input">
+                <button *ngIf="searchQuery()" (click)="searchQuery.set('')" class="clear-btn">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-row">
+                <select [ngModel]="filterVehicleId()" (ngModelChange)="filterVehicleId.set($event)"
+                    class="filter-select">
+                    <option [ngValue]="null">Todos los vehículos</option>
+                    <option *ngFor="let v of dataService.vehicles()" [ngValue]="v.id">{{ v.modelo }} - {{ v.matricula }}
+                    </option>
+                </select>
+
+                <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="filter-select">
+                    <option value="">Todos los tipos</option>
+                    <option *ngFor="let type of maintenanceTypes()" [value]="type">{{ type }}</option>
+                </select>
+
+                <input type="date" [ngModel]="filterDateFrom()" (ngModelChange)="filterDateFrom.set($event)"
+                    placeholder="Desde" class="filter-date">
+
+                <input type="date" [ngModel]="filterDateTo()" (ngModelChange)="filterDateTo.set($event)"
+                    placeholder="Hasta" class="filter-date">
+
+                <button (click)="clearFilters()" class="btn-clear-filters"
+                    *ngIf="searchQuery() || filterVehicleId() || filterType() || filterDateFrom() || filterDateTo()">
+                    <span class="material-icons">filter_alt_off</span>
+                    Limpiar
+                </button>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div *ngIf="alerts().length > 0" class="mb-6 space-y-3">
+            <div *ngFor="let alert of alerts()" class="alert-banner p-4 rounded-lg flex items-start"
+                [class.urgent]="alert.urgent">
+                <span class="material-icons mr-3" [class.text-red-600]="alert.urgent"
+                    [class.text-orange-500]="!alert.urgent">
+                    {{ alert.urgent ? 'error' : 'warning' }}
+                </span>
+                <div style="flex: 1;">
+                    <h4 class="font-bold mb-1" [class.text-red-900]="alert.urgent"
+                        [class.text-orange-900]="!alert.urgent">
+                        {{ alert.type }} - {{ alert.vehicle }}
+                    </h4>
+                    <p class="text-sm font-medium text-gray-700">
+                        {{ alert.message }}
+                        <span *ngIf="alert.date" class="ml-2 opacity-70">
+                            ({{ alert.date | date:'dd/MM/yyyy' }})
+                        </span>
+                    </p>
+                </div>
+                <button (click)="sendAlertEmail(alert)"
+                    class="ml-4 icon-btn-mini bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                    title="Enviar recordatorio por correo"
+                    style="min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-icons" style="font-size: 1.2rem;">mail</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Layout: Grid of Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Empty State -->
+            <div *ngIf="filteredMaintenances().length === 0"
+                class="col-span-full flex flex-col items-center justify-center p-12 text-center bg-white/50 rounded-3xl backdrop-blur-sm border border-white/60 shadow-lg">
+                <div class="bg-indigo-50 p-6 rounded-full mb-6 animate-pulse">
+                    <span class="material-icons text-6xl text-indigo-400">build_circle</span>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                    {{ dataService.maintenances().length === 0 ? 'Sin mantenimientos' : 'No se encontraron resultados'
+                    }}
+                </h3>
+                <p class="text-gray-500 max-w-md mx-auto">
+                    {{ dataService.maintenances().length === 0 ?
+                    'Aún no has registrado ninguna revisión o reparación. Toca el botón + para añadir la primera.' :
+                    'Intenta ajustar los filtros o la búsqueda para ver más resultados.' }}
+                </p>
+            </div>
+
+            <!-- Maintenance Card -->
+            <div *ngFor="let m of filteredMaintenances()" class="maintenance-card group">
+                <!-- Card Header -->
+                <div class="card-header">
+                    <div class="flex items-center gap-3">
+                        <div class="vehicle-icon">
+                            <span class="material-icons">directions_car</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">{{ m.vehiculo?.modelo }}</h3>
+                            <span class="license-badge">{{ m.vehiculo?.matricula }}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button (click)="openModal(m)" class="icon-btn-mini edit" title="Editar">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button (click)="deleteMaintenance(m.id!)" class="icon-btn-mini delete" title="Eliminar">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="type-badge" [ngClass]="{
+                            'type-oil': m.tipo === 'Aceite',
+                            'type-air': m.tipo === 'Aire',
+                            'type-liquids': m.tipo === 'Liquidos',
+                            'type-tires': m.tipo === 'Neumaticos',
+                            'type-battery': m.tipo === 'Bateria',
+                            'type-dist': m.tipo === 'Distribucion',
+                            'type-default': !['Aceite', 'Aire', 'Liquidos', 'Neumaticos', 'Bateria', 'Distribucion'].includes(m.tipo)
+                        }">
+                            <span class="material-icons text-sm mr-1">
+                                {{ m.tipo === 'Aceite' ? 'water_drop' :
+                                m.tipo === 'Aire' ? 'air' :
+                                m.tipo === 'Liquidos' ? 'opacity' :
+                                m.tipo === 'Neumaticos' ? 'tire_repair' :
+                                m.tipo === 'Bateria' ? 'battery_charging_full' :
+                                m.tipo === 'Distribucion' ? 'settings_suggest' : 'build' }}
+                            </span>
+                            {{ m.tipo }}
+                        </div>
+                        <div class="date-badge">
+                            <span class="material-icons text-xs mr-1">event</span>
+                            {{ m.fecha | date:'dd MMM yyyy' }}
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="label">Kilometraje</span>
+                            <span class="value">{{ m.kilometraje | number }} km</span>
+                        </div>
+                        <div class="info-item text-right">
+                            <span class="label">Coste Total</span>
+                            <span class="value cost">{{ (toNumber(m.costePieza || 0) + toNumber(m.costeTaller || 0)) |
+                                currency:'EUR' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <div class="provider-info">
+                            <span class="material-icons text-xs mr-1 text-gray-400">store</span>
+                            {{ m.proveedor || 'Proveedor desconocido' }}
+                        </div>
+                        <div class="driver-avatar" [title]="m.conductor?.nombre">
+                            {{ m.conductor?.nombre?.charAt(0) || '?' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <button (click)="openModal()" class="fab-btn" title="Nuevo Registro">
+            <span class="material-icons">add</span>
+        </button>
+    </div>
+</div>
+
+<!-- Modal OUTSIDE the animated container to avoid transform context issues -->
+<app-maintenance-form *ngIf="showModal" [maintenance]="currentMaintenance" [vehicles]="dataService.vehicles()"
+    [drivers]="dataService.drivers()" (save)="onSaveMaintenance($event)" (cancel)="closeModal()" class="z-[9999]">
+</app-maintenance-form>

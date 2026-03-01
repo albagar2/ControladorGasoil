@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación Técnica - Control de Gasoil Familiar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #6366f1;
+        }
+
+        .section h2 {
+            color: #6366f1;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+        }
+
+        .dialogue {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .question {
+            font-weight: bold;
+            color: #6366f1;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .answer {
+            color: #555;
+            margin-left: 20px;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #6366f1;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:hover {
+            background: #f3f4f6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 2px;
+        }
+
+        .badge-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 3px solid #6366f1;
+        }
+
+        .list-styled {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .list-styled li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+        }
+
+        .list-styled li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📘 Documentación Técnica Completa</h1>
+            <p>Sistema de Control de Gasoil Familiar</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Versión 1.0 · Febrero 2026</p>
+        </div>
+
+        <div class="content">
+            <!-- Introducción -->
+            <div class="section">
+                <h2>🎯 ¿Qué es esta aplicación?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿De qué trata el proyecto?</div>
+                    <div class="answer">
+                        R: Es una aplicación web <span class="highlight">full-stack</span> diseñada para gestionar
+                        flotas de vehículos de forma familiar. Permite controlar vehículos, conductores, repostajes y
+                        mantenimientos, todo organizado por familias con autenticación segura mediante JWT.
+                    </div>
+                </div>
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué tecnologías usa?</div>
+                    <div class="answer">
+                        R: El <strong>frontend</strong> está construido con <span class="badge badge-info">Angular
+                            21</span>, mientras que el <strong>backend</strong> usa <span
+                            class="badge badge-success">Express.js</span> + <span
+                            class="badge badge-success">TypeORM</span> + <span class="badge badge-warning">MySQL</span>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estructura del Proyecto -->
+            <div class="section">
+                <h2>📂 ¿Cómo está organizado el proyecto?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Cuál es la estructura de carpetas principal?</div>
+                    <div class="answer">
+                        R: El proyecto tiene dos carpetas principales:
+                        <ul class="list-styled" style="margin-top: 15px;">
+                            <li><strong>/ (raíz)</strong> - Frontend Angular en el puerto 4200</li>
+                            <li><strong>/backend</strong> - API REST en el puerto 3001</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Frontend (src/app/)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Carpeta</th>
+                                <th>Propósito</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>auth/</code></td>
+                                <td>Login, registro, guards e interceptores</td>
+                            </tr>
+                            <tr>
+                                <td><code>dashboard/</code></td>
+                                <td>Panel principal con tabs</td>
+                            </tr>
+                            <tr>
+                                <td><code>vehicles/</code></td>
+                                <td>CRUD de vehículos</td>
+                            </tr>
+                            <tr>
+                                <td><code>drivers/</code></td>
+                                <td>CRUD de conductores</td>
+                            </tr>
+                            <tr>
+                                <td><code>refuels/</code></td>
+                                <td>Gestión de repostajes</td>
+                            </tr>
+                            <tr>
+                                <td><code>maintenance/</code></td>
+                                <td>Gestión de mantenimientos con filtros</td>
+                            </tr>
+                            <tr>
+                                <td><code>family/</code></td>
+                                <td>Administración familiar (solo admin)</td>
+                            </tr>
+                            <tr>
+                                <td><code>services/</code></td>
+                                <td>ApiService, MaintenanceService, ExportService</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Backend (backend/src/)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Carpeta</th>
+                                <th>Contenido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>controllers/</code></td>
+                                <td>6 controladores (auth, vehicle, driver, refuel, maintenance, family)</td>
+                            </tr>
+                            <tr>
+                                <td><code>entities/</code></td>
+                                <td>5 entidades TypeORM (User, Vehicle, Driver, Refuel, Maintenance, Family)</td>
+                            </tr>
+                            <tr>
+                                <td><code>middleware/</code></td>
+                                <td>authMiddleware (JWT) y uploadMiddleware (Multer)</td>
+                            </tr>
+                            <tr>
+                                <td><code>routes/</code></td>
+                                <td>Definición de todas las rutas API</td>
+                            </tr>
+                            <tr>
+                                <td><code>scripts/</code></td>
+                                <td>seed.ts (datos de prueba)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Rutas y Navegación -->
+            <div class="section">
+                <h2>🛣️ ¿Cómo funciona la navegación?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué rutas públicas tiene la aplicación?</div>
+                    <div class="answer">
+                        R: La aplicación tiene 3 rutas públicas principales:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li><code>/</code> - Página de bienvenida</li>
+                            <li><code>/login</code> - Inicio de sesión</li>
+                            <li><code>/register</code> - Registro de usuarios</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Y las rutas protegidas?</div>
+                    <div class="answer">
+                        R: Todo el contenido principal está en <code>/dashboard</code>, que usa <strong>tabs con query
+                            params</strong>:
+                        <div class="code-box">
+                            /dashboard?tab=resumen → Vista general<br>
+                            /dashboard?tab=vehiculos → Gestión de vehículos<br>
+                            /dashboard?tab=conductores → Gestión de conductores<br>
+                            /dashboard?tab=repostaje → Gestión de repostajes<br>
+                            /dashboard?tab=mantenimiento → Gestión de mantenimientos<br>
+                            /dashboard?tab=familia → Admin de familias<br>
+                            /dashboard?tab=perfil → Perfil de usuario
+                        </div>
+                        Esto permite cambiar de vista sin recargar la página completa.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interfaces -->
+            <div class="section">
+                <h2>🔌 ¿Qué datos maneja la aplicación?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Cuáles son las entidades principales?</div>
+                    <div class="answer">
+                        R: La aplicación maneja 6 entidades principales con sus relaciones:
+                    </div>
+                </div>
+
+                <h3>1. Vehicle (Vehículo)</h3>
+                <div class="code-box">
+                    {
+                    id, matricula, modelo, combustible,
+                    anioMatriculacion, kilometrajeActual,
+                    propietarioId → Driver,
+                    familyId → Family,
+                    // Datos del seguro
+                    seguro_compañia, seguro_numero_poliza,
+                    seguro_fecha_vencimiento, seguro_cobertura,
+                    // Datos de ITV
+                    itv_estado, itv_fecha_caducidad, itv_kilometraje
+                    }
+                </div>
+
+                <h3>2. Driver (Conductor)</h3>
+                <div class="code-box">
+                    {
+                    id, nombre, dni, email, telefono,
+                    fechaRenovacionCarnet,
+                    puntos, puntosMaximos,
+                    role: 'admin' | 'conductor',
+                    familyId → Family
+                    }
+                </div>
+
+                <h3>3. Refuel (Repostaje)</h3>
+                <div class="code-box">
+                    {
+                    id, fecha, kilometraje,
+                    vehiculoId → Vehicle,
+                    conductorId → Driver,
+                    litros, precioPorLitro, costeTotal,
+                    proveedor, tipoCombustible,
+                    ticketImageUrl
+                    }
+                </div>
+
+                <h3>4. Maintenance (Mantenimiento)</h3>
+                <div class="code-box">
+                    {
+                    id, fecha, kilometraje,
+                    vehiculoId → Vehicle,
+                    conductorId → Driver,
+                    tipo: 'Aceite' | 'Frenos' | 'Neumáticos' | ...,
+                    proveedor,
+                    costePieza, costeTaller,
+                    observaciones
+                    }
+                </div>
+
+                <h3>5. Family (Familia)</h3>
+                <div class="code-box">
+                    {
+                    id, nombre,
+                    codigo // Código de invitación
+                    }
+                </div>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="section">
+                <h2>🌐 ¿Qué endpoints tiene la API?</h2>
+
+                <h3>Autenticación (sin protección)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Método</th>
+                                <th>Ruta</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/auth/register</code></td>
+                                <td>Registrar usuario</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/auth/login</code></td>
+                                <td>Iniciar sesión (devuelve JWT)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Recursos (protegidas con JWT)</h3>
+                <div class="dialogue">
+                    <div class="question">P: ¿Todas las rutas de recursos siguen el mismo patrón?</div>
+                    <div class="answer">
+                        R: Sí. Cada recurso (vehicles, drivers, refuels, maintenances) tiene exactamente <strong>4
+                            endpoints CRUD</strong>:
+                        <div class="code-box" style="margin-top: 10px;">
+                            GET /api/{recurso} → Listar todos (filtrado por familia)<br>
+                            POST /api/{recurso} → Crear nuevo<br>
+                            PUT /api/{recurso}/:id → Actualizar existente<br>
+                            DELETE /api/{recurso}/:id → Eliminar
+                        </div>
+                        Por ejemplo: <code>/api/vehicles</code>, <code>/api/drivers</code>, <code>/api/refuels</code>,
+                        <code>/api/maintenances</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicios -->
+            <div class="section">
+                <h2>🛠️ ¿Cómo se comunica el frontend con el backend?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Hay un servicio centralizado para HTTP?</div>
+                    <div class="answer">
+                        R: Sí, <strong>ApiService</strong> es el cliente HTTP centralizado. Todos los componentes lo
+                        usan para hacer peticiones al backend. Está ubicado en <code>services/api.service.ts</code>.
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué otros servicios existen?</div>
+                    <div class="answer">
+                        R: Hay 3 servicios principales:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li><strong>ApiService</strong> - Todas las llamadas HTTP al backend</li>
+                            <li><strong>MaintenanceService</strong> - Lógica de alertas de mantenimiento</li>
+                            <li><strong>ExportService</strong> - Generación de reportes Excel</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Ejemplo: Métodos de ApiService</h3>
+                <div class="code-box">
+                    // Vehículos
+                    getVehicles(): Observable&lt;Vehicle[]&gt;
+                    createVehicle(vehicle): Observable&lt;Vehicle&gt;
+                    updateVehicle(id, vehicle): Observable&lt;Vehicle&gt;
+                    deleteVehicle(id): Observable&lt;void&gt;
+
+                    // Conductores
+                    getDrivers(): Observable&lt;Driver[]&gt;
+                    createDriver(driver): Observable&lt;Driver&gt;
+                    // ... etc
+
+                    // Repostajes, Mantenimientos, Familias
+                    // Siguen el mismo patrón CRUD
+                </div>
+            </div>
+
+            <!-- Seguridad -->
+            <div class="section">
+                <h2>🔒 ¿Cómo funciona la seguridad?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué sistema de autenticación usa?</div>
+                    <div class="answer">
+                        R: La aplicación usa <strong>JWT (JSON Web Tokens)</strong>. El flujo es:
+                        <ol style="margin: 15px 0 0 20px;">
+                            <li>Usuario se registra → Password hasheado con bcrypt</li>
+                            <li>Usuario hace login → Backend genera JWT firmado</li>
+                            <li>Frontend guarda token en localStorage</li>
+                            <li>AuthInterceptor añade token en todas las peticiones:
+                                <code>Authorization: Bearer &lt;token&gt;</code>
+                            </li>
+                            <li>Backend verifica token en authMiddleware</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Cómo se protegen las rutas en el frontend?</div>
+                    <div class="answer">
+                        R: Con <strong>AuthGuard</strong> (<code>auth/auth.guard.ts</code>). Si intentas acceder a
+                        <code>/dashboard</code> sin estar logueado, te redirige automáticamente a <code>/login</code>.
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Y en el backend?</div>
+                    <div class="answer">
+                        R: Todas las rutas protegidas pasan por <strong>authMiddleware</strong> que:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li>Extrae el token del header</li>
+                            <li>Verifica la firma con jwt.verify()</li>
+                            <li>Decodifica el payload (userId, role, familyId)</li>
+                            <li>Añade req.user con la información</li>
+                            <li>Rechaza si token inválido o expirado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Librerías -->
+            <div class="section">
+                <h2>📦 ¿Qué librerías se utilizan?</h2>
+
+                <h3>Frontend (Angular 21)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Librería</th>
+                                <th>Versión</th>
+                                <th>Para qué sirve</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@angular/core</td>
+                                <td>^21.0.0</td>
+                                <td>Framework principal</td>
+                            </tr>
+                            <tr>
+                                <td>@angular/router</td>
+                                <td>^21.0.0</td>
+                                <td>Sistema de rutas</td>
+                            </tr>
+                            <tr>
+                                <td>@angular/forms</td>
+                                <td>^21.0.0</td>
+                                <td>Formularios reactivos</td>
+                            </tr>
+                            <tr>
+                                <td>rxjs</td>
+                                <td>~7.8.0</td>
+                                <td>Observables y streams</td>
+                            </tr>
+                            <tr>
+                                <td>typescript</td>
+                                <td>~5.9.2</td>
+                                <td>Tipado estático</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Backend (Express + TypeORM)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Librería</th>
+                                <th>Versión</th>
+                                <th>Para qué sirve</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>express</td>
+                                <td>^4.19.2</td>
+                                <td>Framework web</td>
+                            </tr>
+                            <tr>
+                                <td>typeorm</td>
+                                <td>^0.3.20</td>
+                                <td>ORM para base de datos</td>
+                            </tr>
+                            <tr>
+                                <td>mysql2</td>
+                                <td>^3.9.4</td>
+                                <td>Driver de MySQL</td>
+                            </tr>
+                            <tr>
+                                <td>bcryptjs</td>
+                                <td>^3.0.3</td>
+                                <td>Hash de contraseñas</td>
+                            </tr>
+                            <tr>
+                                <td>jsonwebtoken</td>
+                                <td>^9.0.3</td>
+                                <td>Generación de JWT</td>
+                            </tr>
+                            <tr>
+                                <td>multer</td>
+                                <td>^2.0.2</td>
+                                <td>Subida de archivos</td>
+                            </tr>
+                            <tr>
+                                <td>cors</td>
+                                <td>^2.8.5</td>
+                                <td>Cross-Origin Resource Sharing</td>
+                            </tr>
+                            <tr>
+                                <td>dotenv</td>
+                                <td>^16.4.5</td>
+                                <td>Variables de entorno</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Base de Datos -->
+            <div class="section">
+                <h2>🗄️ ¿Cómo está configurada la base de datos?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué motor de base de datos usa?</div>
+                    <div class="answer">
+                        R: <strong>MySQL</strong> en el puerto 3306. La base de datos se llama
+                        <code>vehiclemanagement</code>.
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Cómo se crean las tablas?</div>
+                    <div class="answer">
+                        R: TypeORM las crea automáticamente con <code>synchronize: true</code> en desarrollo. Las tablas
+                        se generan a partir de las entidades decoradas con <code>@Entity()</code>.
+                        <br><br>
+                        <strong>⚠️ Importante:</strong> En producción debes desactivar <code>synchronize</code> y usar
+                        migraciones.
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Hay datos de prueba?</div>
+                    <div class="answer">
+                        R: Sí, ejecuta <code>npx ts-node src/scripts/seed.ts</code> desde la carpeta backend. Esto crea:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li>2 usuarios: juan@example.com (admin) y alba@example.com (conductor)</li>
+                            <li>2 familias de ejemplo</li>
+                            <li>Datos de vehículos, conductores, repostajes y mantenimientos</li>
+                        </ul>
+                        La contraseña para ambos es: <code>password123</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mejoras Recientes -->
+            <div class="section">
+                <h2>✨ ¿Qué mejoras se implementaron recientemente?</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué hay nuevo en la página de Mantenimiento?</div>
+                    <div class="answer">
+                        R: La página de mantenimiento ahora tiene:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li><strong>Búsqueda en tiempo real</strong> por vehículo, tipo o proveedor</li>
+                            <li><strong>Filtros avanzados</strong> por vehículo, tipo y rango de fechas</li>
+                            <li><strong>Estadísticas</strong>: total gastado, último mantenimiento, vehículo con más
+                                servicios</li>
+                            <li><strong>UI mejorada</strong> con indicadores visuales y estados</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Se mejoró la experiencia de usuario en los CRUD?</div>
+                    <div class="answer">
+                        R: ¡Sí! Todos los componentes CRUD (Vehicles, Drivers, Refuels) ahora tienen:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li><strong>ChangeDetectorRef</strong> para actualizaciones instantáneas de UI</li>
+                            <li><strong>Mensajes de éxito</strong> verdes que se auto-ocultan en 3 segundos</li>
+                            <li><strong>Mensajes de error</strong> rojos que se auto-ocultan en 3 segundos</li>
+                            <li>Ya no hay alerts() molestos del navegador</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejecución -->
+            <div class="section">
+                <h2>🚀 ¿Cómo ejecutar la aplicación?</h2>
+
+                <h3>Paso 1: Instalar dependencias</h3>
+                <div class="code-box">
+                    # Frontend
+                    cd controlGasoilFamiliar
+                    npm install
+
+                    # Backend
+                    cd backend
+                    npm install
+                </div>
+
+                <h3>Paso 2: Configurar base de datos</h3>
+                <div class="dialogue">
+                    <div class="answer">
+                        Asegúrate de tener MySQL corriendo y crea la base de datos:
+                        <div class="code-box" style="margin-top: 10px;">
+                            CREATE DATABASE vehiclemanagement;
+                        </div>
+                        O ejecuta: <code>npx ts-node src/scripts/createDatabase.ts</code>
+                    </div>
+                </div>
+
+                <h3>Paso 3: Ejecutar aplicación</h3>
+                <div class="code-box">
+                    # Frontend (puerto 4200)
+                    cd controlGasoilFamiliar
+                    npm run dev
+
+                    # Backend (puerto 3001)
+                    cd backend
+                    npm run dev
+                </div>
+
+                <h3>Paso 4: Cargar datos de prueba (opcional)</h3>
+                <div class="code-box">
+                    cd backend
+                    npx ts-node src/scripts/seed.ts
+                </div>
+
+                <div class="dialogue">
+                    <div class="answer">
+                        Accede a <code>http://localhost:4200</code> y haz login con:
+                        <ul class="list-styled" style="margin-top: 10px;">
+                            <li>Email: <code>alba@example.com</code></li>
+                            <li>Password: <code>password123</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recursos Adicionales -->
+            <div class="section">
+                <h2>🎨 Recursos y Diseño</h2>
+                <div class="dialogue">
+                    <div class="question">P: ¿Qué sistema de iconos usa?</div>
+                    <div class="answer">
+                        R: <strong>Google Material Icons</strong> cargados desde CDN en el <code>index.html</code>.
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Cuáles son los colores principales?</div>
+                    <div class="answer">
+                        R: El diseño sigue esta paleta:
+                        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <div style="background: #6366f1; color: white; padding: 10px 20px; border-radius: 8px;">
+                                Primary: #6366f1</div>
+                            <div style="background: #10b981; color: white; padding: 10px 20px; border-radius: 8px;">
+                                Success: #10b981</div>
+                            <div style="background: #f59e0b; color: white; padding: 10px 20px; border-radius: 8px;">
+                                Warning: #f59e0b</div>
+                            <div style="background: #ef4444; color: white; padding: 10px 20px; border-radius: 8px;">
+                                Danger: #ef4444</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialogue">
+                    <div class="question">P: ¿Hay archivos subidos por usuarios?</div>
+                    <div class="answer">
+                        R: Sí, las imágenes de tickets de repostaje se guardan en <code>backend/uploads/</code> usando
+                        Multer.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <h3 style="color: #6366f1; margin-bottom: 15px;">📄 Documento Generado</h3>
+            <p><strong>Sistema de Control de Gasoil Familiar</strong></p>
+            <p>Versión 1.0 · Febrero 2026</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                Frontend: Angular 21 | Backend: Express + TypeORM + MySQL<br>
+                Arquitectura: REST API + JWT Authentication
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+<app-table-card title="Conductores Registrados">
+    <div card-actions>
+        <button class="btn-primary" (click)="openAddModal()" *ngIf="isAdmin">
+            <span class="material-icons">add</span> Nuevo Conductor
+        </button>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Puntos</th>
+                <th *ngIf="isAdmin">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let driver of dataService.drivers()">
+                <td style="font-weight: 600;">{{ driver.dni }}</td>
+                <td>{{ driver.nombre }}</td>
+                <td>{{ driver.telefono }}</td>
+                <td>
+                    <span class="status-badge" [class.active]="driver.puntos >= 12"
+                        [class.warning]="driver.puntos < 12 && driver.puntos > 6" [class.danger]="driver.puntos <= 6">
+                        {{ driver.puntos }} pts
+                    </span>
+                </td>
+                <td *ngIf="isAdmin">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="icon-btn edit" (click)="openEditModal(driver)"><span
+                                class="material-icons">edit</span></button>
+                        <button class="icon-btn delete" (click)="deleteDriver(driver.id)"><span
+                                class="material-icons">delete</span></button>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngIf="dataService.drivers().length === 0">
+                <td colspan="6" style="text-align: center; padding: 2rem;">No hay conductores registrados.</td>
+            </tr>
+        </tbody>
+    </table>
+</app-table-card>
+
+<!-- Driver Modal -->
+<app-modal [show]="showModal" [title]="isEditing ? 'Editar Conductor' : 'Nuevo Conductor'" (close)="closeModal()">
+    <div modal-body>
+        <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" [(ngModel)]="currentDriver.nombre" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>DNI</label>
+            <input type="text" [(ngModel)]="currentDriver.dni" class="form-control">
+        </div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" [(ngModel)]="currentDriver.telefono" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Puntos Actuales</label>
+                <input type="number" [(ngModel)]="currentDriver.puntos" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div modal-footer>
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" (click)="saveDriver()">{{ isEditing ? 'Guardar Cambios' : 'Crear Conductor'
+            }}</button>
+    </div>
+</app-modal>

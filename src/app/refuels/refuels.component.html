@@ -1,0 +1,108 @@
+<app-table-card title="Historial de Consumo">
+    <div card-actions>
+        <button class="btn-primary" (click)="openAddModal()">
+            <span class="material-icons">add</span> Nuevo Repostaje
+        </button>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Vehículo</th>
+                <th>Proveedor</th>
+                <th>Litros</th>
+                <th>Precio/L</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let load of dataService.refuels()">
+                <td>{{ load.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
+                <td>{{ load.proveedor }}</td>
+                <td>{{ load.litros }} L</td>
+                <td>{{ load.precioPorLitro | currency:'EUR' }}</td>
+                <td style="font-weight: 600; color: var(--primary);">{{ load.costeTotal | currency:'EUR' }}</td>
+                <td class="actions-cell">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button *ngIf="load.ticket_path" class="icon-btn info" (click)="viewTicket(load.ticket_path)"
+                            title="Ver Ticket">
+                            <span class="material-icons">description</span>
+                        </button>
+                        <button class="icon-btn edit" (click)="openEditModal(load)">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon-btn delete" (click)="deleteRefuel(load.id)">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngIf="dataService.refuels().length === 0">
+                <td colspan="7" style="text-align: center; padding: 2rem;">No hay registros de repostaje.</td>
+            </tr>
+        </tbody>
+    </table>
+</app-table-card>
+
+<app-receipt-modal *ngIf="showReceiptModal" [receiptUrl]="selectedReceiptUrl" (close)="showReceiptModal = false">
+</app-receipt-modal>
+
+<!-- Refuel Modal -->
+<app-modal [show]="showModal" [title]="isEditing ? 'Editar Repostaje' : 'Nuevo Repostaje'" (close)="closeModal()">
+    <div modal-body>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" [ngModel]="currentRefuel.fecha | date:'yyyy-MM-dd'"
+                    (ngModelChange)="currentRefuel.fecha = $event" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Vehículo</label>
+                <select [(ngModel)]="currentRefuel.vehiculoId" class="form-control">
+                    <option [ngValue]="0" disabled>Selecciona Vehículo</option>
+                    <option *ngFor="let v of dataService.vehicles()" [ngValue]="v.id">{{v.matricula}} - {{v.modelo}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Conductor</label>
+                <select [(ngModel)]="currentRefuel.conductorId" class="form-control">
+                    <option [ngValue]="undefined" disabled>Selecciona Conductor</option>
+                    <option *ngFor="let d of dataService.drivers()" [ngValue]="d.id">{{d.nombre}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Proveedor</label>
+                <input type="text" [(ngModel)]="currentRefuel.proveedor" class="form-control"
+                    placeholder="Cepsa, Repsol...">
+            </div>
+        </div>
+        <div class="grid-3">
+            <div class="form-group">
+                <label>Litros</label>
+                <input type="number" [(ngModel)]="currentRefuel.litros" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Precio/L (€)</label>
+                <input type="number" [(ngModel)]="currentRefuel.precioPorLitro" step="0.001" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Total (€)</label>
+                <input type="number" [(ngModel)]="currentRefuel.costeTotal" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Ticket (Foto)</label>
+            <input type="file" (change)="onFileSelected($event)" class="form-control">
+        </div>
+    </div>
+    <div modal-footer>
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" (click)="saveRefuel()">{{ isEditing ? 'Guardar Cambios' : 'Registrar Repostaje'
+            }}</button>
+    </div>
+</app-modal>

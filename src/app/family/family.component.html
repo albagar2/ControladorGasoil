@@ -1,0 +1,206 @@
+<div class="family-container fade-in">
+    <!-- Messages -->
+
+
+    <!-- Loading State -->
+    <div *ngIf="dataService.loading()" class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!dataService.loading()">
+
+        <!-- ADMIN DASHBOARD -->
+        <div *ngIf="isAdmin" class="admin-dashboard fade-in">
+
+            <div class="admin-layout">
+                <!-- Sidebar: Family List -->
+                <div class="admin-sidebar card">
+                    <div class="sidebar-header">
+                        <h3><span class="material-icons" style="vertical-align: middle;">manage_accounts</span> Familias
+                        </h3>
+                        <div class="create-family-form">
+                            <input type="text" [(ngModel)]="adminNewFamilyName" placeholder="Nueva Familia..."
+                                (keyup.enter)="createFamilyAdmin()">
+                            <button (click)="createFamilyAdmin()" [disabled]="!adminNewFamilyName"
+                                title="Crear Familia">
+                                <span class="material-icons">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="families-list">
+                        <div *ngFor="let fam of allFamilies" class="family-item"
+                            [class.active]="selectedFamily?.id === fam.id" (click)="selectFamilyForEdit(fam)">
+                            <div class="family-info">
+                                <span class="family-name">{{ fam.nombre }}</span>
+                                <span class="family-code">{{ fam.codigo }}</span>
+                            </div>
+                            <div class="family-stats">
+                                <span title="Conductores" class="flex items-center gap-1">
+                                    <span class="material-icons" style="font-size: 16px;">person</span>
+                                    {{ fam.drivers?.length || 0 }}
+                                </span>
+                                <span title="Vehículos" class="flex items-center gap-1">
+                                    <span class="material-icons" style="font-size: 16px;">directions_car</span>
+                                    {{ fam.vehicles?.length || 0 }}
+                                </span>
+                            </div>
+                            <button class="delete-btn" (click)="deleteFamily(fam.id); $event.stopPropagation()"
+                                title="Eliminar">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content: Details -->
+                <div class="admin-content card">
+                    <div *ngIf="selectedFamily; else noSelection" class="family-details fade-in">
+                        <div class="details-header">
+                            <h2>{{ selectedFamily.nombre }}</h2>
+                            <span class="code-badge">
+                                <span class="material-icons"
+                                    style="font-size: 16px; vertical-align: middle;">vpn_key</span>
+                                {{ selectedFamily.codigo }}
+                            </span>
+                        </div>
+
+                        <div class="details-grid">
+                            <!-- Drivers Section -->
+                            <div class="detail-section">
+                                <h4><span class="material-icons text-blue-500"
+                                        style="vertical-align: middle;">badge</span> Conductores</h4>
+
+                                <div class="add-item-row">
+                                    <select [(ngModel)]="selectedDriverId">
+                                        <option [ngValue]="null">Seleccionar conductor...</option>
+                                        <option *ngFor="let d of allDrivers" [ngValue]="d.id">
+                                            {{ d.nombre }} {{ d.familyId ? '(Asignado)' : '' }}
+                                        </option>
+                                    </select>
+                                    <button (click)="assignDriver()" [disabled]="!selectedDriverId"
+                                        class="btn-icon add">
+                                        <span class="material-icons">add</span>
+                                    </button>
+                                </div>
+
+                                <ul class="items-list">
+                                    <li *ngFor="let d of selectedFamily.drivers">
+                                        <span class="item-name">{{ d.nombre }}</span>
+                                        <button (click)="removeDriver(d)" class="btn-icon remove" title="Desvincular">
+                                            <span class="material-icons">close</span>
+                                        </button>
+                                    </li>
+                                    <li *ngIf="!selectedFamily.drivers?.length" class="empty-msg">Sin conductores
+                                        asignados</li>
+                                </ul>
+                            </div>
+
+                            <!-- Vehicles Section -->
+                            <div class="detail-section">
+                                <h4><span class="material-icons text-orange-500"
+                                        style="vertical-align: middle;">directions_car</span> Vehículos</h4>
+
+                                <div class="add-item-row">
+                                    <select [(ngModel)]="selectedVehicleId">
+                                        <option [ngValue]="null">Seleccionar vehículo...</option>
+                                        <option *ngFor="let v of allVehicles" [ngValue]="v.id">
+                                            {{ v.modelo }} - {{ v.matricula }}
+                                        </option>
+                                    </select>
+                                    <button (click)="assignVehicle()" [disabled]="!selectedVehicleId"
+                                        class="btn-icon add">
+                                        <span class="material-icons">add</span>
+                                    </button>
+                                </div>
+
+                                <ul class="items-list">
+                                    <li *ngFor="let v of selectedFamily.vehicles">
+                                        <div class="item-info">
+                                            <span class="item-name">{{ v.modelo }}</span>
+                                            <span class="item-sub">{{ v.matricula }}</span>
+                                        </div>
+                                        <button (click)="removeVehicle(v)" class="btn-icon remove" title="Desvincular">
+                                            <span class="material-icons">close</span>
+                                        </button>
+                                    </li>
+                                    <li *ngIf="!selectedFamily.vehicles?.length" class="empty-msg">Sin vehículos
+                                        asignados</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ng-template #noSelection>
+                        <div class="empty-state">
+                            <span class="material-icons" style="font-size: 64px; color: #ccc;">touch_app</span>
+                            <h3>Selecciona una familia</h3>
+                            <p>Elige una familia de la lista para gestionar sus miembros y vehículos.</p>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not in Family State (Normal User or Leader) -->
+        <div *ngIf="!dataService.family() && (isLeader || !isAdmin)" class="no-family-state fade-in">
+            <div class="card action-card" *ngIf="isLeader">
+                <h3><span class="material-icons" style="vertical-align: middle;">home</span> Crear Nueva Familia</h3>
+                <p>Crea un grupo para tu familia y amigos.</p>
+                <div class="input-group">
+                    <input type="text" [(ngModel)]="createName" placeholder="Nombre de tu Familia">
+                    <button class="btn-primary" (click)="createFamily()" [disabled]="!createName">Crear</button>
+                </div>
+            </div>
+
+            <div class="divider" *ngIf="isLeader">
+                <span>O</span>
+            </div>
+            <div class="card action-card">
+                <h3><span class="material-icons" style="vertical-align: middle;">group_add</span> Unirse a una Familia
+                </h3>
+                <p>Introduce el código que te ha dado el administrador de la familia.</p>
+                <div class="input-group">
+                    <input type="text" [(ngModel)]="joinCode" placeholder="Código de Invitación">
+                    <button class="btn-secondary" (click)="joinFamily()" [disabled]="!joinCode">Unirse</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Family State (Normal User) -->
+        <div *ngIf="dataService.family() && !isAdmin" class="family-dashboard fade-in">
+            <!-- Family Info Card -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h3>{{ dataService.family().nombre }}</h3>
+                    <span class="badge">Activo</span>
+                </div>
+
+                <div class="code-section">
+                    <p>Código de Invitación:</p>
+                    <div class="code-display" (click)="copyCode()">
+                        <span>{{ dataService.family().codigo }}</span>
+                        <span class="material-icons">content_copy</span>
+                    </div>
+                    <small>Comparte este código con otros miembros para que se unan.</small>
+                </div>
+            </div>
+
+            <!-- Members List -->
+            <div class="members-section">
+                <h3>Miembros del Grupo ({{ dataService.family().drivers?.length || 0 }})</h3>
+                <div class="members-grid">
+                    <div *ngFor="let member of dataService.family().drivers" class="member-card">
+                        <div class="member-avatar">
+                            {{ member.nombre.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="member-info">
+                            <h4>{{ member.nombre }}</h4>
+                            <p>{{ member.role === 'admin' ? 'Administrador' : 'Conductor' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

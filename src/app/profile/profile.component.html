@@ -1,0 +1,221 @@
+<div class="container fade-in" style="padding-top: 0;">
+    <!-- Feedback Messages -->
+    <div class="message-bar error" *ngIf="dataService.errorMessage()">
+        <span class="material-icons">error</span> {{ dataService.errorMessage() }}
+    </div>
+
+    <div class="profile-grid">
+        <!-- Sidebar: User Identity -->
+        <div class="sidebar-card">
+            <div class="avatar-container">
+                <div class="avatar">
+                    <span class="material-icons" style="font-size: 60px;">person</span>
+                </div>
+            </div>
+
+            <h2 class="user-name">{{ user().nombre }}</h2>
+            <span class="user-role">{{ user().dni }}</span>
+
+            <div class="sidebar-actions" *ngIf="!isEditing()">
+                <button class="sidebar-btn" (click)="toggleEdit()">
+                    <span class="material-icons">edit</span> Editar Perfil
+                </button>
+                <div style="height: 1px; background: #e2e8f0; margin: 10px 0;"></div>
+                <button class="sidebar-btn danger" (click)="deleteAccount()">
+                    <span class="material-icons">delete_outline</span> Eliminar Cuenta
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+
+            <!-- READ ONLY VIEW -->
+            <ng-container *ngIf="!isEditing()">
+
+                <!-- Personal Info Card -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Información Personal</h3>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-group">
+                            <label>Correo Electrónico</label>
+                            <div class="info-value">{{ user().email || 'No configurado' }}</div>
+                        </div>
+                        <div class="info-group">
+                            <label>Teléfono</label>
+                            <div class="info-value">{{ user().telefono || 'No configurado' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-group">
+                            <label>Fecha Renovación</label>
+                            <div class="info-value">{{ user().fechaRenovacionCarnet | date:'dd/MM/yyyy' }}</div>
+                        </div>
+                        <div class="info-group">
+                            <label>Puntos del Carnet</label>
+                            <div class="points-container">
+                                <div class="points-text">
+                                    <div class="points-big">{{ user().puntos }}</div>
+                                    <div class="points-label">de {{ user().puntosMaximos }} puntos</div>
+                                </div>
+                                <div class="points-chart"
+                                    style="width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--primary-color);">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance Card -->
+                <div class="content-card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <h3>Preferencias</h3>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-group">
+                            <label>Tema de la aplicación</label>
+                            <div class="theme-toggle-container">
+                                <div class="theme-info">
+                                    <span class="material-icons">{{ isDarkMode() ? 'dark_mode' : 'light_mode' }}</span>
+                                    <span>Modo {{ isDarkMode() ? 'Oscuro' : 'Claro' }}</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" [checked]="isDarkMode()" (change)="toggleTheme()">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </ng-container>
+
+            <!-- EDIT MODE -->
+            <form *ngIf="isEditing()" (ngSubmit)="saveProfile()">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Editar Perfil</h3>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <div class="input-with-icon">
+                            <span class="material-icons">badge</span>
+                            <input type="text" [ngModel]="user().nombre"
+                                (ngModelChange)="user.set({...user(), nombre: $event})" name="nombre"
+                                class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <div class="input-with-icon">
+                                <span class="material-icons">email</span>
+                                <input type="email" [ngModel]="user().email"
+                                    (ngModelChange)="user.set({...user(), email: $event})" name="email"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <div class="input-with-icon">
+                                <span class="material-icons">phone</span>
+                                <input type="tel" [ngModel]="user().telefono"
+                                    (ngModelChange)="user.set({...user(), telefono: $event})" name="telefono"
+                                    class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Renovación Carnet</label>
+                            <input type="date" [ngModel]="user().fechaRenovacionCarnet | date:'yyyy-MM-dd'"
+                                (ngModelChange)="user.set({...user(), fechaRenovacionCarnet: $event})"
+                                name="fechaRenovacionCarnet" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Puntos Carnet</label>
+                            <div class="input-with-icon">
+                                <span class="material-icons">star</span>
+                                <input type="number" [ngModel]="user().puntos"
+                                    (ngModelChange)="user.set({...user(), puntos: $event})" name="puntos"
+                                    class="form-control" min="0" max="15">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <h3>Seguridad</h3>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nueva Contraseña (Opcional)</label>
+                        <div class="input-with-icon">
+                            <span class="material-icons">lock</span>
+                            <input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)"
+                                name="password" class="form-control" placeholder="Dejar vacío para mantener">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirmar Contraseña</label>
+                        <div class="input-with-icon">
+                            <span class="material-icons">lock_clock</span>
+                            <input type="password" [ngModel]="confirmPassword()"
+                                (ngModelChange)="confirmPassword.set($event)" name="confirmPassword"
+                                class="form-control" placeholder="Repite la nueva contraseña">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-actions">
+                    <button type="button" class="btn-secondary" (click)="cancelEdit()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary" [disabled]="dataService.loading()">
+                        <span *ngIf="dataService.loading()" class="material-icons spin"
+                            style="font-size: 1.2rem; margin-right: 8px;">refresh</span>
+                        <span *ngIf="dataService.loading()">Guardando...</span>
+                        <span *ngIf="!dataService.loading()">Guardar Cambios</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Custom Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal()">
+    <div class="modal-content delete-modal">
+        <div class="modal-header">
+            <h3>Eliminar Cuenta</h3>
+            <button class="close-btn" (click)="showDeleteModal.set(false)">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="warning-icon-container">
+                <span class="material-icons warning-icon">warning</span>
+            </div>
+            <p class="warning-text">¿Estás seguro de que quieres eliminar tu cuenta?</p>
+            <p class="warning-subtext">Esta acción es permanente y no se puede deshacer. Perderás acceso a todos sus
+                datos.</p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="showDeleteModal.set(false)">Cancelar</button>
+            <button class="btn-danger" (click)="confirmDelete()" [disabled]="dataService.loading()">
+                <span *ngIf="!dataService.loading()">Sí, eliminar cuenta</span>
+                <span *ngIf="dataService.loading()">Eliminando...</span>
+            </button>
+        </div>
+    </div>
+</div>

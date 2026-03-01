@@ -1,0 +1,116 @@
+<app-table-card title="Listado de Vehículos">
+  <div card-actions>
+    <button class="btn-primary" (click)="openAddModal()">
+      <span class="material-icons">add</span> Nuevo Vehículo
+    </button>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Matrícula</th>
+        <th>Modelo</th>
+        <th>Propietario</th>
+        <th>Combustible</th>
+        <th>Distintivo</th>
+        <th>ITV</th>
+        <th>Seguro</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let car of dataService.vehicles()">
+        <td style="font-weight: 600;">{{ car.matricula }}</td>
+        <td>{{ car.modelo }}</td>
+        <td>{{ car.propietario?.nombre || ' - ' }}</td>
+        <td>{{ car.combustible }}</td>
+        <td><span class="status-badge" style="background: #e5e7eb;">{{ car.distintivo }}</span></td>
+        <td>{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
+        <td>{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="icon-btn edit" (click)="openEditModal(car)"><span class="material-icons">edit</span></button>
+            <button class="icon-btn delete" (click)="deleteVehicle(car.id)"><span
+                class="material-icons">delete</span></button>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="dataService.vehicles().length === 0">
+        <td colspan="8" style="text-align: center; padding: 2rem;">No hay vehículos registrados.</td>
+      </tr>
+    </tbody>
+  </table>
+</app-table-card>
+
+<!-- Vehicle Modal -->
+<app-modal [show]="showModal" [title]="isEditing ? 'Editar Vehículo' : 'Nuevo Vehículo'" (close)="closeModal()">
+  <div modal-body>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Matrícula</label>
+        <input type="text" [(ngModel)]="currentVehicle.matricula" placeholder="1234 ABC" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Propietario</label>
+        <select [(ngModel)]="currentVehicle.propietarioId" class="form-control">
+          <option [ngValue]="0" disabled>Selecciona Propietario</option>
+          <option *ngFor="let d of dataService.drivers()" [ngValue]="d.id">{{d.nombre}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Modelo</label>
+        <input type="text" [(ngModel)]="currentVehicle.modelo" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Combustible</label>
+        <select [(ngModel)]="currentVehicle.combustible" class="form-control">
+          <option value="Diesel">Diesel</option>
+          <option value="Gasolina">Gasolina</option>
+          <option value="Hibrido">Híbrido</option>
+          <option value="Electrico">Eléctrico</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Distintivo</label>
+        <select [(ngModel)]="currentVehicle.distintivo" class="form-control">
+          <option value="">Seleccionar</option>
+          <option value="0">0 Emisiones</option>
+          <option value="ECO">ECO</option>
+          <option value="C">C</option>
+          <option value="B">B</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Año</label>
+        <input type="number" [(ngModel)]="currentVehicle.anioMatriculacion" class="form-control">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Kilometraje Actual <span class="text-red-500">*</span></label>
+        <input type="number" [(ngModel)]="currentVehicle.kilometrajeActual" placeholder="Ej: 50000" class="form-control"
+          required>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>ITV Vencimiento</label>
+        <input type="date" [ngModel]="currentVehicle.itv_fecha_caducidad | date:'yyyy-MM-dd'"
+          (ngModelChange)="currentVehicle.itv_fecha_caducidad = $event" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Seguro Vencimiento</label>
+        <input type="date" [ngModel]="currentVehicle.seguro_fecha_vencimiento | date:'yyyy-MM-dd'"
+          (ngModelChange)="currentVehicle.seguro_fecha_vencimiento = $event" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div modal-footer>
+    <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+    <button class="btn-primary" (click)="saveVehicle()">Guardar Vehículo</button>
+  </div>
+</app-modal>

@@ -1,0 +1,151 @@
+
+import { Component, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ApiService, Refuel, Vehicle, Driver } from '../core/services/api.service';
+import { DataService } from '../core/services/data.service';
+import { FormsModule } from '@angular/forms';
+import { ToastService } from '../core/services/toast.service';
+import { ReceiptModalComponent } from '../shared/components/receipt-modal/receipt-modal.component';
+import { TableCardComponent } from '../shared/components/table-card/table-card.component';
+import { ModalComponent } from '../shared/components/modal/modal.component';
+
+@Component({
+    selector: 'app-refuels',
+    standalone: true,
+    imports: [CommonModule, FormsModule, ReceiptModalComponent, TableCardComponent, ModalComponent],
+    templateUrl: './refuels.component.html',
+    styleUrls: ['./refuels.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class RefuelsComponent {
+    public dataService = inject(DataService);
+    private apiService = inject(ApiService);
+    private cdr = inject(ChangeDetectorRef);
+
+    showModal = false;
+    isEditing = false;
+    currentRefuel: Refuel = this.getEmptyRefuel();
+    ticketFile: File | null = null;
+
+    showReceiptModal = false;
+    selectedReceiptUrl = '';
+
+    private toastService = inject(ToastService);
+
+    openAddModal() {
+        this.isEditing = false;
+        this.currentRefuel = this.getEmptyRefuel();
+        this.currentRefuel.fecha = new Date();
+        this.ticketFile = null;
+        this.showModal = true;
+    }
+
+    openEditModal(refuel: Refuel) {
+        this.isEditing = true;
+        this.currentRefuel = { ...refuel };
+        this.ticketFile = null;
+        this.showModal = true;
+    }
+
+    closeModal() {
+        this.showModal = false;
+    }
+
+    onFileSelected(event: any) {
+        this.ticketFile = event.target.files[0];
+    }
+
+    saveRefuel() {
+        if (this.currentRefuel.litros && this.currentRefuel.precioPorLitro) {
+            this.currentRefuel.costeTotal = this.currentRefuel.litros * this.currentRefuel.precioPorLitro;
+        }
+
+        const error = this.validateRefuel();
+        if (error) {
+            this.toastService.warning(error);
+            return;
+        }
+
+        if (this.isEditing && this.currentRefuel.id) {
+            this.apiService.updateRefuel(this.currentRefuel.id, this.currentRefuel).subscribe({
+                next: () => {
+                    this.toastService.success('Repostaje actualizado correctamente');
+                    this.dataService.loadAllData();
+                    this.closeModal();
+                },
+                error: (err) => {
+                    console.error('Error updating refuel', err);
+                    this.toastService.error('Error al actualizar el repostaje.');
+                }
+            });
+        } else {
+            const formData = new FormData();
+            formData.append('vehiculoId', this.currentRefuel.vehiculoId.toString());
+            formData.append('kilometraje', this.currentRefuel.kilometraje.toString());
+            formData.append('litros', this.currentRefuel.litros.toString());
+            formData.append('precioPorLitro', this.currentRefuel.precioPorLitro.toString());
+            formData.append('costeTotal', this.currentRefuel.costeTotal.toString());
+            formData.append('proveedor', this.currentRefuel.proveedor);
+            formData.append('tipoCombustible', this.currentRefuel.tipoCombustible);
+            if (this.currentRefuel.conductorId) {
+                formData.append('conductorId', this.currentRefuel.conductorId.toString());
+            }
+            if (this.ticketFile) {
+                formData.append('ticket', this.ticketFile);
+            }
+
+            this.apiService.createRefuel(formData as any).subscribe({
+                next: (res: any) => {
+                    if (res.maintenanceAlert) {
+                        this.toastService.warning('¡Repostaje registrado! Se recomienda mantenimiento pronto.');
+                    } else {
+                        this.toastService.success('Repostaje creado correctamente');
+                    }
+                    this.dataService.loadAllData();
+                    this.closeModal();
+                },
+                error: (err) => {
+                    console.error('Error creating refuel', err);
+                    this.toastService.error('Error al guardar el repostaje.');
+                }
+            });
+        }
+    }
+
+    deleteRefuel(id: number | undefined) {
+        if (!id) return;
+        if (confirm('¿Estás seguro de eliminar este repostaje?')) {
+            this.apiService.deleteRefuel(id).subscribe({
+                next: () => {
+                    this.toastService.success('Repostaje eliminado correctamente');
+                    this.dataService.loadAllData();
+                },
+                error: (err) => {
+                    console.error('Error deleting refuel', err);
+                    this.toastService.error('Error al eliminar el repostaje');
+                }
+            });
+        }
+    }
+
+    validateRefuel(): string | null {
+        const r = this.currentRefuel;
+        if (!r.vehiculoId) return 'Debes seleccionar un vehículo.';
+        if (r.litros <= 0) return 'Los litros deben ser mayor a 0.';
+        if (r.precioPorLitro <= 0) return 'El precio por litro debe ser mayor a 0.';
+        return null;
+    }
+
+    private getEmptyRefuel(): Refuel {
+        return {
+            fecha: new Date(), vehiculoId: 0, kilometraje: 0,
+            litros: 0, precioPorLitro: 0, costeTotal: 0,
+            proveedor: '', tipoCombustible: ''
+        };
+    }
+
+    viewTicket(ticketPath: string) {
+        this.selectedReceiptUrl = `http://localhost:8000/storage/${ticketPath}`;
+        this.showReceiptModal = true;
+    }
+}

@@ -1,0 +1,67 @@
+<div class="fade-in">
+    <div class="stats-grid">
+        <!-- Vehicles -->
+        <a class="stat-card card-vehicles" routerLink="../vehiculos">
+            <div class="stat-header">
+                <div class="icon-box"><span class="material-icons">directions_car</span></div>
+            </div>
+            <div>
+                <div class="stat-value">{{ dataService.totalVehicles() }}</div>
+                <div class="stat-label">Vehículos Activos</div>
+            </div>
+        </a>
+
+        <!-- Drivers -->
+        <a class="stat-card card-drivers" routerLink="../conductores">
+            <div class="stat-header">
+                <div class="icon-box"><span class="material-icons">badge</span></div>
+            </div>
+            <div>
+                <div class="stat-value">{{ dataService.totalDrivers() }}</div>
+                <div class="stat-label">Conductores</div>
+            </div>
+        </a>
+
+        <!-- Cost -->
+        <div class="stat-card card-cost">
+            <div class="stat-header">
+                <div class="icon-box"><span class="material-icons">paid</span></div>
+            </div>
+            <div>
+                <div class="stat-value">{{ dataService.totalCost() | currency:'EUR' }}</div>
+                <div class="stat-label">Gasto Total</div>
+            </div>
+        </div>
+
+        <!-- Maintenance -->
+        <a class="stat-card maintenance-card" [class.urgent-pulse]="dataService.upcomingMaintenance().length > 0"
+            routerLink="../mantenimiento">
+            <div class="stat-header">
+                <div class="icon-box"><span class="material-icons">handyman</span></div>
+            </div>
+            <div>
+                <div class="stat-value">{{ dataService.upcomingMaintenance().length }}</div>
+                <div class="stat-label" *ngIf="dataService.upcomingMaintenance().length > 0">Alertas de Mantenimiento
+                </div>
+                <div class="stat-label" *ngIf="dataService.upcomingMaintenance().length === 0">Todo en orden</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Maintenance Alerts List -->
+    <div class="section-title" *ngIf="dataService.upcomingMaintenance().length > 0">
+        <h3 style="margin-bottom: 1rem; color: var(--text-main);">Próximos Mantenimientos</h3>
+    </div>
+    <div class="alerts-grid" *ngIf="dataService.upcomingMaintenance().length > 0">
+        <div class="alert-card" *ngFor="let item of dataService.upcomingMaintenance()" [class.urgent]="item.urgent">
+            <span class="material-icons">{{ item.urgent ? 'error' : 'warning' }}</span>
+            <div style="flex: 1;">
+                <div style="font-weight: 600;">{{ item.type }} - {{ item.vehicle }}</div>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">
+                    {{ item.message }}
+                    <span *ngIf="item.date"> ({{ item.date | date:'dd/MM/yyyy' }})</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
