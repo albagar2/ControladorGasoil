@@ -7,10 +7,10 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--card-bg);
     padding: 1.5rem;
     border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     gap: 1.25rem;
@@ -49,6 +49,8 @@
 .stat-label {
     font-size: 0.875rem;
     color: var(--text-muted);
+    opacity: 1;
+    font-weight: 600;
 }
 
 .card-vehicles .icon-box {
@@ -97,7 +99,7 @@
 }
 
 .alert-card {
-    background: white;
+    background: var(--card-bg);
     padding: 1rem;
     border-radius: 0.75rem;
     display: flex;
@@ -108,7 +110,7 @@
 
 .alert-card.urgent {
     border-left-color: #dc2626;
-    background: #fffafb;
+    background: rgba(220, 38, 38, 0.05);
 }
 
 .alert-card.urgent .material-icons {
@@ -140,11 +142,11 @@
 }
 
 .chart-card {
-    background: white;
+    background: var(--card-bg);
     padding: 1.5rem;
     border-radius: 1.25rem;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     display: flex;
     flex-direction: column;
 }

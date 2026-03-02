@@ -18,8 +18,8 @@
   /* Gray 900 */
   --text-secondary: #4b5563;
   /* Gray 600 */
-  --text-muted: #9ca3af;
-  /* Gray 400 */
+  --text-muted: #6b7280;
+  /* Gray 500 - Improved contrast */
 
   --success: #10b981;
   --warning: #f59e0b;
@@ -45,20 +45,24 @@
 
 /* Dark Mode Overrides */
 :root.dark {
-  --bg-color: #0f172a;
-  /* Slate 900 */
-  --card-bg: #1e293b;
-  /* Slate 800 */
-  --text-main: #f8fafc;
-  /* Slate 50 */
-  --text-secondary: #94a3b8;
-  /* Slate 400 */
-  --text-muted: #64748b;
-  /* Slate 500 */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
-  --gradient-card: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  --bg-color: #000000;
+  /* Pure black */
+  --card-bg: #121212;
+  /* Deep slate/black */
+  --text-main: #ffffff;
+  /* Pure white */
+  --text-secondary: #ffffff;
+  /* Pure white for secondary as well - highest contrast */
+  --text-muted: #e2e8f0;
+  /* High contrast gray */
+  --shadow-sm: 0 1px 2px 0 rgba(255, 255, 255, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(255, 255, 255, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(255, 255, 255, 0.1);
+  --gradient-card: linear-gradient(135deg, #121212 0%, #000000 100%);
+  --border-color: #525252;
+  /* More visible borders */
+  --nav-active: #fbbf24;
+  /* Vibrant Amber/Yellow for active states */
 }
 
 html,
@@ -103,6 +107,10 @@ h6 {
   background: #94a3b8;
 }
 
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
 /* Common Components */
 .container {
   max-width: 1200px;
@@ -138,9 +146,9 @@ h6 {
 }
 
 .btn-secondary {
-  background: white;
+  background: var(--card-bg);
   color: var(--text-secondary);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color, #e5e7eb);
   padding: 12px 24px;
   border-radius: var(--btn-radius);
   font-weight: 600;
@@ -149,24 +157,40 @@ h6 {
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: var(--bg-color);
+  border-color: var(--primary-color);
   color: var(--text-main);
-}
-
-.btn-danger {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 12px 24px;
-  border-radius: var(--btn-radius);
-  border: 1px solid #fecaca;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .btn-danger:hover {
   background: #fecaca;
+}
+
+:root.dark .btn-primary {
+  background: #4f46e5;
+  color: #ffffff;
+  border: 2px solid #6366f1;
+}
+
+:root.dark .btn-secondary {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+:root.dark .btn-secondary:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+:root.dark .btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+  border: 2px solid #ef4444;
+}
+
+:root.dark .btn-danger:hover {
+  background: #b91c1c;
 }
 
 /* Cards */
@@ -195,7 +219,7 @@ textarea {
   font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  background-color: #f8fafc;
+  background-color: var(--card-bg);
   color: var(--text-main);
 }
 
@@ -204,7 +228,7 @@ input:focus,
 select:focus {
   outline: none;
   border-color: var(--primary-color);
-  background-color: white;
+  background-color: var(--bg-color);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
@@ -221,7 +245,7 @@ label {
   overflow-x: auto;
   border-radius: var(--card-radius);
   box-shadow: var(--shadow-sm);
-  background: white;
+  background: var(--card-bg);
 }
 
 .data-table {
@@ -231,7 +255,7 @@ label {
 }
 
 .data-table th {
-  background: #f8fafc;
+  background: var(--bg-color);
   padding: 16px;
   text-align: left;
   font-weight: 600;
@@ -239,18 +263,18 @@ label {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .data-table td {
   padding: 16px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-color);
   color: var(--text-main);
   vertical-align: middle;
 }
 
 .data-table tr:hover td {
-  background-color: #f8fafc;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 /* Icons within table */
@@ -348,7 +372,7 @@ label {
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
   width: 90%;
   max-width: 600px;
   border-radius: 20px;
@@ -403,9 +427,9 @@ label {
 
 .modal-footer {
   padding: 20px 24px;
-  background: #f8fafc;
+  background: var(--bg-color);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--border-color);
 }

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ApiService, Driver } from '../core/services/api.service';
 import { DataService } from '../core/services/data.service';
 import { ToastService } from '../core/services/toast.service';
+import { ThemeService } from '../core/services/theme.service';
 
 @Component({
     selector: 'app-profile',
@@ -15,6 +16,7 @@ import { ToastService } from '../core/services/toast.service';
 })
 export class ProfileComponent implements OnInit {
     public dataService = inject(DataService);
+    public themeService = inject(ThemeService);
     private apiService = inject(ApiService);
     private router = inject(Router);
     private toastService = inject(ToastService);
@@ -32,33 +34,13 @@ export class ProfileComponent implements OnInit {
     confirmPassword = signal('');
     isEditing = signal(false);
     showDeleteModal = signal(false);
-    isDarkMode = signal(false);
 
     ngOnInit(): void {
         this.syncWithService();
-        this.checkTheme();
-    }
-
-    private checkTheme(): void {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            this.isDarkMode.set(true);
-            document.documentElement.classList.add('dark');
-        } else {
-            this.isDarkMode.set(false);
-            document.documentElement.classList.remove('dark');
-        }
     }
 
     toggleTheme(): void {
-        this.isDarkMode.update(v => !v);
-        if (this.isDarkMode()) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
+        this.themeService.toggleDarkMode();
     }
 
     private syncWithService(): void {

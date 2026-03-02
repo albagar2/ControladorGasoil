@@ -64,10 +64,14 @@ import { ToastService } from '../../../core/services/toast.service';
         }
 
         :host-context(.dark) .toast-item {
-            background: #1e293b;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         :host-context(.dark) .message {
-            color: #f8fafc;
+            color: var(--text-main);
+        }
+        :host-context(.dark) .toast-item {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
     `]
 })

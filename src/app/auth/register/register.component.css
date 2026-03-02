@@ -34,6 +34,44 @@
     /* Firefox */
 }
 
+:host-context(.dark) .auth-container {
+    background: #000000 !important;
+}
+
+:host-context(.dark) .auth-card {
+    background: #000000 !important;
+    border: 1px solid #334155 !important;
+}
+
+:host-context(.dark) .auth-header h2,
+:host-context(.dark) .auth-subtitle,
+:host-context(.dark) .form-group label {
+    color: #ffffff !important;
+}
+
+:host-context(.dark) .input-wrapper input,
+:host-context(.dark) .styled-select {
+    background: #121212 !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+}
+
+:host-context(.dark) .input-wrapper input:focus,
+:host-context(.dark) .styled-select:focus {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1) !important;
+}
+
+:host-context(.dark) .error-alert {
+    background: #450a0a !important;
+    color: #fca5a5 !important;
+    border-color: #991b1b !important;
+}
+
+:host-context(.dark) .auth-footer {
+    color: #94a3b8 !important;
+}
+
 .auth-card::-webkit-scrollbar {
     display: none;
 }

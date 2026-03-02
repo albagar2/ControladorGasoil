@@ -27,6 +27,7 @@ class EmailService {
     }
 
     async sendMaintenanceAlert(to: string, data: { vehiculo: string, tipo: string, fecha: Date }) {
+        console.log(`Attempting to send maintenance alert to: ${to} for vehicle: ${data.vehiculo}`);
         const mailOptions = {
             from: '"Garaje Familiar" <' + (process.env.SMTP_USER || 'no-reply@garaje.com') + '>',
             to,
@@ -46,10 +47,18 @@ class EmailService {
             `,
         };
 
-        return await this.transporter.sendMail(mailOptions);
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Maintenance alert sent:', info.messageId);
+            return info;
+        } catch (error) {
+            console.error('❌ Error in sendMaintenanceAlert:', error);
+            throw error;
+        }
     }
 
     async sendMonthlyReport(to: string, reportUrl: string, month: string) {
+        console.log(`Attempting to send monthly report to: ${to} for month: ${month}`);
         const mailOptions = {
             from: '"Garaje Familiar" <' + (process.env.SMTP_USER || 'no-reply@garaje.com') + '>',
             to,
@@ -65,10 +74,18 @@ class EmailService {
             `,
         };
 
-        return await this.transporter.sendMail(mailOptions);
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Monthly report sent:', info.messageId);
+            return info;
+        } catch (error) {
+            console.error('❌ Error in sendMonthlyReport:', error);
+            throw error;
+        }
     }
 
     async sendAutomatedAlert(to: string, data: { title: string, message: string, detailLabel: string, detailValue: string }) {
+        console.log(`Attempting to send automated alert to: ${to} - ${data.title}`);
         const mailOptions = {
             from: '"Garaje Familiar" <' + (process.env.SMTP_USER || 'no-reply@garaje.com') + '>',
             to,
@@ -87,7 +104,14 @@ class EmailService {
             `,
         };
 
-        return await this.transporter.sendMail(mailOptions);
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Automated alert sent:', info.messageId);
+            return info;
+        } catch (error) {
+            console.error('❌ Error in sendAutomatedAlert:', error);
+            throw error;
+        }
     }
 }
 

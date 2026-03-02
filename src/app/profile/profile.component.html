@@ -1,4 +1,4 @@
-<div class="container fade-in" style="padding-top: 0;">
+<div class="container fade-in">
     <!-- Feedback Messages -->
     <div class="message-bar error" *ngIf="dataService.errorMessage()">
         <span class="material-icons">error</span> {{ dataService.errorMessage() }}
@@ -20,7 +20,7 @@
                 <button class="sidebar-btn" (click)="toggleEdit()">
                     <span class="material-icons">edit</span> Editar Perfil
                 </button>
-                <div style="height: 1px; background: #e2e8f0; margin: 10px 0;"></div>
+                <div class="content-separator"></div>
                 <button class="sidebar-btn danger" (click)="deleteAccount()">
                     <span class="material-icons">delete_outline</span> Eliminar Cuenta
                 </button>
@@ -62,8 +62,7 @@
                                     <div class="points-big">{{ user().puntos }}</div>
                                     <div class="points-label">de {{ user().puntosMaximos }} puntos</div>
                                 </div>
-                                <div class="points-chart"
-                                    style="width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--primary-color);">
+                                <div class="points-chart">
                                 </div>
                             </div>
                         </div>
@@ -71,22 +70,25 @@
                 </div>
 
                 <!-- Appearance Card -->
-                <div class="content-card" style="margin-top: 25px;">
+                <div class="content-card mt-4">
                     <div class="card-header">
                         <h3>Preferencias</h3>
                     </div>
                     <div class="info-row">
                         <div class="info-group">
                             <label>Tema de la aplicación</label>
-                            <div class="theme-toggle-container">
-                                <div class="theme-info">
-                                    <span class="material-icons">{{ isDarkMode() ? 'dark_mode' : 'light_mode' }}</span>
-                                    <span>Modo {{ isDarkMode() ? 'Oscuro' : 'Claro' }}</span>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" [checked]="isDarkMode()" (change)="toggleTheme()">
-                                    <span class="slider round"></span>
-                                </label>
+                            <div class="segmented-control">
+                                <button type="button" class="control-option" [class.active]="!themeService.darkMode()"
+                                    (click)="!themeService.darkMode() ? null : toggleTheme()">
+                                    <span class="material-icons">light_mode</span>
+                                    <span>Claro</span>
+                                </button>
+                                <button type="button" class="control-option" [class.active]="themeService.darkMode()"
+                                    (click)="themeService.darkMode() ? null : toggleTheme()">
+                                    <span class="material-icons">dark_mode</span>
+                                    <span>Oscuro</span>
+                                </button>
+                                <div class="selection-slider" [class.right]="themeService.darkMode()"></div>
                             </div>
                         </div>
                     </div>
@@ -151,7 +153,7 @@
                     </div>
                 </div>
 
-                <div class="content-card" style="margin-top: 25px;">
+                <div class="content-card mt-4">
                     <div class="card-header">
                         <h3>Seguridad</h3>
                     </div>
@@ -181,8 +183,7 @@
                         Cancelar
                     </button>
                     <button type="submit" class="btn-primary" [disabled]="dataService.loading()">
-                        <span *ngIf="dataService.loading()" class="material-icons spin"
-                            style="font-size: 1.2rem; margin-right: 8px;">refresh</span>
+                        <span *ngIf="dataService.loading()" class="material-icons spin mr-2">refresh</span>
                         <span *ngIf="dataService.loading()">Guardando...</span>
                         <span *ngIf="!dataService.loading()">Guardar Cambios</span>
                     </button>

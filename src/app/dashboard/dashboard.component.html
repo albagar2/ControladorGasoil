@@ -71,8 +71,7 @@
                 <p>Bienvenido a tu panel de control de gastos.</p>
             </div>
             <div class="actions" style="display: flex; gap: 0.5rem;" *ngIf="activeTab !== 'perfil'">
-                <button class="btn-primary" (click)="emailReport()" [disabled]="dataService.loading()"
-                    style="background-color: #6366f1;">
+                <button class="btn-primary" (click)="emailReport()" [disabled]="dataService.loading()">
                     <span class="material-icons">mail</span> Enviar Informe
                 </button>
                 <button class="btn-primary" (click)="exportData()" [disabled]="dataService.loading()">
@@ -83,7 +82,7 @@
 
         <!-- Error Message -->
         <div *ngIf="dataService.errorMessage()" class="alert-card urgent">
-            <span class="material-icons" style="color: #dc2626;">error</span>
+            <span class="material-icons">error</span>
             <div>
                 <strong>Error de Conexión:</strong> {{ dataService.errorMessage() }}
             </div>

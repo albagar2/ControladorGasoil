@@ -17,9 +17,12 @@ export const emailController = {
             });
 
             res.json({ message: 'Alerta de mantenimiento enviada con éxito.' });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error enviando alerta de mantenimiento:', error);
-            res.status(500).json({ message: 'Error al enviar el correo.', error });
+            res.status(500).json({
+                message: 'Error al enviar el correo de alerta.',
+                details: error.message || 'Error desconocido'
+            });
         }
     },
 

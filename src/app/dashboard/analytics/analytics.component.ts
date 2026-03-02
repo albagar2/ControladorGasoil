@@ -1,18 +1,20 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../core/services/data.service';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { NgChartsModule } from 'ng2-charts';
+import { Chart, registerables, ChartConfiguration, ChartData, ChartType } from 'chart.js';
+
+Chart.register(...registerables);
 
 @Component({
     selector: 'app-analytics',
     standalone: true,
-    imports: [CommonModule, BaseChartDirective],
+    imports: [CommonModule, NgChartsModule],
     templateUrl: './analytics.component.html',
     styleUrls: ['./analytics.component.css']
 })
 export class AnalyticsComponent implements OnInit {
-    private dataService = inject(DataService);
+    public dataService = inject(DataService);
 
     totalSpent = computed(() => {
         const refuels = this.dataService.refuels();

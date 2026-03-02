@@ -43,7 +43,7 @@
     border: none;
     background: transparent;
     font-size: 1.1rem;
-    color: var(--text-primary);
+    color: var(--text-main);
     outline: none;
 }
 
@@ -96,7 +96,7 @@
 
 .result-title {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-main);
 }
 
 .result-subtitle {
@@ -170,7 +170,7 @@
 
 /* Dark Mode Overrides for Search */
 :host-context(.dark) .search-container {
-    background: #1e1e1e;
+    background: var(--card-bg);
     border-color: rgba(255, 255, 255, 0.05);
 }
 

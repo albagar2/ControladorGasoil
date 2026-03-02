@@ -81,7 +81,7 @@ export const getMyFamily = async (req: Request, res: Response) => {
         });
 
         if (!driver || !driver.family) {
-            return res.status(404).json({ message: 'Not in a family' });
+            return res.json(null);
         }
 
         const family = driver.family;
