@@ -2,89 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Family } from '../models/family.model';
+import { Vehicle } from '../models/vehicle.model';
+import { Driver } from '../models/driver.model';
+import { Refuel } from '../models/refuel.model';
+import { Maintenance } from '../models/maintenance.model';
 
-export interface Family {
-    id: number;
-    nombre: string;
-    codigo: string;
-}
-
-export interface Vehicle {
-    id?: number;
-    matricula: string;
-    modelo: string;
-    combustible: string;
-    distintivo: string;
-    seguro_compañia: string;
-    seguro_numero_poliza: string;
-    seguro_fecha_vencimiento: Date;
-    seguro_cobertura: string;
-    itv_estado: string;
-    itv_fecha_caducidad: Date;
-    itv_kilometraje: number;
-    anioMatriculacion: number;
-    propietarioId: number;
-    propietario?: Driver;
-    familyId?: number;
-    family?: Family;
-    kilometrajeActual: number;
-    imagenUrl?: string;
-    created_at?: Date;
-    updated_at?: Date;
-}
-
-export interface Driver {
-    id?: number;
-    nombre: string;
-    dni: string;
-    email?: string;
-    telefono: string;
-    fechaRenovacionCarnet: Date;
-    puntos: number;
-    puntosMaximos: number;
-    imagenUrl?: string;
-    role?: 'admin' | 'conductor' | 'leader';
-    familyId?: number;
-    family?: Family;
-    created_at?: Date;
-    updated_at?: Date;
-}
-
-export interface Refuel {
-    id?: number;
-    fecha: Date;
-    vehiculoId: number;
-    vehiculo?: Vehicle;
-    kilometraje: number;
-    litros: number;
-    precioPorLitro: number;
-    costeTotal: number;
-    proveedor: string;
-    tipoCombustible: string;
-    ticket_path?: string;
-    ticketImageUrl?: string;
-    conductorId?: number;
-    conductor?: Driver;
-    created_at?: Date;
-    updated_at?: Date;
-}
-
-
-export interface Maintenance {
-    id?: number;
-    fecha: Date;
-    kilometraje: number;
-    tipo: string;
-    proveedor?: string;
-    costePieza: number;
-    costeTaller: number;
-    observaciones?: string;
-    vehiculoId: number;
-    conductorId?: number;
-    vehiculo?: Vehicle;
-    conductor?: Driver;
-    ticketImageUrl?: string;
-}
+export type { Family, Vehicle, Driver, Refuel, Maintenance };
 
 @Injectable({
     providedIn: 'root'
@@ -93,6 +17,18 @@ export class ApiService {
     private apiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) { }
+
+    private toFormData(obj: any): FormData {
+        if (obj instanceof FormData) return obj;
+        const formData = new FormData();
+        Object.keys(obj).forEach(key => {
+            const value = obj[key];
+            if (value !== null && value !== undefined) {
+                formData.append(key, value instanceof Date ? value.toISOString() : value);
+            }
+        });
+        return formData;
+    }
 
     // Auth
     register(driver: Driver): Observable<any> {
@@ -159,12 +95,12 @@ export class ApiService {
         return this.http.get<Refuel[]>(`${this.apiUrl}/refuels`);
     }
 
-    createRefuel(refuelData: FormData): Observable<Refuel> {
-        return this.http.post<Refuel>(`${this.apiUrl}/refuels`, refuelData);
+    createRefuel(refuelData: any): Observable<Refuel> {
+        return this.http.post<Refuel>(`${this.apiUrl}/refuels`, this.toFormData(refuelData));
     }
 
-    updateRefuel(id: string | number, refuel: Refuel): Observable<Refuel> {
-        return this.http.put<Refuel>(`${this.apiUrl}/refuels/${id}`, refuel);
+    updateRefuel(id: string | number, refuel: any): Observable<Refuel> {
+        return this.http.put<Refuel>(`${this.apiUrl}/refuels/${id}`, this.toFormData(refuel));
     }
 
     deleteRefuel(id: string | number): Observable<any> {
@@ -177,35 +113,11 @@ export class ApiService {
     }
 
     createMaintenance(maintenance: any): Observable<Maintenance> {
-        // If it's already FormData (from component), send it directly
-        if (maintenance instanceof FormData) {
-            return this.http.post<Maintenance>(`${this.apiUrl}/maintenances`, maintenance);
-        }
-
-        // Otherwise convert it (fallback)
-        const formData = new FormData();
-        Object.keys(maintenance).forEach(key => {
-            const value = (maintenance as any)[key];
-            if (value !== null && value !== undefined) {
-                formData.append(key, value instanceof Date ? value.toISOString() : value);
-            }
-        });
-        return this.http.post<Maintenance>(`${this.apiUrl}/maintenances`, formData);
+        return this.http.post<Maintenance>(`${this.apiUrl}/maintenances`, this.toFormData(maintenance));
     }
 
     updateMaintenance(id: string | number, maintenance: any): Observable<Maintenance> {
-        if (maintenance instanceof FormData) {
-            return this.http.put<Maintenance>(`${this.apiUrl}/maintenances/${id}`, maintenance);
-        }
-
-        const formData = new FormData();
-        Object.keys(maintenance).forEach(key => {
-            const value = (maintenance as any)[key];
-            if (value !== null && value !== undefined) {
-                formData.append(key, value instanceof Date ? value.toISOString() : value);
-            }
-        });
-        return this.http.put<Maintenance>(`${this.apiUrl}/maintenances/${id}`, formData);
+        return this.http.put<Maintenance>(`${this.apiUrl}/maintenances/${id}`, this.toFormData(maintenance));
     }
 
     deleteMaintenance(id: string | number): Observable<any> {

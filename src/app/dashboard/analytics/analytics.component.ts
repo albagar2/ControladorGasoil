@@ -38,19 +38,39 @@ export class AnalyticsComponent implements OnInit {
     });
 
     // Chart Data: Expenditure by Month
-    public lineChartData: ChartData<'line'> = {
-        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
-        datasets: [
-            {
-                data: [65, 59, 80, 81, 56, 55, 40],
-                label: 'Gastos Combustible (€)',
-                fill: true,
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                tension: 0.4
-            }
-        ]
-    };
+    public lineChartData = computed<ChartData<'line'>>(() => {
+        const refuels = this.dataService.refuels();
+        const maintenances = this.dataService.maintenances();
+        const monthlyData: Record<string, number> = {};
+
+        // Group everything by month
+        refuels.forEach(r => {
+            const date = new Date(r.fecha);
+            const key = date.toLocaleString('default', { month: 'short' });
+            monthlyData[key] = (monthlyData[key] || 0) + (r.costeTotal || 0);
+        });
+
+        maintenances.forEach(m => {
+            const date = new Date(m.fecha);
+            const key = date.toLocaleString('default', { month: 'short' });
+            monthlyData[key] = (monthlyData[key] || 0) + (m.costePieza || 0) + (m.costeTaller || 0);
+        });
+
+        const labels = Object.keys(monthlyData);
+        return {
+            labels,
+            datasets: [
+                {
+                    data: labels.map(l => monthlyData[l]),
+                    label: 'Gastos Totales (€)',
+                    fill: true,
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    tension: 0.4
+                }
+            ]
+        };
+    });
 
     public lineChartOptions: ChartConfiguration['options'] = {
         responsive: true,
@@ -71,10 +91,10 @@ export class AnalyticsComponent implements OnInit {
     }
 
     prepareChartData() {
+        // We still use prepareChartData for Pie chart as it's not computed yet (could be refactored too)
         const vehicles = this.dataService.vehicles();
         const refuels = this.dataService.refuels();
 
-        // Pie Chart: Expenditure per vehicle
         const vehicleLabels: string[] = [];
         const vehicleData: number[] = [];
 

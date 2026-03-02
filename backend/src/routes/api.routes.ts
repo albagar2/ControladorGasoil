@@ -8,6 +8,7 @@ import * as FamilyController from '../controllers/family.controller';
 import { emailController } from '../controllers/email.controller';
 import { upload } from '../middleware/upload';
 import { checkJwt } from '../middleware/auth.middleware';
+import { validateFields } from '../middleware/validation.middleware';
 
 const router = Router();
 
@@ -89,7 +90,7 @@ router.post('/auth/login', AuthController.login);
 router.get('/vehicles', checkJwt, VehicleController.getVehicles);
 
 router.get('/vehicles/:id', checkJwt, VehicleController.getVehicleById);
-router.post('/vehicles', checkJwt, VehicleController.createVehicle);
+router.post('/vehicles', checkJwt, validateFields(['matricula', 'modelo', 'combustible']), VehicleController.createVehicle);
 router.put('/vehicles/:id', checkJwt, VehicleController.updateVehicle);
 router.delete('/vehicles/:id', checkJwt, VehicleController.deleteVehicle);
 
@@ -145,7 +146,7 @@ router.delete('/refuels/:id', checkJwt, RefuelController.deleteRefuel);
  *         description: List of maintenances
  */
 router.get('/maintenances', checkJwt, MaintenanceController.getMaintenances);
-router.post('/maintenances', checkJwt, upload.single('ticket'), MaintenanceController.createMaintenance);
+router.post('/maintenances', checkJwt, upload.single('ticket'), validateFields(['vehiculoId', 'fecha', 'tipo']), MaintenanceController.createMaintenance);
 router.put('/maintenances/:id', checkJwt, MaintenanceController.updateMaintenance);
 router.delete('/maintenances/:id', checkJwt, MaintenanceController.deleteMaintenance);
 

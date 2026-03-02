@@ -5,6 +5,8 @@ import { DataService } from '../../core/services/data.service';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
 
+import { ExportService } from '../../core/services/export.service';
+
 @Component({
     selector: 'app-resumen',
     standalone: true,
@@ -14,6 +16,12 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 })
 export class ResumenComponent {
     public dataService = inject(DataService);
+    private exportService = inject(ExportService);
+
+    exportData() {
+        const refuels = this.dataService.refuels();
+        this.exportService.exportToCsv('repostajes.csv', refuels);
+    }
 
     // 1. Chart: Monthly Evolution (Line)
     public lineChartData = computed<ChartData<'line'>>(() => {
