@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Refuel } from '../entities/Refuel';
 import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
+import { alertService } from '../services/alert.service';
 
 const refuelRepository = AppDataSource.getRepository(Refuel);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
@@ -75,6 +76,9 @@ export const createRefuel = async (req: Request, res: Response) => {
             // Let's assume if mileage > 15000 and no record, alert.
             if (kilometraje > 15000) maintenanceAlert = true;
         }
+
+        // Check for alerts immediately
+        await alertService.checkAndSendAlerts(vehiculoId);
 
         res.status(201).json({ ...savedRefuel, maintenanceAlert });
 

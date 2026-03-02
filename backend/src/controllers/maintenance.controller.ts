@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Maintenance } from '../entities/Maintenance';
 import { Vehicle } from '../entities/Vehicle';
 import { asyncHandler } from '../utils/asyncHandler';
+import { alertService } from '../services/alert.service';
 
 const maintenanceRepository = AppDataSource.getRepository(Maintenance);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
@@ -54,6 +55,9 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
         relations: ["vehiculo", "conductor"]
     });
 
+    // Check for alerts immediately
+    await alertService.checkAndSendAlerts(vId);
+
     res.status(201).json(fullMaintenance);
 });
 
@@ -96,6 +100,9 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
         where: { id: maintenance.id },
         relations: ["vehiculo", "conductor"]
     });
+
+    // Check for alerts immediately
+    await alertService.checkAndSendAlerts(maintenance.vehiculoId);
 
     res.json(fullMaintenance);
 });

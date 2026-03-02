@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Driver } from '../entities/Driver';
 import { Vehicle } from '../entities/Vehicle';
 import { asyncHandler } from '../utils/asyncHandler';
+import { alertService } from '../services/alert.service';
 
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
 const driverRepository = AppDataSource.getRepository(Driver);
@@ -46,6 +47,10 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
 
     const newVehicle = vehicleRepository.create(vehicleData);
     const savedVehicle = await vehicleRepository.save(newVehicle);
+
+    // Check for alerts immediately (e.g. if ITV/Insurance dates are already close)
+    await alertService.checkAndSendAlerts(savedVehicle.id);
+
     res.status(201).json(savedVehicle);
 });
 
@@ -64,6 +69,10 @@ export const updateVehicle = asyncHandler(async (req: Request, res: Response) =>
 
     vehicleRepository.merge(vehicle, req.body);
     const results = await vehicleRepository.save(vehicle);
+
+    // Check for alerts immediately
+    await alertService.checkAndSendAlerts(vehicle.id);
+
     res.json(results);
 });
 
