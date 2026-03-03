@@ -1,9 +1,11 @@
 
 import { Component, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService, Refuel, Vehicle, Driver } from '../core/services/api.service';
+import { RefuelService } from '../core/services/refuel.service';
 import { DataService } from '../core/services/data.service';
+import { Refuel } from '../core/models/refuel.model';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../environments/environment';
 import { ToastService } from '../core/services/toast.service';
 import { ReceiptModalComponent } from '../shared/components/receipt-modal/receipt-modal.component';
 import { TableCardComponent } from '../shared/components/table-card/table-card.component';
@@ -19,7 +21,7 @@ import { ModalComponent } from '../shared/components/modal/modal.component';
 })
 export class RefuelsComponent {
     public dataService = inject(DataService);
-    private apiService = inject(ApiService);
+    private refuelService = inject(RefuelService);
     private cdr = inject(ChangeDetectorRef);
 
     showModal = false;
@@ -67,7 +69,7 @@ export class RefuelsComponent {
         }
 
         if (this.isEditing && this.currentRefuel.id) {
-            this.apiService.updateRefuel(this.currentRefuel.id, this.currentRefuel).subscribe({
+            this.refuelService.updateRefuel(this.currentRefuel.id, this.currentRefuel).subscribe({
                 next: () => {
                     this.toastService.success('Repostaje actualizado correctamente');
                     this.dataService.loadAllData();
@@ -79,22 +81,13 @@ export class RefuelsComponent {
                 }
             });
         } else {
-            const formData = new FormData();
-            formData.append('vehiculoId', this.currentRefuel.vehiculoId.toString());
-            formData.append('kilometraje', this.currentRefuel.kilometraje.toString());
-            formData.append('litros', this.currentRefuel.litros.toString());
-            formData.append('precioPorLitro', this.currentRefuel.precioPorLitro.toString());
-            formData.append('costeTotal', this.currentRefuel.costeTotal.toString());
-            formData.append('proveedor', this.currentRefuel.proveedor);
-            formData.append('tipoCombustible', this.currentRefuel.tipoCombustible);
-            if (this.currentRefuel.conductorId) {
-                formData.append('conductorId', this.currentRefuel.conductorId.toString());
-            }
+            // Include ticket file in the data
+            const data = { ...this.currentRefuel };
             if (this.ticketFile) {
-                formData.append('ticket', this.ticketFile);
+                (data as any).ticket = this.ticketFile;
             }
 
-            this.apiService.createRefuel(formData as any).subscribe({
+            this.refuelService.createRefuel(data).subscribe({
                 next: (res: any) => {
                     if (res.maintenanceAlert) {
                         this.toastService.warning('¡Repostaje registrado! Se recomienda mantenimiento pronto.');
@@ -115,7 +108,7 @@ export class RefuelsComponent {
     deleteRefuel(id: number | undefined) {
         if (!id) return;
         if (confirm('¿Estás seguro de eliminar este repostaje?')) {
-            this.apiService.deleteRefuel(id).subscribe({
+            this.refuelService.deleteRefuel(id).subscribe({
                 next: () => {
                     this.toastService.success('Repostaje eliminado correctamente');
                     this.dataService.loadAllData();
@@ -145,7 +138,7 @@ export class RefuelsComponent {
     }
 
     viewTicket(ticketPath: string) {
-        this.selectedReceiptUrl = `http://localhost:8000/storage/${ticketPath}`;
+        this.selectedReceiptUrl = `${environment.apiUrl.replace('/api', '')}/${ticketPath}`;
         this.showReceiptModal = true;
     }
 }

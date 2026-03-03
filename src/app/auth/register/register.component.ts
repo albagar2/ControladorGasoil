@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ApiService, Driver } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-register',
@@ -29,7 +29,7 @@ export class RegisterComponent implements OnInit {
     showPassword = false;
     showConfirmPassword = false;
 
-    constructor(private apiService: ApiService, private router: Router) { }
+    constructor(private authService: AuthService, private router: Router) { }
 
     ngOnInit() {
         if (localStorage.getItem('token')) {
@@ -56,7 +56,7 @@ export class RegisterComponent implements OnInit {
         this.isLoading = true;
         this.errorMessage = '';
 
-        this.apiService.register(this.driver).subscribe({
+        this.authService.register(this.driver).subscribe({
             next: (res) => {
                 this.router.navigate(['/login']);
                 this.isLoading = false;

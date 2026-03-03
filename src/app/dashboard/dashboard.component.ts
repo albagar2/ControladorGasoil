@@ -2,7 +2,8 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../core/services/data.service';
 import { ExportService } from '../core/services/export.service';
-import { ApiService } from '../core/services/api.service';
+import { EmailService } from '../core/services/email.service';
+import { AuthService } from '../core/services/auth.service';
 import { ThemeService } from '../core/services/theme.service';
 import { ToastService } from '../core/services/toast.service';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
@@ -27,7 +28,8 @@ export class DashboardComponent implements OnInit {
     public dataService = inject(DataService);
     public themeService = inject(ThemeService);
     private exportService = inject(ExportService);
-    private apiService = inject(ApiService);
+    private emailService = inject(EmailService);
+    private authService = inject(AuthService);
     private toastService = inject(ToastService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
@@ -54,8 +56,7 @@ export class DashboardComponent implements OnInit {
     }
 
     logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('currentUser');
+        this.authService.logout();
         this.router.navigate(['/login']);
     }
 
@@ -102,7 +103,7 @@ export class DashboardComponent implements OnInit {
         this.dataService.loading.set(true);
         const currentMonth = new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' });
 
-        this.apiService.sendMonthlyReport({
+        this.emailService.sendMonthlyReport({
             to: email,
             reportUrl: 'https://ejemplo.com/informe.pdf', // Example placeholder URL
             month: currentMonth

@@ -1,9 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, Maintenance, Vehicle, Driver } from '../core/services/api.service';
+import { MaintenanceApiService } from '../core/services/maintenance-api.service';
+import { EmailService } from '../core/services/email.service';
 import { MaintenanceService } from '../core/services/maintenance.service';
 import { DataService } from '../core/services/data.service';
+import { Maintenance } from '../core/models/maintenance.model';
+import { Vehicle } from '../core/models/vehicle.model';
 import { MaintenanceFormComponent } from './maintenance-form/maintenance-form.component';
 import { ToastService } from '../core/services/toast.service';
 
@@ -17,7 +20,8 @@ import { ToastService } from '../core/services/toast.service';
 })
 export class MaintenanceComponent implements OnInit {
     public dataService = inject(DataService);
-    private apiService = inject(ApiService);
+    private maintenanceApiService = inject(MaintenanceApiService);
+    private emailService = inject(EmailService);
     private maintenanceService = inject(MaintenanceService);
     private toastService = inject(ToastService);
     private cdr = inject(ChangeDetectorRef);
@@ -192,8 +196,8 @@ export class MaintenanceComponent implements OnInit {
 
         this.dataService.loading.set(true);
         const obs = id
-            ? this.apiService.updateMaintenance(id, maintenance)
-            : this.apiService.createMaintenance(maintenance);
+            ? this.maintenanceApiService.updateMaintenance(id, maintenance)
+            : this.maintenanceApiService.createMaintenance(maintenance);
 
         obs.subscribe({
             next: () => {
@@ -212,7 +216,7 @@ export class MaintenanceComponent implements OnInit {
     deleteMaintenance(id: number) {
         if (!confirm('¿Estás seguro de que deseas eliminar este mantenimiento?')) return;
         this.dataService.loading.set(true);
-        this.apiService.deleteMaintenance(id).subscribe({
+        this.maintenanceApiService.deleteMaintenance(id).subscribe({
             next: () => {
                 this.toastService.success('Mantenimiento eliminado');
                 this.dataService.loadAllData();
@@ -245,7 +249,7 @@ export class MaintenanceComponent implements OnInit {
         }
 
         this.dataService.loading.set(true);
-        this.apiService.sendMaintenanceAlert({
+        this.emailService.sendMaintenanceAlert({
             to: email,
             vehicleName: alert.vehicle,
             maintenanceType: alert.type,

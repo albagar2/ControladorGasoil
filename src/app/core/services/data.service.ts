@@ -1,6 +1,14 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { ApiService, Vehicle, Driver, Refuel, Maintenance } from './api.service';
-import { MaintenanceService, MaintenanceAlert } from './maintenance.service';
+import { VehicleService } from './vehicle.service';
+import { DriverService } from './driver.service';
+import { RefuelService } from './refuel.service';
+import { MaintenanceApiService } from './maintenance-api.service';
+import { FamilyService } from './family.service';
+import { MaintenanceService } from './maintenance.service';
+import { Vehicle } from '../models/vehicle.model';
+import { Driver } from '../models/driver.model';
+import { Refuel } from '../models/refuel.model';
+import { Maintenance } from '../models/maintenance.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
@@ -8,7 +16,11 @@ import { catchError, finalize } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class DataService {
-    private apiService = inject(ApiService);
+    private vehicleService = inject(VehicleService);
+    private driverService = inject(DriverService);
+    private refuelService = inject(RefuelService);
+    private maintenanceApiService = inject(MaintenanceApiService);
+    private familyService = inject(FamilyService);
     private maintenanceService = inject(MaintenanceService);
 
     // State Signals
@@ -66,11 +78,11 @@ export class DataService {
         }
 
         forkJoin({
-            vehicles: this.apiService.getVehicles().pipe(catchError(() => of([]))),
-            drivers: this.apiService.getDrivers().pipe(catchError(() => of([]))),
-            refuels: this.apiService.getRefuels().pipe(catchError(() => of([]))),
-            maintenances: this.apiService.getMaintenances().pipe(catchError(() => of([]))),
-            family: this.apiService.getMyFamily().pipe(catchError(err => {
+            vehicles: this.vehicleService.getVehicles().pipe(catchError(() => of([]))),
+            drivers: this.driverService.getDrivers().pipe(catchError(() => of([]))),
+            refuels: this.refuelService.getRefuels().pipe(catchError(() => of([]))),
+            maintenances: this.maintenanceApiService.getMaintenances().pipe(catchError(() => of([]))),
+            family: this.familyService.getMyFamily().pipe(catchError(err => {
                 if (err.status === 404) return of(null);
                 console.error('Error loading family', err);
                 return of(null);
@@ -78,7 +90,7 @@ export class DataService {
         }).pipe(
             finalize(() => this.loading.set(false))
         ).subscribe({
-            next: (result) => {
+            next: (result: any) => {
                 this.vehicles.set(result.vehicles);
                 this.drivers.set(result.drivers);
                 this.refuels.set(result.refuels);

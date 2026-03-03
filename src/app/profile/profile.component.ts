@@ -2,8 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ApiService, Driver } from '../core/services/api.service';
+import { DriverService } from '../core/services/driver.service';
 import { DataService } from '../core/services/data.service';
+import { Driver } from '../core/models/driver.model';
 import { ToastService } from '../core/services/toast.service';
 import { ThemeService } from '../core/services/theme.service';
 
@@ -17,7 +18,7 @@ import { ThemeService } from '../core/services/theme.service';
 export class ProfileComponent implements OnInit {
     public dataService = inject(DataService);
     public themeService = inject(ThemeService);
-    private apiService = inject(ApiService);
+    private driverService = inject(DriverService);
     private router = inject(Router);
     private toastService = inject(ToastService);
 
@@ -91,7 +92,7 @@ export class ProfileComponent implements OnInit {
             updateData.password = this.password();
         }
 
-        this.apiService.updateProfile(updateData).subscribe({
+        this.driverService.updateProfile(updateData).subscribe({
             next: (updated: any) => {
                 const newSession = { ...this.dataService.currentUser(), ...updated };
                 this.dataService.currentUser.set(newSession);
@@ -118,7 +119,7 @@ export class ProfileComponent implements OnInit {
 
     confirmDelete(): void {
         this.dataService.loading.set(true);
-        this.apiService.deleteProfile().subscribe({
+        this.driverService.deleteProfile().subscribe({
             next: () => {
                 this.toastService.info('Cuenta eliminada.');
                 localStorage.clear();

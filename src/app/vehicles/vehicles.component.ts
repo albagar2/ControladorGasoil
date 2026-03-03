@@ -1,8 +1,9 @@
 
 import { Component, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService, Vehicle, Driver } from '../core/services/api.service';
+import { VehicleService } from '../core/services/vehicle.service';
 import { DataService } from '../core/services/data.service';
+import { Vehicle } from '../core/models/vehicle.model';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../core/services/toast.service';
 import { TableCardComponent } from '../shared/components/table-card/table-card.component';
@@ -18,7 +19,7 @@ import { ModalComponent } from '../shared/components/modal/modal.component';
 })
 export class VehiclesComponent {
   public dataService = inject(DataService);
-  private apiService = inject(ApiService);
+  private vehicleService = inject(VehicleService);
   private cdr = inject(ChangeDetectorRef);
 
   showModal = false;
@@ -51,8 +52,8 @@ export class VehiclesComponent {
     }
 
     const obs = (this.isEditing && this.currentVehicle.id)
-      ? this.apiService.updateVehicle(this.currentVehicle.id, this.currentVehicle)
-      : this.apiService.createVehicle(this.currentVehicle);
+      ? this.vehicleService.updateVehicle(this.currentVehicle.id, this.currentVehicle)
+      : this.vehicleService.createVehicle(this.currentVehicle);
 
     obs.subscribe({
       next: () => {
@@ -70,7 +71,7 @@ export class VehiclesComponent {
   deleteVehicle(id: number | undefined) {
     if (!id) return;
     if (confirm('¿Estás seguro de eliminar este vehículo?')) {
-      this.apiService.deleteVehicle(id).subscribe({
+      this.vehicleService.deleteVehicle(id).subscribe({
         next: () => {
           this.toastService.success('Vehículo eliminado correctamente');
           this.dataService.loadAllData();

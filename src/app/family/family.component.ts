@@ -1,8 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, Driver } from '../core/services/api.service';
+import { FamilyService } from '../core/services/family.service';
+import { DriverService } from '../core/services/driver.service';
+import { VehicleService } from '../core/services/vehicle.service';
 import { DataService } from '../core/services/data.service';
+import { Driver } from '../core/models/driver.model';
 import { ToastService } from '../core/services/toast.service';
 
 @Component({
@@ -15,7 +18,9 @@ import { ToastService } from '../core/services/toast.service';
 })
 export class FamilyComponent implements OnInit {
     public dataService = inject(DataService);
-    private apiService = inject(ApiService);
+    private familyService = inject(FamilyService);
+    private driverService = inject(DriverService);
+    private vehicleService = inject(VehicleService);
     private cdr = inject(ChangeDetectorRef);
 
     isAdmin = false;
@@ -55,7 +60,7 @@ export class FamilyComponent implements OnInit {
         if (!this.isAdmin) return;
         this.dataService.loading.set(true);
 
-        this.apiService.getAllFamilies().subscribe({
+        this.familyService.getAllFamilies().subscribe({
             next: (families: any[]) => {
                 this.allFamilies = families;
                 this.dataService.loading.set(false);
@@ -70,14 +75,14 @@ export class FamilyComponent implements OnInit {
         });
 
         // Load drivers and vehicles for assignment
-        this.apiService.getDrivers().subscribe(drivers => this.allDrivers = drivers);
-        this.apiService.getVehicles().subscribe(vehicles => this.allVehicles = vehicles);
+        this.driverService.getDrivers().subscribe(drivers => this.allDrivers = drivers);
+        this.vehicleService.getVehicles().subscribe(vehicles => this.allVehicles = vehicles);
     }
 
     createFamily() {
         if (!this.createName.trim()) return;
         this.dataService.loading.set(true);
-        this.apiService.createFamily(this.createName).subscribe({
+        this.familyService.createFamily(this.createName).subscribe({
             next: () => {
                 this.toastService.success('¡Familia creada con éxito!');
                 this.dataService.loadAllData();
@@ -93,7 +98,7 @@ export class FamilyComponent implements OnInit {
     joinFamily() {
         if (!this.joinCode.trim()) return;
         this.dataService.loading.set(true);
-        this.apiService.joinFamily(this.joinCode).subscribe({
+        this.familyService.joinFamily(this.joinCode).subscribe({
             next: () => {
                 this.toastService.success('¡Te has unido a la familia!');
                 this.dataService.loadAllData();
@@ -117,7 +122,7 @@ export class FamilyComponent implements OnInit {
 
     createFamilyAdmin() {
         if (!this.adminNewFamilyName.trim()) return;
-        this.apiService.createFamilyAdmin(this.adminNewFamilyName).subscribe({
+        this.familyService.createFamilyAdmin(this.adminNewFamilyName).subscribe({
             next: (fam) => {
                 this.toastService.success('Familia creada (Modo Admin)');
                 this.allFamilies.push(fam);
@@ -133,7 +138,7 @@ export class FamilyComponent implements OnInit {
 
     deleteFamily(id: number) {
         if (!confirm('¿Eliminar esta familia? Se desasignarán todos sus miembros y vehículos.')) return;
-        this.apiService.deleteFamily(id).subscribe({
+        this.familyService.deleteFamily(id).subscribe({
             next: () => {
                 this.allFamilies = this.allFamilies.filter(f => f.id !== id);
                 this.selectedFamily = null;
@@ -158,7 +163,7 @@ export class FamilyComponent implements OnInit {
 
         const updatedDriver = { ...driver, familyId: this.selectedFamily.id, family: undefined };
         if (updatedDriver.id) {
-            this.apiService.updateDriver(updatedDriver.id, updatedDriver).subscribe({
+            this.driverService.updateDriver(updatedDriver.id, updatedDriver).subscribe({
                 next: (res) => {
                     if (!this.selectedFamily.drivers) this.selectedFamily.drivers = [];
                     this.selectedFamily.drivers.push(res);
@@ -174,7 +179,7 @@ export class FamilyComponent implements OnInit {
         if (!confirm(`¿Desvincular a ${driver.nombre} de esta familia?`)) return;
         if (!driver.id) return;
         const updatedDriver = { ...driver, familyId: null as any };
-        this.apiService.updateDriver(driver.id, updatedDriver).subscribe({
+        this.driverService.updateDriver(driver.id, updatedDriver).subscribe({
             next: () => {
                 this.selectedFamily.drivers = this.selectedFamily.drivers.filter((d: Driver) => d.id !== driver.id);
                 this.cdr.detectChanges();
@@ -190,7 +195,7 @@ export class FamilyComponent implements OnInit {
 
         const updatedVehicle = { ...vehicle, familyId: this.selectedFamily.id, family: undefined };
         if (updatedVehicle.id) {
-            this.apiService.updateVehicle(updatedVehicle.id, updatedVehicle).subscribe({
+            this.vehicleService.updateVehicle(updatedVehicle.id, updatedVehicle).subscribe({
                 next: (res) => {
                     if (!this.selectedFamily.vehicles) this.selectedFamily.vehicles = [];
                     this.selectedFamily.vehicles.push(res);
@@ -206,7 +211,7 @@ export class FamilyComponent implements OnInit {
         if (!confirm(`¿Desvincular ${vehicle.matricula}?`)) return;
         if (!vehicle.id) return;
         const updatedVehicle = { ...vehicle, familyId: null as any };
-        this.apiService.updateVehicle(vehicle.id, updatedVehicle).subscribe({
+        this.vehicleService.updateVehicle(vehicle.id, updatedVehicle).subscribe({
             next: () => {
                 this.selectedFamily.vehicles = this.selectedFamily.vehicles.filter((v: any) => v.id !== vehicle.id);
                 this.cdr.detectChanges();

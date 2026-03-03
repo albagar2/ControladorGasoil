@@ -126,8 +126,15 @@ export const updateRefuel = async (req: Request, res: Response) => {
         if (!refuel) return res.status(404).json({ message: 'Refuel not found' });
 
         refuelRepository.merge(refuel, req.body);
-        const result = await refuelRepository.save(refuel);
-        res.json(result);
+        await refuelRepository.save(refuel);
+
+        // Return with relations
+        const fullRefuel = await refuelRepository.findOne({
+            where: { id: refuel.id },
+            relations: ["vehiculo", "conductor"]
+        });
+
+        res.json(fullRefuel);
     } catch (error) {
         res.status(500).json({ message: 'Error updating refuel', error });
     }

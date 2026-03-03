@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { inject } from '@angular/core';
 
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
     isLoading = false;
     showPassword = false;
 
-    private apiService = inject(ApiService);
+    private authService = inject(AuthService);
     private router = inject(Router);
     private toastService = inject(ToastService);
 
@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
     login() {
         if (this.isLoading) return;
         this.isLoading = true;
-        this.apiService.login(this.credentials).subscribe({
+        this.authService.login(this.credentials).subscribe({
             next: (res) => {
                 localStorage.setItem('token', res.token);
                 localStorage.setItem('currentUser', JSON.stringify(res.user));

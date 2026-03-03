@@ -1,8 +1,9 @@
 
 import { Component, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService, Driver } from '../core/services/api.service';
+import { DriverService } from '../core/services/driver.service';
 import { DataService } from '../core/services/data.service';
+import { Driver } from '../core/models/driver.model';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../core/services/toast.service';
 import { TableCardComponent } from '../shared/components/table-card/table-card.component';
@@ -18,7 +19,7 @@ import { ModalComponent } from '../shared/components/modal/modal.component';
 })
 export class DriversComponent {
     public dataService = inject(DataService);
-    private apiService = inject(ApiService);
+    private driverService = inject(DriverService);
     private cdr = inject(ChangeDetectorRef);
 
     showModal = false;
@@ -60,8 +61,8 @@ export class DriversComponent {
         }
 
         const obs = (this.isEditing && this.currentDriver.id)
-            ? this.apiService.updateDriver(this.currentDriver.id, this.currentDriver)
-            : this.apiService.createDriver(this.currentDriver);
+            ? this.driverService.updateDriver(this.currentDriver.id, this.currentDriver)
+            : this.driverService.createDriver(this.currentDriver);
 
         obs.subscribe({
             next: () => {
@@ -79,7 +80,7 @@ export class DriversComponent {
     deleteDriver(id: number | undefined) {
         if (!id) return;
         if (confirm('¿Estás seguro de eliminar este conductor?')) {
-            this.apiService.deleteDriver(id).subscribe({
+            this.driverService.deleteDriver(id).subscribe({
                 next: () => {
                     this.toastService.success('Conductor eliminado correctamente');
                     this.dataService.loadAllData();
