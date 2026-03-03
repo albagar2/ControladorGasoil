@@ -20,6 +20,7 @@ export class DataService {
     loading = signal<boolean>(false);
     errorMessage = signal<string | null>(null);
     currentUser = signal<Driver | null>(null);
+    dismissedAlertIds = signal<string[]>(JSON.parse(localStorage.getItem('dismissedAlerts') || '[]'));
 
     // Computed Signals
     totalVehicles = computed(() => this.vehicles().length);
@@ -35,8 +36,18 @@ export class DataService {
     });
 
     upcomingMaintenance = computed(() => {
-        return this.maintenanceService.getUpcomingMaintenance(this.vehicles(), this.maintenances());
+        const alerts = this.maintenanceService.getUpcomingMaintenance(this.vehicles(), this.maintenances());
+        return alerts.filter(a => !this.dismissedAlertIds().includes(a.id));
     });
+
+    dismissAlert(alertId: string) {
+        const current = this.dismissedAlertIds();
+        if (!current.includes(alertId)) {
+            const newValue = [...current, alertId];
+            this.dismissedAlertIds.set(newValue);
+            localStorage.setItem('dismissedAlerts', JSON.stringify(newValue));
+        }
+    }
 
     loadAllData() {
         this.loading.set(true);

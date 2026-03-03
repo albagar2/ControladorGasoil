@@ -196,6 +196,8 @@
     border-radius: 0;
     background: transparent !important;
     box-shadow: none !important;
+    min-width: 65px;
+    /* Evitar que se compriman demasiado */
 }
 
 .bottom-nav .nav-item .material-icons {
@@ -258,9 +260,9 @@
 
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .menu-item {
@@ -274,9 +276,11 @@
     color: var(--text-main);
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
-    transition: transform 0.2s;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
 }
 
 .menu-item:active {

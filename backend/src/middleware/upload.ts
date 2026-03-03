@@ -6,16 +6,24 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        const now = new Date();
+        const timestamp = now.getFullYear().toString() +
+            (now.getMonth() + 1).toString().padStart(2, '0') +
+            now.getDate().toString().padStart(2, '0') + '_' +
+            now.getHours().toString().padStart(2, '0') +
+            now.getMinutes().toString().padStart(2, '0');
+        // Usamos un ID único temporal, el controlador le pondrá la matrícula después
+        const uniqueId = Math.random().toString(36).substring(2, 7);
+        cb(null, `TEMP_${timestamp}_${uniqueId}${path.extname(file.originalname)}`);
     }
 });
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    if (file.mimetype.startsWith('image/')) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'];
+    if (allowedTypes.includes(file.mimetype.toLowerCase()) || file.mimetype.startsWith('image/')) {
         cb(null, true);
     } else {
-        cb(new Error('Only images are allowed'));
+        cb(new Error('Formato de imagen no soportado: ' + file.mimetype));
     }
 };
 

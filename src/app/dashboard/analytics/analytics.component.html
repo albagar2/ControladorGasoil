@@ -1,8 +1,19 @@
 <div class="analytics-container fade-in">
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+        <button class="btn-primary" (click)="exportData()" style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+            </svg>
+            Exportar Informe PDF
+        </button>
+    </div>
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon fuel">
-                <span class="material-icons">euro</span>
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: currentColor;">
+                    <path
+                        d="M15 18.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5zM15 11c-1.9 0-3.5 1.6-3.5 3.5s1.6 3.5 3.5 3.5 3.5-1.6 3.5-3.5-1.6-3.5-3.5-3.5zM12 24c-6.6 0-12-5.4-12-12s5.4-12 12-12 12 5.4 12 12-5.4 12-12 12zm0-22c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM14 10h-4v2h4v-2z" />
+                </svg>
             </div>
             <div class="stat-info">
                 <label>Gasto Total Acumulado</label>
@@ -11,7 +22,10 @@
         </div>
         <div class="stat-card">
             <div class="stat-icon efficiency">
-                <span class="material-icons">speed</span>
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: currentColor;">
+                    <path
+                        d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.43zM10 17v-4c0-1.1.9-2 2-2s2 .9 2 2h2a4 4 0 0 0-8 0v4h2z" />
+                </svg>
             </div>
             <div class="stat-info">
                 <label>Media Consumo (L/100km)</label>
@@ -20,7 +34,10 @@
         </div>
         <div class="stat-card">
             <div class="stat-icon records">
-                <span class="material-icons">history</span>
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: currentColor;">
+                    <path
+                        d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
+                </svg>
             </div>
             <div class="stat-info">
                 <label>Registros Totales</label>
@@ -35,7 +52,7 @@
                 <h3>Histórico de Gastos</h3>
             </div>
             <div class="chart-wrapper">
-                <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'">
+                <canvas baseChart [data]="lineChartData()" [options]="lineChartOptions" [type]="'line'">
                 </canvas>
             </div>
         </div>

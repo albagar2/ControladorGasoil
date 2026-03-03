@@ -4,6 +4,8 @@ import { Refuel } from '../entities/Refuel';
 import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
 import { alertService } from '../services/alert.service';
+import fs from 'fs';
+import path from 'path';
 
 const refuelRepository = AppDataSource.getRepository(Refuel);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
@@ -23,6 +25,7 @@ export const getRefuels = async (req: Request, res: Response) => {
 
 export const createRefuel = async (req: Request, res: Response) => {
     try {
+        console.log('Creating refuel with body:', req.body);
         let { vehiculoId, kilometraje, litros, precioPorLitro, costeTotal, proveedor, tipoCombustible, conductorId } = req.body;
 
         // Ensure numbers
@@ -31,13 +34,43 @@ export const createRefuel = async (req: Request, res: Response) => {
         litros = parseFloat(litros.toString());
         precioPorLitro = parseFloat(precioPorLitro.toString());
         costeTotal = parseFloat(costeTotal.toString());
-        if (conductorId) conductorId = parseInt(conductorId.toString());
 
-        const ticketImageUrl = req.file ? `uploads/${req.file.filename}` : undefined;
+        // Tratar 0 como undefined para evitar errores de FK
+        if (conductorId) {
+            const cId = parseInt(conductorId.toString());
+            conductorId = cId !== 0 ? cId : undefined;
+        } else {
+            conductorId = undefined;
+        }
 
         const vehicle = await vehicleRepository.findOneBy({ id: vehiculoId });
         if (!vehicle) {
+            // Limpiar archivo si el vehículo no existe
+            if (req.file) fs.unlinkSync(req.file.path);
             return res.status(404).json({ message: "Vehicle not found" });
+        }
+
+        let ticketImageUrl = undefined;
+        if (req.file) {
+            const now = new Date();
+            const timestamp = now.getFullYear().toString() +
+                (now.getMonth() + 1).toString().padStart(2, '0') +
+                now.getDate().toString().padStart(2, '0') + '_' +
+                now.getHours().toString().padStart(2, '0') +
+                now.getMinutes().toString().padStart(2, '0');
+
+            // Limpiar matrícula de espacios y caracteres raros
+            const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
+            const newFileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
+            const newPath = path.join('uploads', newFileName);
+
+            try {
+                fs.renameSync(req.file.path, newPath);
+                ticketImageUrl = `uploads/${newFileName}`;
+            } catch (err) {
+                console.error('Error renaming file', err);
+                ticketImageUrl = `uploads/${req.file.filename}`;
+            }
         }
 
         const newRefuel = refuelRepository.create({

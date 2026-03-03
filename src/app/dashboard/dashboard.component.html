@@ -125,13 +125,10 @@
                 </h1>
                 <p>Bienvenido a tu panel de control de gastos.</p>
             </div>
-            <div class="actions" style="display: flex; gap: 0.5rem;" *ngIf="activeTab !== 'perfil'">
-                <button class="btn-primary" (click)="emailReport()" [disabled]="dataService.loading()">
-                    <span class="material-icons">mail</span> Enviar Informe
-                </button>
-                <button class="btn-primary" (click)="exportData()" [disabled]="dataService.loading()">
-                    <span class="material-icons">download</span> Descargar Informe
-                </button>
+            <div class="actions"
+                *ngIf="activeTab === 'vehiculos' || activeTab === 'repostaje' || activeTab === 'conductores'"
+                style="display: flex; gap: 0.5rem;">
+                <!-- Acciones rápidas si fuera necesario, o vacío para limpiar -->
             </div>
         </header>
 

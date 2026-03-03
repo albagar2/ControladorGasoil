@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Maintenance, Vehicle } from './api.service';
 
 export interface MaintenanceAlert {
+    id: string; // Unique ID for dismissal
+    vehicleId: number;
     type: string;
     vehicle: string;
     date?: Date;
@@ -85,6 +87,8 @@ export class MaintenanceService {
 
                 if (isDue) {
                     upcomingMaintenance.push({
+                        id: `${vehicle.id}_${rule.id}`,
+                        vehicleId: vehicle.id!,
                         type: rule.label,
                         vehicle: `${vehicle.modelo} (${vehicle.matricula})`,
                         message: reason,
@@ -99,6 +103,8 @@ export class MaintenanceService {
                 if (itvDate <= thirtyDaysFromNow && itvDate >= today) {
                     const daysLeft = Math.ceil((itvDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
                     upcomingMaintenance.push({
+                        id: `${vehicle.id}_ITV`,
+                        vehicleId: vehicle.id!,
                         type: 'ITV',
                         vehicle: `${vehicle.modelo} (${vehicle.matricula})`,
                         date: itvDate,
@@ -108,6 +114,8 @@ export class MaintenanceService {
                     });
                 } else if (itvDate < today) {
                     upcomingMaintenance.push({
+                        id: `${vehicle.id}_ITV_EXPIRED`,
+                        vehicleId: vehicle.id!,
                         type: 'ITV',
                         vehicle: `${vehicle.modelo} (${vehicle.matricula})`,
                         date: itvDate,
@@ -124,6 +132,8 @@ export class MaintenanceService {
                 if (insuranceDate <= thirtyDaysFromNow && insuranceDate >= today) {
                     const daysLeft = Math.ceil((insuranceDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
                     upcomingMaintenance.push({
+                        id: `${vehicle.id}_INSURANCE`,
+                        vehicleId: vehicle.id!,
                         type: 'Seguro',
                         vehicle: `${vehicle.modelo} (${vehicle.matricula})`,
                         date: insuranceDate,
@@ -136,6 +146,8 @@ export class MaintenanceService {
 
             // 4. Tires special reminder (Monthly)
             upcomingMaintenance.push({
+                id: `${vehicle.id}_TIRES_REMINDER`,
+                vehicleId: vehicle.id!,
                 type: 'Neumáticos',
                 vehicle: `${vehicle.modelo} (${vehicle.matricula})`,
                 message: 'Control mensual de presión y dibujo recomendado',

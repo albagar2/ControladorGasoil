@@ -17,11 +17,17 @@ export const getMaintenances = asyncHandler(async (req: Request, res: Response) 
 });
 
 export const createMaintenance = asyncHandler(async (req: Request, res: Response) => {
+    console.log('Creating maintenance with body:', req.body);
     const { vehiculoId, conductorId, fecha, tipo, costePieza, costeTaller, observaciones, kilometraje, proveedor } = req.body;
 
     const vId = parseInt(vehiculoId);
-    const cId = conductorId ? parseInt(conductorId) : undefined;
+    // Tratar 0 como undefined para evitar errores de clave foránea si no se selecciona nada
+    const cId = (conductorId && parseInt(conductorId) !== 0) ? parseInt(conductorId) : undefined;
     const km = parseInt(kilometraje) || 0;
+
+    if (!vId || isNaN(vId)) {
+        return res.status(400).json({ message: "Vehiculo ID es requerido y debe ser válido" });
+    }
 
     const vehicle = await vehicleRepository.findOneBy({ id: vId });
     if (!vehicle) {
@@ -38,7 +44,7 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
         observaciones,
         kilometraje: km,
         proveedor,
-        ticketImageUrl: req.file ? `/uploads/${req.file.filename}` : undefined
+        ticketImageUrl: req.file ? `uploads/${req.file.filename}` : undefined
     });
 
     await maintenanceRepository.save(maintenance);
@@ -73,7 +79,7 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
     const km = parseInt(kilometraje) || 0;
 
     maintenance.vehiculoId = parseInt(vehiculoId);
-    maintenance.conductorId = conductorId ? parseInt(conductorId) : undefined;
+    maintenance.conductorId = (conductorId && parseInt(conductorId) !== 0) ? parseInt(conductorId) : undefined;
     maintenance.fecha = new Date(fecha);
     maintenance.tipo = tipo;
     maintenance.costePieza = parseFloat(costePieza) || 0;

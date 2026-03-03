@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../core/services/data.service';
+import { ExportService } from '../../core/services/export.service';
 import { NgChartsModule } from 'ng2-charts';
 import { Chart, registerables, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
@@ -15,6 +16,15 @@ Chart.register(...registerables);
 })
 export class AnalyticsComponent implements OnInit {
     public dataService = inject(DataService);
+    private exportService = inject(ExportService);
+
+    exportData() {
+        this.exportService.generateCostReport(
+            this.dataService.vehicles(),
+            this.dataService.refuels(),
+            this.dataService.maintenances()
+        );
+    }
 
     totalSpent = computed(() => {
         const refuels = this.dataService.refuels();

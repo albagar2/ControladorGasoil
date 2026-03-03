@@ -19,8 +19,11 @@ export class ResumenComponent {
     private exportService = inject(ExportService);
 
     exportData() {
-        const refuels = this.dataService.refuels();
-        this.exportService.exportToCsv('repostajes.csv', refuels);
+        this.exportService.generateCostReport(
+            this.dataService.vehicles(),
+            this.dataService.refuels(),
+            this.dataService.maintenances()
+        );
     }
 
     // 1. Chart: Monthly Evolution (Line)

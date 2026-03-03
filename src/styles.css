@@ -252,6 +252,7 @@ label {
   width: 100%;
   border-collapse: collapse;
   white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-table th {
@@ -351,6 +352,19 @@ label {
   .grid-2,
   .grid-3 {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 16px;
+    font-size: 0.9rem;
   }
 }
 

@@ -22,3 +22,15 @@
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
+
+@media (max-width: 600px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}

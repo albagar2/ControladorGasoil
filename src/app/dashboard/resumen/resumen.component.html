@@ -47,18 +47,6 @@
             </div>
         </a>
 
-        <!-- Export (As a button styled like a card but with action) -->
-        <div class="stat-card export-card" (click)="exportData()"
-            style="cursor: pointer; background: var(--surface-card); border: 1px dashed var(--accent-primary);">
-            <div class="stat-header">
-                <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><span
-                        class="material-icons">download</span></div>
-            </div>
-            <div>
-                <div class="stat-value" style="font-size: 1.2rem;">Exportar</div>
-                <div class="stat-label">Descargar CSV</div>
-            </div>
-        </div>
     </div>
 
     <!-- Maintenance Alerts List -->
@@ -75,6 +63,9 @@
                     <span *ngIf="item.date"> ({{ item.date | date:'dd/MM/yyyy' }})</span>
                 </div>
             </div>
+            <button class="dismiss-btn" (click)="dataService.dismissAlert(item.id)" title="Descartar">
+                <span class="material-icons">close</span>
+            </button>
         </div>
     </div>
 </div>
