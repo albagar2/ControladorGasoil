@@ -63,6 +63,11 @@ export class DashboardComponent implements OnInit {
         this.isMobileMenuOpen = !this.isMobileMenuOpen;
     }
 
+    toggleMobileMoreMenu() {
+        this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    }
+
+
     closeMobileMenu() {
         this.isMobileMenuOpen = false;
     }

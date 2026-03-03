@@ -433,3 +433,26 @@ label {
   gap: 12px;
   border-top: 1px solid var(--border-color);
 }
+
+/* Fix for Material Icons on Mobile - ensure text doesn't show if font fails */
+.material-icons {
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
+
+/* Fallback: if user sees text, make it very small or hidden but icons still work */
+@media (max-width: 768px) {
+  .material-icons {
+    max-width: 24px;
+    overflow: hidden;
+  }
+}

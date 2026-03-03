@@ -36,4 +36,14 @@ export class ExportService {
             document.body.removeChild(link);
         }
     }
+
+    generateCostReport(vehicles: any[], refuels: any[], maintenance: any[]) {
+        const reportData = [
+            ...vehicles.map(v => ({ type: 'Vehículo', name: v.name, detail: v.plate, cost: 0 })),
+            ...refuels.map(r => ({ type: 'Repostaje', name: r.vehicleName, detail: `${r.liters}L`, cost: r.totalCost })),
+            ...maintenance.map(m => ({ type: 'Mantenimiento', name: m.vehicleName, detail: m.description, cost: m.cost }))
+        ];
+        this.exportToCsv('reporte_gastos.csv', reportData);
+    }
 }
+

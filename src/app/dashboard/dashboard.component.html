@@ -1,6 +1,6 @@
 <div class="dashboard-layout fade-in">
-    <!-- Sidebar / Navbar -->
-    <header class="sidebar" [class.mobile-open]="isMobileMenuOpen">
+    <!-- Desktop Sidebar (Hidden on Mobile) -->
+    <aside class="sidebar desktop-only">
         <div class="brand">
             <div class="brand-icon">
                 <span class="material-icons">directions_car</span>
@@ -9,49 +9,104 @@
         </div>
 
         <nav class="nav-links">
-            <a class="nav-item" routerLink="resumen" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="resumen" routerLinkActive="active">
                 <span class="material-icons">dashboard</span>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-item" routerLink="vehiculos" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="vehiculos" routerLinkActive="active">
                 <span class="material-icons">directions_car</span>
                 <span>Vehículos</span>
             </a>
-            <a class="nav-item" routerLink="conductores" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="conductores" routerLinkActive="active">
                 <span class="material-icons">badge</span>
                 <span>Conductores</span>
             </a>
-            <a class="nav-item" routerLink="repostaje" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="repostaje" routerLinkActive="active">
                 <span class="material-icons">local_gas_station</span>
                 <span>Repostajes</span>
             </a>
-            <a class="nav-item" routerLink="mantenimiento" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="mantenimiento" routerLinkActive="active">
                 <span class="material-icons">handyman</span>
                 <span>Mantenimientos</span>
             </a>
-            <a class="nav-item" routerLink="analiticas" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="analiticas" routerLinkActive="active">
                 <span class="material-icons">insights</span>
                 <span>Analíticas</span>
             </a>
-            <a class="nav-item" routerLink="familia" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="familia" routerLinkActive="active">
                 <span class="material-icons">family_restroom</span>
                 <span>Familia</span>
             </a>
-            <a class="nav-item" routerLink="perfil" routerLinkActive="active" (click)="closeMobileMenu()">
+            <a class="nav-item" routerLink="perfil" routerLinkActive="active">
                 <span class="material-icons">manage_accounts</span>
                 <span>Configuración</span>
             </a>
+            <div class="nav-spacer"></div>
             <a class="nav-item logout" (click)="logout()">
                 <span class="material-icons">logout</span>
                 <span>Salir</span>
             </a>
         </nav>
+    </aside>
 
-        <!-- Mobile Toggle Button -->
-        <button class="mobile-toggle" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
-            <span class="material-icons">{{ isMobileMenuOpen ? 'close' : 'menu' }}</span>
-        </button>
-    </header>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav mobile-only">
+        <a class="nav-item" routerLink="resumen" routerLinkActive="active">
+            <span class="material-icons">dashboard</span>
+            <span>Inicio</span>
+        </a>
+        <a class="nav-item" routerLink="vehiculos" routerLinkActive="active">
+            <span class="material-icons">directions_car</span>
+            <span>Garaje</span>
+        </a>
+        <a class="nav-item" routerLink="repostaje" routerLinkActive="active">
+            <span class="material-icons">local_gas_station</span>
+            <span>Gasol</span>
+        </a>
+        <a class="nav-item" routerLink="mantenimiento" routerLinkActive="active">
+            <span class="material-icons">handyman</span>
+            <span>Mant.</span>
+        </a>
+        <a class="nav-item" (click)="toggleMobileMoreMenu()" [class.active]="isMobileMenuOpen">
+            <span class="material-icons">more_horiz</span>
+            <span>Más</span>
+        </a>
+    </nav>
+
+    <!-- Mobile More Menu Overlay -->
+    <div class="mobile-menu-overlay" *ngIf="isMobileMenuOpen" (click)="closeMobileMenu()" [@fadeIn]>
+        <div class="mobile-menu-content" (click)="$event.stopPropagation()">
+            <div class="menu-header">
+                <h3>Opciones</h3>
+                <button class="close-btn" (click)="closeMobileMenu()">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="menu-grid">
+                <a class="menu-item" routerLink="conductores" (click)="closeMobileMenu()">
+                    <span class="material-icons">badge</span>
+                    <span>Conductores</span>
+                </a>
+                <a class="menu-item" routerLink="analiticas" (click)="closeMobileMenu()">
+                    <span class="material-icons">insights</span>
+                    <span>Analíticas</span>
+                </a>
+                <a class="menu-item" routerLink="familia" (click)="closeMobileMenu()">
+                    <span class="material-icons">family_restroom</span>
+                    <span>Familia</span>
+                </a>
+                <a class="menu-item" routerLink="perfil" (click)="closeMobileMenu()">
+                    <span class="material-icons">manage_accounts</span>
+                    <span>Perfil</span>
+                </a>
+                <a class="menu-item logout" (click)="logout()">
+                    <span class="material-icons">logout</span>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Main Content -->
     <main class="main-content">

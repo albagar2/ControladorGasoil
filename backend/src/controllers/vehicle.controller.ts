@@ -39,7 +39,7 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     const { userId } = req.user;
     const driver = await driverRepository.findOneBy({ id: userId });
 
-    const vehicleData = req.body;
+    const vehicleData: Partial<Vehicle> = req.body;
     if (driver && driver.familyId) {
         vehicleData.familyId = driver.familyId;
     }
