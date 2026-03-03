@@ -44,7 +44,7 @@ AppDataSource.initialize()
 
         // Root route
         app.get('/', (req, res) => {
-            res.send('Vehicle Management API is running (MySQL)');
+            res.send('Vehicle Management API is running (PostgreSQL/Supabase)');
         });
 
         // Global Error Handling
