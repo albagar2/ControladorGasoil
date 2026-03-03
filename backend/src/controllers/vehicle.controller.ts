@@ -10,16 +10,15 @@ const driverRepository = AppDataSource.getRepository(Driver);
 
 export const getVehicles = asyncHandler(async (req: Request, res: Response) => {
     // @ts-ignore
-    const { userId, role } = req.user;
+    const { userId, role, familyId } = req.user;
 
     if (role === 'admin') {
         const vehicles = await vehicleRepository.find({ relations: ["propietario", "family"] });
         return res.json(vehicles);
     }
 
-    const driver = await driverRepository.findOneBy({ id: userId });
-
-    if (!driver || !driver.familyId) {
+    if (!familyId) {
+        // Fallback: If no family, see only owned vehicles
         const vehicles = await vehicleRepository.find({
             where: { propietarioId: userId },
             relations: ["propietario"]
@@ -28,7 +27,7 @@ export const getVehicles = asyncHandler(async (req: Request, res: Response) => {
     }
 
     const vehicles = await vehicleRepository.find({
-        where: { familyId: driver.familyId },
+        where: { familyId: familyId },
         relations: ["propietario", "family"]
     });
     res.json(vehicles);
@@ -64,8 +63,16 @@ export const getVehicleById = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const updateVehicle = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId, userId } = req.user;
     const vehicle = await vehicleRepository.findOneBy({ id: parseInt(req.params.id) });
+
     if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+
+    // Security Check: Admin or same family or owner
+    if (role !== 'admin' && vehicle.familyId !== familyId && vehicle.propietarioId !== userId) {
+        return res.status(403).json({ message: 'Forbidden: You do not have access to this vehicle' });
+    }
 
     vehicleRepository.merge(vehicle, req.body);
     const results = await vehicleRepository.save(vehicle);
@@ -77,7 +84,17 @@ export const updateVehicle = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const deleteVehicle = asyncHandler(async (req: Request, res: Response) => {
-    const result = await vehicleRepository.delete(req.params.id);
-    if (result.affected === 0) return res.status(404).json({ message: 'Vehicle not found' });
+    // @ts-ignore
+    const { role, familyId, userId } = req.user;
+    const vehicle = await vehicleRepository.findOneBy({ id: parseInt(req.params.id) });
+
+    if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+
+    // Security Check
+    if (role !== 'admin' && vehicle.familyId !== familyId && vehicle.propietarioId !== userId) {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    await vehicleRepository.remove(vehicle);
     res.json({ message: 'Vehicle deleted successfully' });
 });

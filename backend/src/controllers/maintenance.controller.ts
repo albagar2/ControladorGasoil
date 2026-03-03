@@ -9,10 +9,20 @@ const maintenanceRepository = AppDataSource.getRepository(Maintenance);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
 
 export const getMaintenances = asyncHandler(async (req: Request, res: Response) => {
-    const maintenances = await maintenanceRepository.find({
-        relations: ["vehiculo", "conductor"],
-        order: { fecha: "DESC" }
-    });
+    // @ts-ignore
+    const { role, familyId } = req.user;
+
+    const query = maintenanceRepository.createQueryBuilder("maintenance")
+        .leftJoinAndSelect("maintenance.vehiculo", "vehicle")
+        .leftJoinAndSelect("maintenance.conductor", "driver")
+        .orderBy("maintenance.fecha", "DESC");
+
+    if (role !== 'admin') {
+        if (!familyId) return res.json([]);
+        query.where("vehicle.familyId = :familyId", { familyId });
+    }
+
+    const maintenances = await query.getMany();
     res.json(maintenances);
 });
 
@@ -32,6 +42,13 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
     const vehicle = await vehicleRepository.findOneBy({ id: vId });
     if (!vehicle) {
         return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    // Security Check
+    // @ts-ignore
+    const { role, familyId } = req.user;
+    if (role !== 'admin' && vehicle.familyId !== familyId) {
+        return res.status(403).json({ message: "Forbidden: Vehicle belongs to another family" });
     }
 
     const maintenance = maintenanceRepository.create({
@@ -71,14 +88,33 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
     const { id } = req.params;
     const { vehiculoId, conductorId, fecha, tipo, costePieza, costeTaller, observaciones, kilometraje, proveedor } = req.body;
 
-    let maintenance = await maintenanceRepository.findOneBy({ id: parseInt(id) });
+    let maintenance = await maintenanceRepository.findOne({
+        where: { id: parseInt(id) },
+        relations: ["vehiculo"]
+    });
     if (!maintenance) {
         return res.status(404).json({ message: "Maintenance not found" });
     }
 
-    const km = parseInt(kilometraje) || 0;
+    // Security Check
+    // @ts-ignore
+    const { role, familyId } = req.user;
+    if (role !== 'admin' && maintenance.vehiculo.familyId !== familyId) {
+        return res.status(403).json({ message: "Forbidden" });
+    }
 
-    maintenance.vehiculoId = parseInt(vehiculoId);
+    const km = parseInt(kilometraje) || 0;
+    const vId = parseInt(vehiculoId);
+
+    // If changing vehicle, check new vehicle too
+    if (vId !== maintenance.vehiculoId) {
+        const newVehicle = await vehicleRepository.findOneBy({ id: vId });
+        if (!newVehicle || (role !== 'admin' && newVehicle.familyId !== familyId)) {
+            return res.status(403).json({ message: "Forbidden: Target vehicle belongs to another family" });
+        }
+    }
+
+    maintenance.vehiculoId = vId;
     maintenance.conductorId = (conductorId && parseInt(conductorId) !== 0) ? parseInt(conductorId) : undefined;
     maintenance.fecha = new Date(fecha);
     maintenance.tipo = tipo;
@@ -115,11 +151,23 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
 
 export const deleteMaintenance = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await maintenanceRepository.delete(id);
+    // @ts-ignore
+    const { role, familyId } = req.user;
 
-    if (result.affected === 0) {
+    const maintenance = await maintenanceRepository.findOne({
+        where: { id: parseInt(id) },
+        relations: ["vehiculo"]
+    });
+
+    if (!maintenance) {
         return res.status(404).json({ message: "Maintenance not found" });
     }
 
+    // Security Check
+    if (role !== 'admin' && maintenance.vehiculo.familyId !== familyId) {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
+    await maintenanceRepository.remove(maintenance);
     res.status(204).send();
 });

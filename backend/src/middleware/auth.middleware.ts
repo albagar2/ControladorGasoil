@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
+import { AppDataSource } from '../data-source';
+import { Driver } from '../entities/Driver';
 
-export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
+const driverRepository = AppDataSource.getRepository(Driver);
+
+export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
     const header = req.headers['authorization'];
 
     if (!header) {
@@ -18,15 +22,19 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as any;
-        // Attach user specific info to request
-        // We use 'userId' because that's what we used in the controller (req.user.userId)
-        // But the token payload has { id, role }
-        // Debug decoding
-        console.log('Decoded Token:', decoded);
+        const userId = decoded.id || decoded.userId;
+
+        // Fetch user to get current familyId and role from DB (more secure than token)
+        const user = await driverRepository.findOneBy({ id: userId });
+
+        if (!user) {
+            return res.status(401).json({ message: 'User no longer exists' });
+        }
 
         (req as any).user = {
-            userId: decoded.id || decoded.userId, // Fallback just in case
-            role: decoded.role
+            userId: user.id,
+            role: user.role,
+            familyId: user.familyId
         };
         next();
     } catch (error) {

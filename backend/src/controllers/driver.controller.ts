@@ -6,7 +6,23 @@ import { asyncHandler } from '../utils/asyncHandler';
 const driverRepository = AppDataSource.getRepository(Driver);
 
 export const getDrivers = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId } = req.user;
+
+    if (role === 'admin') {
+        const drivers = await driverRepository.find({
+            relations: ['family']
+        });
+        return res.json(drivers);
+    }
+
+    if (!familyId) {
+        // If no family, return empty or just self (let's do empty for "list" context as per requirement "view conductors of their family")
+        return res.json([]);
+    }
+
     const drivers = await driverRepository.find({
+        where: { familyId: familyId },
         relations: ['family']
     });
     res.json(drivers);
@@ -25,8 +41,20 @@ export const getDriverById = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const updateDriver = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId, userId } = req.user;
     const driver = await driverRepository.findOneBy({ id: parseInt(req.params.id) });
+
     if (!driver) return res.status(404).json({ message: 'Driver not found' });
+
+    // Security Check: Admin or SAME USER (for points/profile) or LEADER in same family
+    const isSelf = driver.id === userId;
+    const sameFamily = driver.familyId === familyId;
+    const isLeader = role === 'leader';
+
+    if (role !== 'admin' && !isSelf && !(isLeader && sameFamily)) {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
 
     driverRepository.merge(driver, req.body);
     const result = await driverRepository.save(driver);
@@ -35,8 +63,19 @@ export const updateDriver = asyncHandler(async (req: Request, res: Response) => 
 
 
 export const deleteDriver = asyncHandler(async (req: Request, res: Response) => {
-    const result = await driverRepository.delete(req.params.id);
-    if (result.affected === 0) return res.status(404).json({ message: 'Driver not found' });
+    // @ts-ignore
+    const { role, familyId } = req.user;
+    const driver = await driverRepository.findOneBy({ id: parseInt(req.params.id) });
+
+    if (!driver) return res.status(404).json({ message: 'Driver not found' });
+
+    // Security: Only admins can delete drivers from list (non-profile delete)? 
+    // Usually leaders might delete members.
+    if (role !== 'admin' && !(role === 'leader' && driver.familyId === familyId)) {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    await driverRepository.remove(driver);
     res.json({ message: 'Driver deleted successfully' });
 });
 

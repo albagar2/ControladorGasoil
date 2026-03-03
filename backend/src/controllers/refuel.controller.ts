@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Refuel } from '../entities/Refuel';
 import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
+import { asyncHandler } from '../utils/asyncHandler';
 import { alertService } from '../services/alert.service';
 import fs from 'fs';
 import path from 'path';
@@ -11,17 +12,23 @@ const refuelRepository = AppDataSource.getRepository(Refuel);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
 const maintenanceRepository = AppDataSource.getRepository(Maintenance);
 
-export const getRefuels = async (req: Request, res: Response) => {
-    try {
-        const refuels = await refuelRepository.find({
-            relations: ["vehiculo", "conductor"],
-            order: { fecha: "DESC" }
-        });
-        res.json(refuels);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching refuels', error });
+export const getRefuels = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId } = req.user;
+
+    const query = refuelRepository.createQueryBuilder("refuel")
+        .leftJoinAndSelect("refuel.vehiculo", "vehicle")
+        .leftJoinAndSelect("refuel.conductor", "driver")
+        .orderBy("refuel.fecha", "DESC");
+
+    if (role !== 'admin') {
+        if (!familyId) return res.json([]);
+        query.where("vehicle.familyId = :familyId", { familyId });
     }
-};
+
+    const refuels = await query.getMany();
+    res.json(refuels);
+});
 
 export const createRefuel = async (req: Request, res: Response) => {
     try {
@@ -48,6 +55,14 @@ export const createRefuel = async (req: Request, res: Response) => {
             // Limpiar archivo si el vehículo no existe
             if (req.file) fs.unlinkSync(req.file.path);
             return res.status(404).json({ message: "Vehicle not found" });
+        }
+
+        // Security Check: Vehicle must belong to same family
+        // @ts-ignore
+        const { role, familyId } = req.user;
+        if (role !== 'admin' && vehicle.familyId !== familyId) {
+            if (req.file) fs.unlinkSync(req.file.path);
+            return res.status(403).json({ message: "Forbidden: Vehicle belongs to another family" });
         }
 
         let ticketImageUrl = undefined;
@@ -120,32 +135,48 @@ export const createRefuel = async (req: Request, res: Response) => {
     }
 };
 
-export const updateRefuel = async (req: Request, res: Response) => {
-    try {
-        const refuel = await refuelRepository.findOneBy({ id: parseInt(req.params.id) });
-        if (!refuel) return res.status(404).json({ message: 'Refuel not found' });
+export const updateRefuel = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId } = req.user;
+    const refuel = await refuelRepository.findOne({
+        where: { id: parseInt(req.params.id) },
+        relations: ["vehiculo"]
+    });
 
-        refuelRepository.merge(refuel, req.body);
-        await refuelRepository.save(refuel);
+    if (!refuel) return res.status(404).json({ message: 'Refuel not found' });
 
-        // Return with relations
-        const fullRefuel = await refuelRepository.findOne({
-            where: { id: refuel.id },
-            relations: ["vehiculo", "conductor"]
-        });
-
-        res.json(fullRefuel);
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating refuel', error });
+    // Security Check
+    if (role !== 'admin' && refuel.vehiculo.familyId !== familyId) {
+        return res.status(403).json({ message: 'Forbidden' });
     }
-};
 
-export const deleteRefuel = async (req: Request, res: Response) => {
-    try {
-        const result = await refuelRepository.delete(req.params.id);
-        if (result.affected === 0) return res.status(404).json({ message: 'Refuel not found' });
-        res.json({ message: 'Refuel deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting refuel', error });
+    refuelRepository.merge(refuel, req.body);
+    await refuelRepository.save(refuel);
+
+    // Return with relations
+    const fullRefuel = await refuelRepository.findOne({
+        where: { id: refuel.id },
+        relations: ["vehiculo", "conductor"]
+    });
+
+    res.json(fullRefuel);
+});
+
+export const deleteRefuel = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId } = req.user;
+    const refuel = await refuelRepository.findOne({
+        where: { id: parseInt(req.params.id) },
+        relations: ["vehiculo"]
+    });
+
+    if (!refuel) return res.status(404).json({ message: 'Refuel not found' });
+
+    // Security Check
+    if (role !== 'admin' && refuel.vehiculo.familyId !== familyId) {
+        return res.status(403).json({ message: 'Forbidden' });
     }
-};
+
+    await refuelRepository.remove(refuel);
+    res.json({ message: 'Refuel deleted successfully' });
+});
