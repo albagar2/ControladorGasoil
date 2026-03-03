@@ -1,4 +1,8 @@
 /* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
 :root {
   /* Premium Palette */
   --primary-color: #4f46e5;

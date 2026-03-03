@@ -16,8 +16,8 @@
         "express": "^4.19.2",
         "jsonwebtoken": "^9.0.3",
         "multer": "^2.1.0",
-        "mysql2": "^3.9.4",
         "node-cron": "^4.2.1",
+        "pg": "^8.19.0",
         "reflect-metadata": "^0.2.2",
         "typeorm": "^0.3.20"
     },
@@ -27,6 +27,7 @@
         "@types/multer": "^2.0.0",
         "@types/node": "^20.12.7",
         "@types/node-cron": "^3.0.11",
+        "@types/pg": "^8.11.5",
         "ts-node": "^10.9.2",
         "typescript": "^5.4.5"
     }
