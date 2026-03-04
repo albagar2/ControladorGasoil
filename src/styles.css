@@ -45,6 +45,10 @@
   --gradient-dark: linear-gradient(135deg, #1f2937 0%, #111827 100%);
   --gradient-orange: linear-gradient(135deg, #FF5722 0%, #FF8A65 100%);
   --primary-orange: #FF5722;
+
+  /* Logo Colors */
+  --logo-primary: #4f46e5;
+  --logo-accent: #f59e0b;
 }
 
 /* Dark Mode Overrides */
@@ -67,6 +71,12 @@
   /* More visible borders */
   --nav-active: #fbbf24;
   /* Vibrant Amber/Yellow for active states */
+
+  /* Logo Colors Dark Mode - Higher Contrast */
+  --logo-primary: #818cf8;
+  /* Indigo 400 */
+  --logo-accent: #fbbf24;
+  /* Amber 400 */
 }
 
 html,
