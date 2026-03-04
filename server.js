@@ -10,6 +10,7 @@ app.use(express.static(DIST_PATH));
 
 // Handle SPA routing: redirect all requests to index.html
 app.get('*', (req, res) => {
+    console.log(`[${new Date().toISOString()}] Redirecting: ${req.method} ${req.url}`);
     res.sendFile(path.join(DIST_PATH, 'index.html'));
 });
 
