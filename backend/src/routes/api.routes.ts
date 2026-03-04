@@ -11,6 +11,15 @@ import { checkJwt } from '../middleware/auth.middleware';
 
 const router = Router();
 
+// API Status Route
+router.get('/status', (req, res) => {
+    res.json({
+        message: 'Welcome to the Vehicle Management API',
+        status: 'operational',
+        timestamp: new Date()
+    });
+});
+
 router.use('/auth', authRoutes);
 router.use('/vehicles', vehicleRoutes);
 router.use('/drivers', driverRoutes);

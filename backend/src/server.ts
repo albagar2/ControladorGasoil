@@ -14,32 +14,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors({
-    origin: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true,
-    optionsSuccessStatus: 200
-}));
+// Detailed Request Logging
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
+// Robust CORS Middleware
+app.use(cors()); // Allow everything for debugging
+app.options('*', cors()); // Ensure all OPTIONS requests are handled by CORS
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api', apiRoutes);
 
-// API Status Route
-app.get('/api/status', (req, res) => {
-    res.json({
-        message: 'Welcome to the Vehicle Management API',
-        status: 'operational',
-        timestamp: new Date()
-    });
-});
-
-// Root route
+// Root redirect to status for health checks
 app.get('/', (req, res) => {
-    res.send('Vehicle Management API is running (PostgreSQL/Supabase)');
+    res.redirect('/api/status');
 });
 
 // Global Error Handling
