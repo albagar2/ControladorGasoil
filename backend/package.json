@@ -4,7 +4,8 @@
     "description": "Backend for Vehicle Management System",
     "main": "src/server.ts",
     "scripts": {
-        "start": "ts-node src/server.ts",
+        "build": "tsc",
+        "start": "node dist/server.js",
         "dev": "ts-node src/server.ts"
     },
     "dependencies": {
