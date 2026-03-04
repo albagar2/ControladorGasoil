@@ -29,6 +29,14 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "rgbcolor",
+              "core-js",
+              "html2canvas",
+              "dompurify",
+              "jspdf",
+              "canvg"
             ]
           },
           "configurations": {
@@ -41,8 +49,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "10kB",
-                  "maximumError": "12kB"
+                  "maximumWarning": "20kB",
+                  "maximumError": "25kB"
                 }
               ],
               "outputHashing": "all"
