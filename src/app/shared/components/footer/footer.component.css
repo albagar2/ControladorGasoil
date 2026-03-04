@@ -1,0 +1,58 @@
+.app-footer {
+    width: 100%;
+    padding: 2rem 1.5rem;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    margin-top: auto;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 10;
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.copyright {
+    font-weight: 400;
+}
+
+.copyright strong {
+    color: var(--primary-color, #4f46e5);
+}
+
+.rights {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Dark Mode Overrides */
+:host-context(.dark) .app-footer {
+    background: #121212;
+    border-top-color: #334155;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .app-footer {
+        padding: 1.5rem 1rem;
+        /* Añadir padding extra inferior para no chocar con la navegación móvil si existe */
+        padding-bottom: 90px;
+    }
+
+    .footer-info {
+        gap: 0.25rem;
+    }
+}

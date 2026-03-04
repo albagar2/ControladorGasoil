@@ -99,3 +99,20 @@
 :host-context(.dark) .chart-card {
     border-color: rgba(255, 255, 255, 0.05);
 }
+
+.analytics-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+    .analytics-header {
+        justify-content: center;
+    }
+
+    .analytics-header button {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -4,41 +4,44 @@
             <span class="material-icons">add</span> Nuevo Conductor
         </button>
     </div>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>DNI</th>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Puntos</th>
-                <th *ngIf="isAdmin">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let driver of dataService.drivers()">
-                <td style="font-weight: 600;">{{ driver.dni }}</td>
-                <td>{{ driver.nombre }}</td>
-                <td>{{ driver.telefono }}</td>
-                <td>
-                    <span class="status-badge" [class.active]="driver.puntos >= 12"
-                        [class.warning]="driver.puntos < 12 && driver.puntos > 6" [class.danger]="driver.puntos <= 6">
-                        {{ driver.puntos }} pts
-                    </span>
-                </td>
-                <td *ngIf="isAdmin">
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="icon-btn edit" (click)="openEditModal(driver)"><span
-                                class="material-icons">edit</span></button>
-                        <button class="icon-btn delete" (click)="deleteDriver(driver.id)"><span
-                                class="material-icons">delete</span></button>
-                    </div>
-                </td>
-            </tr>
-            <tr *ngIf="dataService.drivers().length === 0">
-                <td colspan="6" style="text-align: center; padding: 2rem;">No hay conductores registrados.</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>DNI</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Puntos</th>
+                    <th *ngIf="isAdmin">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let driver of dataService.drivers()">
+                    <td style="font-weight: 600;">{{ driver.dni }}</td>
+                    <td>{{ driver.nombre }}</td>
+                    <td>{{ driver.telefono }}</td>
+                    <td>
+                        <span class="status-badge" [class.active]="driver.puntos >= 12"
+                            [class.warning]="driver.puntos < 12 && driver.puntos > 6"
+                            [class.danger]="driver.puntos <= 6">
+                            {{ driver.puntos }} pts
+                        </span>
+                    </td>
+                    <td *ngIf="isAdmin">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="icon-btn edit" (click)="openEditModal(driver)"><span
+                                    class="material-icons">edit</span></button>
+                            <button class="icon-btn delete" (click)="deleteDriver(driver.id)"><span
+                                    class="material-icons">delete</span></button>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="dataService.drivers().length === 0">
+                    <td colspan="5" style="text-align: center; padding: 2rem;">No hay conductores registrados.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </app-table-card>
 
 <!-- Driver Modal -->

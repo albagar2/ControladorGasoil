@@ -5,52 +5,54 @@
     </button>
   </div>
 
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Matrícula</th>
-        <th>Modelo</th>
-        <th>Propietario</th>
-        <th>Combustible</th>
-        <th>Kilometraje</th>
-        <th>Distintivo</th>
-        <th>ITV</th>
-        <th>Seguro</th>
-        <th class="text-right">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let car of dataService.vehicles()">
-        <td style="font-weight: 600;">{{ car.matricula }}</td>
-        <td>{{ car.modelo }}</td>
-        <td>{{ car.propietario?.nombre || ' - ' }}</td>
-        <td>{{ car.combustible }}</td>
-        <td><span class="km-text">{{ car.kilometrajeActual | number }} km</span></td>
-        <td><span class="status-badge badge-distintivo" [attr.data-type]="car.distintivo">{{ car.distintivo }}</span>
-        </td>
-        <td>{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
-        <td>{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
-        <td class="text-right">
-          <div class="actions-wrapper">
-            <button class="icon-btn edit" (click)="openEditModal(car)">
-              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
-                <path
-                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-              </svg>
-            </button>
-            <button class="icon-btn delete" (click)="deleteVehicle(car.id)">
-              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
-                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-              </svg>
-            </button>
-          </div>
-        </td>
-      </tr>
-      <tr *ngIf="dataService.vehicles().length === 0">
-        <td colspan="8" style="text-align: center; padding: 2rem;">No hay vehículos registrados.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Modelo</th>
+          <th>Propietario</th>
+          <th>Combustible</th>
+          <th>Kilometraje</th>
+          <th>Distintivo</th>
+          <th>ITV</th>
+          <th>Seguro</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let car of dataService.vehicles()">
+          <td style="font-weight: 600;">{{ car.matricula }}</td>
+          <td>{{ car.modelo }}</td>
+          <td>{{ car.propietario?.nombre || ' - ' }}</td>
+          <td>{{ car.combustible }}</td>
+          <td><span class="km-text">{{ car.kilometrajeActual | number }} km</span></td>
+          <td><span class="status-badge badge-distintivo" [attr.data-type]="car.distintivo">{{ car.distintivo }}</span>
+          </td>
+          <td>{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
+          <td>{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
+          <td class="text-right">
+            <div class="actions-wrapper">
+              <button class="icon-btn edit" (click)="openEditModal(car)">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
+                  <path
+                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg>
+              </button>
+              <button class="icon-btn delete" (click)="deleteVehicle(car.id)">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="dataService.vehicles().length === 0">
+          <td colspan="9" style="text-align: center; padding: 2rem;">No hay vehículos registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </app-table-card>
 
 <!-- Vehicle Modal -->

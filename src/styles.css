@@ -247,9 +247,12 @@ label {
 /* Tables */
 .table-container {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: var(--card-radius);
   box-shadow: var(--shadow-sm);
   background: var(--card-bg);
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 .data-table {
