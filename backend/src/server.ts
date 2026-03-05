@@ -21,8 +21,29 @@ app.use((req, res, next) => {
 });
 
 // Robust CORS Middleware
-app.use(cors()); // Allow everything for debugging
-app.options('*', cors()); // Ensure all OPTIONS requests are handled by CORS
+const allowedOrigins = [
+    'https://familydrive.onrender.com',
+    'http://localhost:4200'
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            console.log(`[CORS] Origin ${origin} not explicitly allowed, but allowing for debug`);
+            return callback(null, true);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
+}));
+
+// Handle all OPTIONS requests explicitly
+app.options('*', cors());
 
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -32,7 +53,12 @@ app.use('/api', apiRoutes);
 
 // Root redirect to status for health checks
 app.get('/', (req, res) => {
-    res.redirect('/api/status');
+    console.log(`[${new Date().toISOString()}] Root access - redirecting to /api/status`);
+    res.send(`
+        <h1>Vehicle Management API (BACKEND)</h1>
+        <p>Status: <a href="/api/status">Check API Status</a></p>
+        <p>If you see this page on your main domain, your Render services are still swapped!</p>
+    `);
 });
 
 // Global Error Handling
