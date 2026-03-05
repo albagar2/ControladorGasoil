@@ -52,20 +52,32 @@
 
                     <div class="info-row">
                         <div class="info-group">
-                            <label>Fecha Renovación</label>
-                            <div class="info-value">{{ user().fechaRenovacionCarnet | date:'dd/MM/yyyy' }}</div>
-                        </div>
-                        <div class="info-group">
                             <label>Puntos del Carnet</label>
                             <div class="points-container">
                                 <div class="points-text">
                                     <div class="points-big">{{ user().puntos }}</div>
                                     <div class="points-label">de {{ user().puntosMaximos }} puntos</div>
                                 </div>
-                                <div class="points-chart">
-                                </div>
+                                <div class="points-chart"></div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Licenses Card -->
+                <div class="content-card mt-4">
+                    <div class="card-header">
+                        <h3>Carnets de Conducir</h3>
+                    </div>
+                    <div class="license-badge-list">
+                        <div *ngFor="let license of user().licenses" class="license-badge">
+                            <span class="type">{{ license.type }}</span>
+                            <span class="expiry">Vence: {{ license.expirationDate | date:'dd/MM/yyyy' }}</span>
+                        </div>
+                    </div>
+                    <div *ngIf="!user().licenses?.length" class="info-value"
+                        style="color: var(--text-muted); margin-top: 10px;">
+                        No hay carnets registrados
                     </div>
                 </div>
 
@@ -134,21 +146,42 @@
                         </div>
                     </div>
 
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Renovación Carnet</label>
-                            <input type="date" [ngModel]="user().fechaRenovacionCarnet | date:'yyyy-MM-dd'"
-                                (ngModelChange)="user.set({...user(), fechaRenovacionCarnet: $event})"
-                                name="fechaRenovacionCarnet" class="form-control">
+                    <div class="licenses-section">
+                        <div class="licenses-header">
+                            <h4>Gestión de Carnets</h4>
+                            <button type="button" class="btn-add-text" (click)="addLicense()"
+                                *ngIf="(user().licenses?.length || 0) < 15">
+                                <span class="material-icons">add_circle_outline</span> Añadir
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>Puntos Carnet</label>
-                            <div class="input-with-icon">
-                                <span class="material-icons">star</span>
-                                <input type="number" [ngModel]="user().puntos"
-                                    (ngModelChange)="user.set({...user(), puntos: $event})" name="puntos"
-                                    class="form-control" min="0" max="15">
+                        <div *ngFor="let license of user().licenses; let i = index" class="license-row">
+                            <div class="form-group mb-0">
+                                <label>Tipo</label>
+                                <select [ngModel]="license.type" (ngModelChange)="license.type = $event"
+                                    [name]="'licenseType' + i" class="form-control" style="padding-left: 12px;">
+                                    <option *ngFor="let type of licenseTypes" [value]="type">{{ type }}</option>
+                                </select>
                             </div>
+                            <div class="form-group mb-0">
+                                <label>Fecha Vencimiento</label>
+                                <input type="date" [ngModel]="license.expirationDate | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="license.expirationDate = $event" [name]="'licenseDate' + i"
+                                    class="form-control" style="padding-left: 12px;">
+                            </div>
+                            <button type="button" class="btn-icon-remove" (click)="removeLicense(i)"
+                                *ngIf="(user().licenses?.length || 0) > 1">
+                                <span class="material-icons">delete_outline</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Puntos Carnet</label>
+                        <div class="input-with-icon">
+                            <span class="material-icons">star</span>
+                            <input type="number" [ngModel]="user().puntos"
+                                (ngModelChange)="user.set({...user(), puntos: $event})" name="puntos"
+                                class="form-control" min="0" max="15">
                         </div>
                     </div>
                 </div>

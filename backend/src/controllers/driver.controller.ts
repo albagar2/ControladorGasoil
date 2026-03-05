@@ -11,7 +11,7 @@ export const getDrivers = asyncHandler(async (req: Request, res: Response) => {
 
     if (role === 'admin') {
         const drivers = await driverRepository.find({
-            relations: ['family']
+            relations: ['family', 'licenses']
         });
         return res.json(drivers);
     }
@@ -23,7 +23,7 @@ export const getDrivers = asyncHandler(async (req: Request, res: Response) => {
 
     const drivers = await driverRepository.find({
         where: { familyId: familyId },
-        relations: ['family']
+        relations: ['family', 'licenses']
     });
     res.json(drivers);
 });
@@ -103,11 +103,29 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
         driver.password = await bcrypt.hash(password, 10);
     }
 
+    // Explicitly handle licenses if provided
+    if (req.body.licenses) {
+        const { License } = require('../entities/License');
+        driver.licenses = req.body.licenses.map((l: any) => {
+            const license = new License();
+            Object.assign(license, l);
+            license.driver = driver;
+            return license;
+        });
+    }
+
     driverRepository.merge(driver, updateData);
     const result = await driverRepository.save(driver);
 
+    // Reload with relations to return full object
+    const updatedDriver = await driverRepository.findOne({
+        where: { id: userId },
+        relations: ['licenses']
+    });
+
     // Remove password from response
-    const { password: _, ...driverData } = result;
+    if (!updatedDriver) return res.status(500).json({ message: 'Error reloading driver' });
+    const { password: _, ...driverData } = updatedDriver;
 
     res.json(driverData);
 });

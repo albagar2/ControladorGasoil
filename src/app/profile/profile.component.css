@@ -616,3 +616,114 @@
 .control-option:hover:not(.active) {
     color: var(--text-main);
 }
+
+/* Licenses Section */
+.licenses-section {
+    background: var(--bg-color);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px dashed var(--primary-color);
+    margin-bottom: 25px;
+}
+
+.licenses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.licenses-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.license-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color, #f1f5f9);
+    animation: fadeIn 0.3s ease;
+}
+
+.license-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.license-badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.license-badge {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+}
+
+.license-badge .type {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.license-badge .expiry {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.btn-icon-remove {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon-remove:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-add-text {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.btn-add-text:hover {
+    background: rgba(79, 70, 229, 0.1);
+}
+
+:host-context(.dark) .licenses-section {
+    background: rgba(255, 255, 255, 0.05);
+}

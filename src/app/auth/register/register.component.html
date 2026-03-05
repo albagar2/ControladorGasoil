@@ -125,12 +125,38 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="fechaRenovacionCarnet">Renovación Carnet</label>
-                <div class="input-wrapper">
-                    <input type="date" id="fechaRenovacionCarnet" [(ngModel)]="driver.fechaRenovacionCarnet"
-                        name="fechaRenovacionCarnet" required>
+            <div class="licenses-section">
+                <div class="licenses-header">
+                    <h3>Carnets de Conducir</h3>
+                    <button type="button" class="btn-add-text" (click)="addLicense()"
+                        *ngIf="driver.licenses.length < 15">
+                        <span class="material-icons" style="font-size: 18px;">add_circle_outline</span> Añadir otro
+                    </button>
                 </div>
+
+                <div *ngFor="let license of driver.licenses; let i = index" class="license-row">
+                    <div class="form-group mb-0">
+                        <label>Tipo</label>
+                        <div class="input-wrapper">
+                            <select [(ngModel)]="license.type" [name]="'licenseType' + i" class="styled-select">
+                                <option *ngFor="let type of licenseTypes" [value]="type">{{ type }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Vence el</label>
+                        <div class="input-wrapper">
+                            <input type="date" [(ngModel)]="license.expirationDate" [name]="'licenseDate' + i" required>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-icon-remove" (click)="removeLicense(i)"
+                        *ngIf="driver.licenses.length > 1" title="Quitar carnet">
+                        <span class="material-icons" style="font-size: 20px;">delete_outline</span>
+                    </button>
+                </div>
+                <small *ngIf="driver.licenses.length >= 15" style="color: #64748b; font-size: 0.8rem;">
+                    Máximo 15 carnets permitidos.
+                </small>
             </div>
 
             <button type="submit" class="btn-submit btn-register" [disabled]="isLoading" [class.loading]="isLoading">

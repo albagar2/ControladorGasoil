@@ -5,6 +5,7 @@ import { Vehicle } from "./entities/Vehicle";
 import { Refuel } from "./entities/Refuel";
 import { Maintenance } from "./entities/Maintenance";
 import { Family } from "./entities/Family";
+import { License } from "./entities/License";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,7 +19,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME || "postgres",
     synchronize: true, // Auto-update schema for dev/supabase initial sync
     logging: false,
-    entities: [Driver, Vehicle, Refuel, Maintenance, Family],
+    entities: [Driver, Vehicle, Refuel, Maintenance, Family, License],
     migrations: [],
     subscribers: [],
     ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,

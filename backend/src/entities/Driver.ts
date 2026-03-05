@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { Family } from "./Family";
+import { License } from "./License";
 
 @Entity("drivers")
 export class Driver {
@@ -48,4 +49,7 @@ export class Driver {
     @ManyToOne(() => Family, (family) => family.drivers, { nullable: true })
     @JoinColumn({ name: 'familyId' })
     family!: Family;
+
+    @OneToMany(() => License, (license) => license.driver, { cascade: true })
+    licenses!: License[];
 }

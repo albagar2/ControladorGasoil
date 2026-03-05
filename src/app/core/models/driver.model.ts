@@ -1,4 +1,5 @@
 import type { Family } from './family.model';
+import type { License } from './license.model';
 
 export type Driver = {
     id?: number;
@@ -13,6 +14,7 @@ export type Driver = {
     role?: 'admin' | 'conductor' | 'leader';
     familyId?: number;
     family?: Family;
+    licenses?: License[];
     created_at?: Date;
     updated_at?: Date;
 }

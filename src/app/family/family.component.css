@@ -685,3 +685,29 @@ button:disabled {
         grid-template-columns: 1fr;
     }
 }
+
+/* Member Licenses */
+.member-licenses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.mini-license {
+    background: rgba(79, 70, 229, 0.1);
+    color: var(--primary-color);
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(79, 70, 229, 0.2);
+    text-transform: uppercase;
+    cursor: help;
+}
+
+:host-context(.dark) .mini-license {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}

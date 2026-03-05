@@ -36,6 +36,8 @@ export class ProfileComponent implements OnInit {
     isEditing = signal(false);
     showDeleteModal = signal(false);
 
+    licenseTypes = ['AM', 'A1', 'A2', 'A', 'B1', 'B', 'C1', 'C', 'D1', 'D', 'BE', 'C1E', 'CE', 'D1E', 'DE'];
+
     ngOnInit(): void {
         this.syncWithService();
     }
@@ -47,13 +49,34 @@ export class ProfileComponent implements OnInit {
     private syncWithService(): void {
         const current = this.dataService.currentUser();
         if (current) {
-            this.user.set({ ...current, puntosMaximos: 15 });
+            this.user.set({
+                ...current,
+                puntosMaximos: 15,
+                licenses: current.licenses || []
+            });
         } else {
-            // If no user in service, try to load it (DataService.loadAllData handles this, but we can be safe)
+            // If no user in service, try to load it
             const userStr = localStorage.getItem('currentUser') || localStorage.getItem('user');
             if (!userStr) {
                 this.router.navigate(['/login']);
             }
+        }
+    }
+
+    addLicense() {
+        const currentUser = this.user();
+        if ((currentUser.licenses?.length || 0) < 15) {
+            const updatedLicenses = [...(currentUser.licenses || []), { type: 'B' as any, expirationDate: '' }];
+            this.user.set({ ...currentUser, licenses: updatedLicenses });
+        }
+    }
+
+    removeLicense(index: number) {
+        const currentUser = this.user();
+        if ((currentUser.licenses?.length || 0) > 1) {
+            const updatedLicenses = [...(currentUser.licenses || [])];
+            updatedLicenses.splice(index, 1);
+            this.user.set({ ...currentUser, licenses: updatedLicenses });
         }
     }
 
@@ -74,6 +97,17 @@ export class ProfileComponent implements OnInit {
             this.toastService.warning('El nombre es obligatorio.');
             return;
         }
+
+        // Check if all licenses have type and date
+        if (userData.licenses) {
+            for (const license of userData.licenses) {
+                if (!license.type || !license.expirationDate) {
+                    this.toastService.warning('Por favor, completa todos los datos de los carnets.');
+                    return;
+                }
+            }
+        }
+
         if (this.password() && this.password() !== this.confirmPassword()) {
             this.toastService.warning('Las contraseñas no coinciden.');
             return;
@@ -85,8 +119,19 @@ export class ProfileComponent implements OnInit {
             telefono: userData.telefono,
             email: userData.email,
             puntos: userData.puntos,
-            fechaRenovacionCarnet: userData.fechaRenovacionCarnet
+            licenses: userData.licenses
         };
+
+        // Calculate the soonest expiration date to maintain compatibility with legacy field
+        if (userData.licenses && userData.licenses.length > 0) {
+            const dates = userData.licenses
+                .map((l: any) => new Date(l.expirationDate).getTime())
+                .filter((t: number) => !isNaN(t));
+
+            if (dates.length > 0) {
+                updateData.fechaRenovacionCarnet = new Date(Math.min(...dates));
+            }
+        }
 
         if (this.password()) {
             updateData.password = this.password();

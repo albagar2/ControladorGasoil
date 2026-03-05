@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
 
 export const register = async (req: Request, res: Response) => {
     try {
-        const { nombre, dni, telefono, fechaRenovacionCarnet, email, password, role } = req.body;
+        const { nombre, dni, telefono, fechaRenovacionCarnet, email, password, role, licenses } = req.body;
 
         const existingDriver = await driverRepository.findOne({ where: [{ dni }, { email }] });
         if (existingDriver) {
@@ -27,7 +27,8 @@ export const register = async (req: Request, res: Response) => {
             password: hashedPassword,
             role,
             puntos: req.body.puntos || 15,
-            puntosMaximos: 15
+            puntosMaximos: 15,
+            licenses: licenses || []
         });
 
         await driverRepository.save(driver);

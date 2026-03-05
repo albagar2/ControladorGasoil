@@ -197,6 +197,12 @@
                         <div class="member-info">
                             <h4>{{ member.nombre }}</h4>
                             <p>{{ member.role === 'admin' ? 'Administrador' : 'Conductor' }}</p>
+                            <div class="member-licenses" *ngIf="member.licenses?.length">
+                                <span *ngFor="let l of member.licenses" class="mini-license"
+                                    [title]="'Vence: ' + (l.expirationDate | date:'dd/MM/yyyy')">
+                                    {{ l.type }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
