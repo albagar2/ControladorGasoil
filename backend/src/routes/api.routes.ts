@@ -26,6 +26,7 @@ router.use('/drivers', driverRoutes);
 router.use('/refuels', refuelRoutes);
 router.use('/maintenances', maintenanceRoutes);
 router.use('/family', familyRoutes);
+router.use('/families', familyRoutes);
 router.use('/email', emailRoutes);
 
 // Profile routes (Legacy / Shared)
