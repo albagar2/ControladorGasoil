@@ -32,4 +32,14 @@ router.use('/email', emailRoutes);
 router.patch('/profile', checkJwt, DriverController.updateProfile);
 router.delete('/profile', checkJwt, DriverController.deleteProfile);
 
+// Catch-all for /api routes to debug 404s
+router.all('*', (req, res) => {
+    console.log(`[API 404] Unmatched route: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({
+        status: 'error',
+        message: `API route not found: ${req.method} ${req.originalUrl}`,
+        availablePrefixes: ['/auth', '/vehicles', '/drivers', '/refuels', '/maintenances', '/family', '/email', '/status']
+    });
+});
+
 export default router;
