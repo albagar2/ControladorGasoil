@@ -13,7 +13,12 @@ export const getDrivers = asyncHandler(async (req: Request, res: Response) => {
         const drivers = await driverRepository.find({
             relations: ['family', 'licenses']
         });
-        return res.json(drivers);
+
+        // Apply migration logic to all drivers in the list (for admin view consistency)
+        const { migrateLegacyLicense } = require('../utils/migration.utils');
+        const migratedDrivers = await Promise.all(drivers.map(d => migrateLegacyLicense(d)));
+
+        return res.json(migratedDrivers);
     }
 
     if (!familyId) {

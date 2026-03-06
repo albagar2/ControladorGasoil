@@ -43,7 +43,10 @@ export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
-        const driver = await driverRepository.findOne({ where: { email } });
+        const driver = await driverRepository.findOne({
+            where: { email },
+            relations: ['licenses']
+        });
         if (!driver) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -63,7 +66,10 @@ export const login = async (req: Request, res: Response) => {
             { expiresIn: '1h' }
         );
 
-        const { password: _, ...driverWithoutPassword } = driver;
+        const { migrateLegacyLicense } = require('../utils/migration.utils');
+        const driverWithLicenses = await migrateLegacyLicense(driver);
+
+        const { password: _, ...driverWithoutPassword } = driverWithLicenses;
 
         return res.json({ token, user: driverWithoutPassword });
     } catch (error) {
