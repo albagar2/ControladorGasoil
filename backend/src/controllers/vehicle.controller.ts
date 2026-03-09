@@ -16,6 +16,15 @@ const sanitizeVehicleData = (data: any) => {
             sanitized[key] = null;
         }
     }
+
+    // Explicit Date Parsing for ITV and Insurance
+    if (typeof sanitized.itv_fecha_caducidad === 'string' && sanitized.itv_fecha_caducidad.trim() !== '') {
+        sanitized.itv_fecha_caducidad = new Date(sanitized.itv_fecha_caducidad);
+    }
+    if (typeof sanitized.seguro_fecha_vencimiento === 'string' && sanitized.seguro_fecha_vencimiento.trim() !== '') {
+        sanitized.seguro_fecha_vencimiento = new Date(sanitized.seguro_fecha_vencimiento);
+    }
+
     return sanitized;
 };
 
@@ -49,10 +58,8 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     const { userId } = req.user;
     const driver = await driverRepository.findOneBy({ id: userId });
 
-    // Sanitize data: convert empty strings to null
-    console.log('[DEBUG] Incoming Vehicle Body:', JSON.stringify(req.body, null, 2));
+    // Sanitize and Parse data: convert empty strings to null and handle dates
     const vehicleData: any = sanitizeVehicleData(req.body);
-    console.log('[DEBUG] Sanitized Vehicle Data:', JSON.stringify(vehicleData, null, 2));
 
     // Check if matricula already exists
     if (vehicleData.matricula) {
@@ -68,10 +75,7 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     vehicleData.propietarioId = vehicleData.propietarioId || userId;
 
     const newVehicle = vehicleRepository.create(vehicleData as Vehicle);
-    console.log('[DEBUG] Created Vehicle Entity:', JSON.stringify(newVehicle, null, 2));
-
     const savedVehicle = await vehicleRepository.save(newVehicle);
-    console.log('[DEBUG] Saved Vehicle Entity:', JSON.stringify(savedVehicle, null, 2));
 
     // Check for alerts immediately (e.g. if ITV/Insurance dates are already close)
     try {

@@ -738,18 +738,32 @@
 }
 
 :host-context(.dark) .alert-banner {
-    background: #1c1917 !important;
-    border-color: #d97706 !important;
+    background: #111827 !important;
+    /* Slate 900 instead of 1c1917 */
+    border-color: #f59e0b !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 :host-context(.dark) .alert-banner h4,
 :host-context(.dark) .alert-banner p {
-    color: #ffffff !important;
+    color: #f8fafc !important;
+    /* Very light slate */
+}
+
+:host-context(.dark) .alert-banner .material-icons {
+    color: #fbbf24 !important;
+    /* Vibrant yellow */
 }
 
 :host-context(.dark) .alert-banner.urgent {
     background: #450a0a !important;
-    border-color: #dc2626 !important;
+    /* Keep dark red but soften border */
+    border-color: #ef4444 !important;
+}
+
+:host-context(.dark) .alert-banner.urgent .material-icons {
+    color: #f87171 !important;
+    /* Light red */
 }
 
 .alert-banner.urgent {
@@ -952,6 +966,11 @@
     left: 1rem;
     color: #9ca3af;
     pointer-events: none;
+    z-index: 5;
+}
+
+:host-context(.dark) .search-bar .material-icons {
+    color: #e2e8f0;
 }
 
 .search-input {
