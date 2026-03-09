@@ -6,13 +6,13 @@ class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+            port: parseInt(process.env.SMTP_PORT || '465'),
+            secure: process.env.SMTP_SECURE !== 'false', // true by default for 465
             auth: {
                 user: process.env.SMTP_USER || 'tucorreo@gmail.com',
                 pass: process.env.SMTP_PASS || 'tu_contraseña_de_aplicacion',
             },
-            connectionTimeout: 10000, // 10 seconds
+            connectionTimeout: 10000,
             greetingTimeout: 10000,
             socketTimeout: 10000
         });

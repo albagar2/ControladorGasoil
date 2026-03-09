@@ -72,8 +72,13 @@ app.listen(Number(PORT), '0.0.0.0', () => {
 
     // Initialize Database in the background
     AppDataSource.initialize()
-        .then(() => {
+        .then(async () => {
             console.log("Data Source has been initialized!");
+
+            // Wait a bit for synchronize: true to finish and stable
+            console.log("Waiting for database stabilization...");
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
             setupSwagger(app);
             setupCronJobs();
             startKeepAlive();

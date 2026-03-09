@@ -17,10 +17,15 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USER || "postgres",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "postgres",
-    synchronize: true, // Auto-update schema for dev/supabase initial sync
+    synchronize: true, // Auto-update schema
     logging: false,
     entities: [Driver, Vehicle, Refuel, Maintenance, Family, License],
     migrations: [],
     subscribers: [],
     ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    extra: {
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+    }
 });
