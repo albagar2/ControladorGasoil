@@ -63,10 +63,10 @@ export class MaintenanceComponent implements OnInit {
         if (to) filtered = filtered.filter(m => new Date(m.fecha) <= new Date(to));
 
         // Apply Monthly Filter (Primary organization)
-        const month = this.selectedMonth();
+        const [year, month] = this.selectedMonth().split('-').map(Number);
         filtered = filtered.filter(m => {
             const date = new Date(m.fecha);
-            return date.toISOString().startsWith(month);
+            return date.getFullYear() === year && (date.getMonth() + 1) === month;
         });
 
         return filtered;
@@ -286,12 +286,16 @@ export class MaintenanceComponent implements OnInit {
     prevMonth() {
         const [year, month] = this.selectedMonth().split('-').map(Number);
         const date = new Date(year, month - 2, 1);
-        this.selectedMonth.set(date.toISOString().substring(0, 7));
+        const newYear = date.getFullYear();
+        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+        this.selectedMonth.set(`${newYear}-${newMonth}`);
     }
 
     nextMonth() {
         const [year, month] = this.selectedMonth().split('-').map(Number);
         const date = new Date(year, month, 1);
-        this.selectedMonth.set(date.toISOString().substring(0, 7));
+        const newYear = date.getFullYear();
+        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+        this.selectedMonth.set(`${newYear}-${newMonth}`);
     }
 }

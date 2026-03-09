@@ -30,9 +30,15 @@ export class AnalyticsComponent implements OnInit {
     }
 
     totalSpent = computed(() => {
-        const month = this.selectedMonth();
-        const refuels = this.dataService.refuels().filter(r => new Date(r.fecha).toISOString().startsWith(month));
-        const maintenances = this.dataService.maintenances().filter(m => new Date(m.fecha).toISOString().startsWith(month));
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+        const refuels = this.dataService.refuels().filter(r => {
+            const d = new Date(r.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
+        const maintenances = this.dataService.maintenances().filter(m => {
+            const d = new Date(m.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
 
         const fuelCost = refuels.reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
         const maintCost = maintenances.reduce((acc, m) => acc + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0), 0);
@@ -40,12 +46,15 @@ export class AnalyticsComponent implements OnInit {
     });
 
     averageEfficiency = computed(() => {
-        const month = this.selectedMonth();
+        const [year, month] = this.selectedMonth().split('-').map(Number);
         const allRefuels = this.dataService.refuels();
         // Efficiency needs historical context to calculate KM difference, 
         // but we'll scope the "usage" (liters) and "traveled" to current context if possible
         // For simplicity as requested, we'll filter refuels of the month
-        const refuels = allRefuels.filter(r => new Date(r.fecha).toISOString().startsWith(month));
+        const refuels = allRefuels.filter(r => {
+            const d = new Date(r.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
 
         if (refuels.length < 1) return 0;
 
@@ -109,9 +118,12 @@ export class AnalyticsComponent implements OnInit {
 
     // Chart Data: Share by vehicle (Computed & Monthly)
     public pieChartData = computed<ChartData<'pie'>>(() => {
-        const month = this.selectedMonth();
+        const [year, month] = this.selectedMonth().split('-').map(Number);
         const vehicles = this.dataService.vehicles();
-        const refuels = this.dataService.refuels().filter(r => new Date(r.fecha).toISOString().startsWith(month));
+        const refuels = this.dataService.refuels().filter(r => {
+            const d = new Date(r.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
 
         const vehicleLabels: string[] = [];
         const vehicleData: number[] = [];
@@ -147,21 +159,31 @@ export class AnalyticsComponent implements OnInit {
     }
 
     monthlyRecordsCount = computed(() => {
-        const month = this.selectedMonth();
-        const refuels = this.dataService.refuels().filter(r => new Date(r.fecha).toISOString().startsWith(month));
-        const maintenances = this.dataService.maintenances().filter(m => new Date(m.fecha).toISOString().startsWith(month));
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+        const refuels = this.dataService.refuels().filter(r => {
+            const d = new Date(r.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
+        const maintenances = this.dataService.maintenances().filter(m => {
+            const d = new Date(m.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
         return refuels.length + maintenances.length;
     });
 
     prevMonth() {
         const [year, month] = this.selectedMonth().split('-').map(Number);
         const date = new Date(year, month - 2, 1);
-        this.selectedMonth.set(date.toISOString().substring(0, 7));
+        const newYear = date.getFullYear();
+        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+        this.selectedMonth.set(`${newYear}-${newMonth}`);
     }
 
     nextMonth() {
         const [year, month] = this.selectedMonth().split('-').map(Number);
         const date = new Date(year, month, 1);
-        this.selectedMonth.set(date.toISOString().substring(0, 7));
+        const newYear = date.getFullYear();
+        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+        this.selectedMonth.set(`${newYear}-${newMonth}`);
     }
 }

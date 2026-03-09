@@ -152,9 +152,10 @@ export class RefuelsComponent {
     }
 
     get filteredRefuels(): Refuel[] {
+        const [year, month] = this.selectedMonth.split('-').map(Number);
         return this.dataService.refuels().filter(r => {
             const date = new Date(r.fecha);
-            return date.toISOString().startsWith(this.selectedMonth);
+            return date.getFullYear() === year && (date.getMonth() + 1) === month;
         });
     }
 
@@ -174,13 +175,19 @@ export class RefuelsComponent {
 
     prevMonth() {
         const [year, month] = this.selectedMonth.split('-').map(Number);
+        // Date constructor with month-1 handles underflow (Jan -> Dec) automatically
         const date = new Date(year, month - 2, 1);
-        this.selectedMonth = date.toISOString().substring(0, 7);
+        const newYear = date.getFullYear();
+        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+        this.selectedMonth = `${newYear}-${newMonth}`;
     }
 
     nextMonth() {
         const [year, month] = this.selectedMonth.split('-').map(Number);
+        // Date constructor with month handles overflow (Dec -> Jan) automatically
         const date = new Date(year, month, 1);
-        this.selectedMonth = date.toISOString().substring(0, 7);
+        const newYear = date.getFullYear();
+        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+        this.selectedMonth = `${newYear}-${newMonth}`;
     }
 }
