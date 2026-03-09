@@ -6,15 +6,19 @@ class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '465'),
-            secure: process.env.SMTP_SECURE !== 'false', // true by default for 465
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: false, // TLS is required for 587 but secure: true is for 465
             auth: {
                 user: process.env.SMTP_USER || 'tucorreo@gmail.com',
                 pass: process.env.SMTP_PASS || 'tu_contraseña_de_aplicacion',
             },
-            connectionTimeout: 10000,
-            greetingTimeout: 10000,
-            socketTimeout: 10000
+            tls: {
+                rejectUnauthorized: false, // Helps with some cloud firewalls
+                minVersion: 'TLSv1.2'
+            },
+            connectionTimeout: 15000,
+            greetingTimeout: 15000,
+            socketTimeout: 15000
         });
     }
 

@@ -68,12 +68,21 @@ export const createRefuel = asyncHandler(async (req: Request, res: Response) => 
     const { role, familyId } = req.user;
 
     const refuelData = sanitizeRefuelData(req.body);
-    const { vehiculoId, kilometraje, litros, precioPorLitro, costeTotal, proveedor, tipoCombustible, conductorId, fecha } = refuelData;
+    const { vehiculoId, kilometraje, litros, precioPorLitro, conductorId, fecha } = refuelData;
+    let { tipoCombustible, proveedor } = refuelData;
 
     const vehicle = await vehicleRepository.findOneBy({ id: vehiculoId });
     if (!vehicle) {
         if (req.file) fs.unlinkSync(req.file.path);
         return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    // Default values if missing
+    if (!tipoCombustible || tipoCombustible.trim() === '') {
+        tipoCombustible = vehicle.combustible || 'Diesel';
+    }
+    if (!proveedor) {
+        proveedor = 'Desconocido';
     }
 
     // Security Check
@@ -106,6 +115,8 @@ export const createRefuel = asyncHandler(async (req: Request, res: Response) => 
 
     const newRefuel = refuelRepository.create({
         ...refuelData,
+        tipoCombustible,
+        proveedor,
         ticketImageUrl
     });
 

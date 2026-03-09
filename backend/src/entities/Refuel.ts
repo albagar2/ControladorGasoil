@@ -24,7 +24,7 @@ export class Refuel {
     @Column()
     proveedor!: string;
 
-    @Column({ name: 'tipo_combustible' })
+    @Column({ name: 'tipo_combustible', nullable: true })
     tipoCombustible!: string;
 
     @Column({ name: 'vehiculo_id' })
