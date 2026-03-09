@@ -8,6 +8,17 @@ import { alertService } from '../services/alert.service';
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
 const driverRepository = AppDataSource.getRepository(Driver);
 
+const sanitizeVehicleData = (data: any) => {
+    const sanitized = { ...data };
+    for (const key in sanitized) {
+        // Convert empty strings to null for database compatibility
+        if (sanitized[key] === '') {
+            sanitized[key] = null;
+        }
+    }
+    return sanitized;
+};
+
 export const getVehicles = asyncHandler(async (req: Request, res: Response) => {
     // @ts-ignore
     const { userId, role, familyId } = req.user;
@@ -38,13 +49,23 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     const { userId } = req.user;
     const driver = await driverRepository.findOneBy({ id: userId });
 
-    const vehicleData: Partial<Vehicle> = req.body;
+    // Sanitize data: convert empty strings to null
+    const vehicleData: any = sanitizeVehicleData(req.body);
+
+    // Check if matricula already exists
+    if (vehicleData.matricula) {
+        const existing = await vehicleRepository.findOneBy({ matricula: vehicleData.matricula.toUpperCase().trim() });
+        if (existing) {
+            return res.status(400).json({ status: 'error', message: `La matrícula ${vehicleData.matricula} ya está registrada.` });
+        }
+    }
+
     if (driver && driver.familyId) {
         vehicleData.familyId = driver.familyId;
     }
-    vehicleData.propietarioId = userId;
+    vehicleData.propietarioId = vehicleData.propietarioId || userId;
 
-    const newVehicle = vehicleRepository.create(vehicleData);
+    const newVehicle = vehicleRepository.create(vehicleData as Vehicle);
     const savedVehicle = await vehicleRepository.save(newVehicle);
 
     // Check for alerts immediately (e.g. if ITV/Insurance dates are already close)
@@ -78,7 +99,8 @@ export const updateVehicle = asyncHandler(async (req: Request, res: Response) =>
         return res.status(403).json({ message: 'Forbidden: You do not have access to this vehicle' });
     }
 
-    vehicleRepository.merge(vehicle, req.body);
+    const sanitizedData = sanitizeVehicleData(req.body);
+    vehicleRepository.merge(vehicle, sanitizedData);
     const results = await vehicleRepository.save(vehicle);
 
     // Check for alerts immediately

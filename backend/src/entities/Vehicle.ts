@@ -18,10 +18,10 @@ export class Vehicle {
     @Column()
     modelo!: string;
 
-    @Column({ type: 'enum', enum: ['Gasolina', 'Diesel', 'Eléctrico', 'Híbrido', 'GLP', 'GNC'], default: 'Diesel' })
+    @Column({ type: 'enum', enum: ['Gasolina', 'Diesel', 'Eléctrico', 'Híbrido', 'GLP', 'GNC'], default: 'Diesel', nullable: true })
     combustible!: CombustibleType;
 
-    @Column({ type: 'enum', enum: ['0', 'ECO', 'C', 'B'], default: 'C' })
+    @Column({ type: 'enum', enum: ['0', 'ECO', 'C', 'B'], default: 'C', nullable: true })
     distintivo!: DistintivoType;
 
     // Seguro (Flattened)
@@ -38,7 +38,7 @@ export class Vehicle {
     seguro_cobertura!: CoberturaType;
 
     // ITV (Flattened)
-    @Column({ type: 'enum', enum: ['Pasada', 'Pendiente', 'Caducada', 'Favorable', 'Desfavorable'], default: 'Pendiente', name: 'itv_estado' })
+    @Column({ type: 'enum', enum: ['Pasada', 'Pendiente', 'Caducada', 'Favorable', 'Desfavorable'], default: 'Pendiente', name: 'itv_estado', nullable: true })
     itv_estado!: ItvEstadoType;
 
     @Column({ type: 'date', name: 'itv_fecha_caducidad', nullable: true })
