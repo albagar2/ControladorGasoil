@@ -23,8 +23,18 @@ class EmailService {
             await this.transporter.verify();
             console.log('✅ SMTP Connection verified');
             return true;
-        } catch (error) {
-            console.error('❌ SMTP Connection failed:', error);
+        } catch (error: any) {
+            console.error('❌ SMTP Connection failed:', {
+                message: error.message,
+                code: error.code,
+                command: error.command,
+                response: error.response,
+                status: error.status,
+                stack: error.stack
+            });
+            if (error.code === 'ETIMEDOUT') {
+                console.warn('💡 TIP: Port 465/587 might be blocked by Render. Consider using a different provider or checking Render documentation for SMTP egress.');
+            }
             return false;
         }
     }

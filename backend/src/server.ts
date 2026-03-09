@@ -10,11 +10,19 @@ import { setupCronJobs } from './config/cron';
 import { startKeepAlive } from './services/keep-alive.service';
 import { errorMiddleware } from './middleware/error.middleware';
 import { emailService } from './services/email.service';
+import fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+    console.log(`[Startup] Creating uploads directory at ${uploadsDir}`);
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Detailed Request Logging
 app.use((req, res, next) => {
