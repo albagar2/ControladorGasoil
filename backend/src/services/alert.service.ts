@@ -26,6 +26,7 @@ class AlertService {
     ];
 
     async checkAndSendAlerts(vehicleId: number) {
+        console.log(`[AlertService] Checking alerts for vehicle ${vehicleId}...`);
         const vehicleRepository = AppDataSource.getRepository(Vehicle);
         const maintenanceRepository = AppDataSource.getRepository(Maintenance);
 
@@ -34,7 +35,15 @@ class AlertService {
             relations: ['propietario']
         });
 
-        if (!vehicle || !vehicle.propietario?.email) return;
+        if (!vehicle) {
+            console.log(`[AlertService] Vehicle ${vehicleId} not found.`);
+            return;
+        }
+
+        if (!vehicle.propietario?.email) {
+            console.warn(`[AlertService] Vehicle ${vehicle.matricula} has no owner email. Skipping alerts.`);
+            return;
+        }
 
         const maintenances = await maintenanceRepository.find({
             where: { vehiculoId: vehicleId }
@@ -46,6 +55,7 @@ class AlertService {
 
         // 1. Check Maintenance Rules
         for (const rule of this.RULES) {
+            console.log(`[AlertService] Checking rule: ${rule.label} for ${vehicle.matricula}`);
             const vehicleMaintenances = maintenances
                 .filter(m => m.tipo === rule.id)
                 .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
@@ -78,12 +88,18 @@ class AlertService {
             }
 
             if (isDue) {
-                await emailService.sendAutomatedAlert(vehicle.propietario.email, {
-                    title: `Mantenimiento: ${rule.label} - ${vehicle.matricula}`,
-                    message: `Tu vehículo ${vehicle.modelo} (${vehicle.matricula}) requiere ${rule.label.toLowerCase()}.`,
-                    detailLabel: 'Razón',
-                    detailValue: reason
-                });
+                console.log(`[AlertService] Alert triggered: ${rule.label} for ${vehicle.matricula}. Reason: ${reason}`);
+                try {
+                    await emailService.sendAutomatedAlert(vehicle.propietario.email, {
+                        title: `Mantenimiento: ${rule.label} - ${vehicle.matricula}`,
+                        message: `Tu vehículo ${vehicle.modelo} (${vehicle.matricula}) requiere ${rule.label.toLowerCase()}.`,
+                        detailLabel: 'Razón',
+                        detailValue: reason
+                    });
+                    console.log(`[AlertService] Email notification sent to ${vehicle.propietario.email}`);
+                } catch (err) {
+                    console.error(`[AlertService] Failed to send email to ${vehicle.propietario.email}:`, err);
+                }
             }
         }
 
@@ -91,12 +107,17 @@ class AlertService {
         if (vehicle.itv_fecha_caducidad) {
             const itvDate = new Date(vehicle.itv_fecha_caducidad);
             if (itvDate <= thirtyDaysFromNow) {
-                await emailService.sendAutomatedAlert(vehicle.propietario.email, {
-                    title: `ITV Próxima a Caducar: ${vehicle.matricula}`,
-                    message: `La ITV de tu vehículo ${vehicle.modelo} (${vehicle.matricula}) caduca pronto o ya ha caducado.`,
-                    detailLabel: 'Fecha de Caducidad',
-                    detailValue: itvDate.toLocaleDateString()
-                });
+                console.log(`[AlertService] ITV Alert triggered for ${vehicle.matricula}. Expiry: ${itvDate.toLocaleDateString()}`);
+                try {
+                    await emailService.sendAutomatedAlert(vehicle.propietario.email, {
+                        title: `ITV Próxima a Caducar: ${vehicle.matricula}`,
+                        message: `La ITV de tu vehículo ${vehicle.modelo} (${vehicle.matricula}) caduca pronto o ya ha caducado.`,
+                        detailLabel: 'Fecha de Caducidad',
+                        detailValue: itvDate.toLocaleDateString()
+                    });
+                } catch (err) {
+                    console.error(`[AlertService] Failed to send ITV email:`, err);
+                }
             }
         }
 
@@ -104,12 +125,17 @@ class AlertService {
         if (vehicle.seguro_fecha_vencimiento) {
             const insuranceDate = new Date(vehicle.seguro_fecha_vencimiento);
             if (insuranceDate <= thirtyDaysFromNow) {
-                await emailService.sendAutomatedAlert(vehicle.propietario.email, {
-                    title: `Seguro Próximo a Vencer: ${vehicle.matricula}`,
-                    message: `El seguro de tu vehículo ${vehicle.modelo} (${vehicle.matricula}) vence pronto o ya ha vencido.`,
-                    detailLabel: 'Fecha de Vencimiento',
-                    detailValue: insuranceDate.toLocaleDateString()
-                });
+                console.log(`[AlertService] Insurance Alert triggered for ${vehicle.matricula}. Expiry: ${insuranceDate.toLocaleDateString()}`);
+                try {
+                    await emailService.sendAutomatedAlert(vehicle.propietario.email, {
+                        title: `Seguro Próximo a Vencer: ${vehicle.matricula}`,
+                        message: `El seguro de tu vehículo ${vehicle.modelo} (${vehicle.matricula}) vence pronto o ya ha vencido.`,
+                        detailLabel: 'Fecha de Vencimiento',
+                        detailValue: insuranceDate.toLocaleDateString()
+                    });
+                } catch (err) {
+                    console.error(`[AlertService] Failed to send Insurance email:`, err);
+                }
             }
         }
     }

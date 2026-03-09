@@ -5,9 +5,7 @@ class EmailService {
 
     constructor() {
         this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: false, // TLS is required for 587 but secure: true is for 465
+            service: 'gmail',
             auth: {
                 user: process.env.SMTP_USER || 'tucorreo@gmail.com',
                 pass: process.env.SMTP_PASS || 'tu_contraseña_de_aplicacion',
