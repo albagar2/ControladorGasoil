@@ -14,9 +14,9 @@ class EmailService {
                 rejectUnauthorized: false, // Helps with some cloud firewalls
                 minVersion: 'TLSv1.2'
             },
-            connectionTimeout: 15000,
-            greetingTimeout: 15000,
-            socketTimeout: 15000
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 30000
         });
     }
 
