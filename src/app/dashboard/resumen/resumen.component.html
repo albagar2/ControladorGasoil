@@ -1,52 +1,66 @@
 <div class="fade-in">
+    <!-- Premium Welcome Header -->
+    <div class="welcome-header mb-8">
+        <h1 class="text-4xl font-extrabold tracking-tight">
+            Hola de nuevo, <span class="gradient-text">Bienvenido</span> 👋
+        </h1>
+        <p class="text-slate-500 mt-2 text-lg">Aquí tienes el resumen actual de tu flota familiar.</p>
+    </div>
+
     <div class="stats-grid">
         <!-- Vehicles -->
-        <a class="stat-card card-vehicles" routerLink="../vehiculos">
-            <div class="stat-header">
-                <div class="icon-box"><span class="material-icons">directions_car</span></div>
+        <a class="stat-card glass-card hover-glow" routerLink="../vehiculos">
+            <div class="stat-icon-wrapper bg-indigo-50 text-indigo-600">
+                <span class="material-icons">directions_car</span>
             </div>
-            <div>
+            <div class="stat-content">
                 <div class="stat-value">{{ dataService.totalVehicles() }}</div>
                 <div class="stat-label">Vehículos Activos</div>
             </div>
+            <div class="card-accent indigo"></div>
         </a>
 
         <!-- Drivers -->
-        <a class="stat-card card-drivers" routerLink="../conductores">
-            <div class="stat-header">
-                <div class="icon-box"><span class="material-icons">badge</span></div>
+        <a class="stat-card glass-card hover-glow" routerLink="../conductores">
+            <div class="stat-icon-wrapper bg-emerald-50 text-emerald-600">
+                <span class="material-icons">badge</span>
             </div>
-            <div>
+            <div class="stat-content">
                 <div class="stat-value">{{ dataService.totalDrivers() }}</div>
                 <div class="stat-label">Conductores</div>
             </div>
+            <div class="card-accent emerald"></div>
         </a>
 
         <!-- Cost -->
-        <div class="stat-card card-cost">
-            <div class="stat-header">
-                <div class="icon-box"><span class="material-icons">paid</span></div>
+        <div class="stat-card glass-card hover-glow">
+            <div class="stat-icon-wrapper bg-amber-50 text-amber-600">
+                <span class="material-icons">paid</span>
             </div>
-            <div>
+            <div class="stat-content">
                 <div class="stat-value">{{ dataService.totalCost() | currency:'EUR' }}</div>
-                <div class="stat-label">Gasto Total</div>
+                <div class="stat-label">Gasto Total Acumulado</div>
             </div>
+            <div class="card-accent amber"></div>
         </div>
 
         <!-- Maintenance -->
-        <a class="stat-card maintenance-card" [class.urgent-pulse]="dataService.upcomingMaintenance().length > 0"
+        <a class="stat-card glass-card hover-glow" [class.urgent-card]="dataService.upcomingMaintenance().length > 0"
             routerLink="../mantenimiento">
-            <div class="stat-header">
-                <div class="icon-box"><span class="material-icons">handyman</span></div>
+            <div class="stat-icon-wrapper" [class.bg-rose-50]="dataService.upcomingMaintenance().length > 0"
+                [class.text-rose-600]="dataService.upcomingMaintenance().length > 0"
+                [class.bg-slate-50]="dataService.upcomingMaintenance().length === 0">
+                <span class="material-icons">{{ dataService.upcomingMaintenance().length > 0 ? 'report_problem' :
+                    'verified' }}</span>
             </div>
-            <div>
+            <div class="stat-content">
                 <div class="stat-value">{{ dataService.upcomingMaintenance().length }}</div>
-                <div class="stat-label" *ngIf="dataService.upcomingMaintenance().length > 0">Alertas de Mantenimiento
-                </div>
-                <div class="stat-label" *ngIf="dataService.upcomingMaintenance().length === 0">Todo en orden</div>
+                <div class="stat-label">{{ dataService.upcomingMaintenance().length > 0 ? 'Alertas de Mantenimiento' :
+                    'Todo en orden' }}</div>
             </div>
+            <div class="card-accent" [class.rose]="dataService.upcomingMaintenance().length > 0"
+                [class.slate]="dataService.upcomingMaintenance().length === 0"></div>
         </a>
-
     </div>
 
     <!-- Maintenance Alerts List -->
