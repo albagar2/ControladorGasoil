@@ -9,7 +9,7 @@ router.use(checkJwt);
 
 router.get('/', RefuelController.getRefuels);
 router.post('/', upload.single('ticket'), RefuelController.createRefuel);
-router.put('/:id', RefuelController.updateRefuel);
+router.put('/:id', upload.single('ticket'), RefuelController.updateRefuel);
 router.delete('/:id', RefuelController.deleteRefuel);
 
 export default router;

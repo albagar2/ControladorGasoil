@@ -69,7 +69,12 @@ export class RefuelsComponent {
         }
 
         if (this.isEditing && this.currentRefuel.id) {
-            this.refuelService.updateRefuel(this.currentRefuel.id, this.currentRefuel).subscribe({
+            const data = { ...this.currentRefuel };
+            if (this.ticketFile) {
+                (data as any).ticket = this.ticketFile;
+            }
+
+            this.refuelService.updateRefuel(this.currentRefuel.id, data).subscribe({
                 next: () => {
                     this.toastService.success('Repostaje actualizado correctamente');
                     this.dataService.loadAllData();

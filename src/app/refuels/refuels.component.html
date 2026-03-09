@@ -10,6 +10,7 @@
                 <tr>
                     <th>Fecha</th>
                     <th>Vehículo</th>
+                    <th>KM</th>
                     <th>Proveedor</th>
                     <th>Litros</th>
                     <th>Precio/L</th>
@@ -21,14 +22,15 @@
                 <tr *ngFor="let load of dataService.refuels()">
                     <td>{{ load.fecha | date:'dd/MM/yyyy' }}</td>
                     <td>{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
+                    <td>{{ load.kilometraje | number }} km</td>
                     <td>{{ load.proveedor }}</td>
                     <td>{{ load.litros }} L</td>
                     <td>{{ load.precioPorLitro | currency:'EUR' }}</td>
                     <td style="font-weight: 600; color: var(--primary);">{{ load.costeTotal | currency:'EUR' }}</td>
                     <td class="actions-cell">
                         <div style="display: flex; gap: 0.5rem;">
-                            <button *ngIf="load.ticket_path" class="icon-btn info"
-                                (click)="viewTicket(load.ticket_path)" title="Ver Ticket">
+                            <button *ngIf="load.ticketImageUrl" class="icon-btn info"
+                                (click)="viewTicket(load.ticketImageUrl)" title="Ver Ticket">
                                 <span class="material-icons">description</span>
                             </button>
                             <button class="icon-btn edit" (click)="openEditModal(load)">
@@ -41,7 +43,7 @@
                     </td>
                 </tr>
                 <tr *ngIf="dataService.refuels().length === 0">
-                    <td colspan="7" style="text-align: center; padding: 2rem;">No hay registros de repostaje.</td>
+                    <td colspan="8" style="text-align: center; padding: 2rem;">No hay registros de repostaje.</td>
                 </tr>
             </tbody>
         </table>

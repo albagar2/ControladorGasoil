@@ -23,11 +23,11 @@ const sanitizeRefuelData = (data: any) => {
     }
 
     // Ensure numbers are really numbers
-    if (sanitized.vehiculoId) sanitized.vehiculoId = parseInt(sanitized.vehiculoId.toString());
-    if (sanitized.kilometraje) sanitized.kilometraje = parseInt(sanitized.kilometraje.toString());
-    if (sanitized.litros) sanitized.litros = parseFloat(sanitized.litros.toString());
-    if (sanitized.precioPorLitro) sanitized.precioPorLitro = parseFloat(sanitized.precioPorLitro.toString());
-    if (sanitized.costeTotal) sanitized.costeTotal = parseFloat(sanitized.costeTotal.toString());
+    if (sanitized.vehiculoId !== undefined && sanitized.vehiculoId !== null) sanitized.vehiculoId = parseInt(sanitized.vehiculoId.toString());
+    if (sanitized.kilometraje !== undefined && sanitized.kilometraje !== null) sanitized.kilometraje = parseInt(sanitized.kilometraje.toString());
+    if (sanitized.litros !== undefined && sanitized.litros !== null) sanitized.litros = parseFloat(sanitized.litros.toString());
+    if (sanitized.precioPorLitro !== undefined && sanitized.precioPorLitro !== null) sanitized.precioPorLitro = parseFloat(sanitized.precioPorLitro.toString());
+    if (sanitized.costeTotal !== undefined && sanitized.costeTotal !== null) sanitized.costeTotal = parseFloat(sanitized.costeTotal.toString());
 
     // ConductorId 0 -> null
     if (sanitized.conductorId) {
@@ -161,19 +161,54 @@ export const updateRefuel = asyncHandler(async (req: Request, res: Response) => 
         relations: ["vehiculo"]
     });
 
-    if (!refuel) return res.status(404).json({ message: 'Refuel not found' });
+    if (!refuel) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        return res.status(404).json({ message: 'Refuel not found' });
+    }
 
     // Security Check
     if (role !== 'admin' && refuel.vehiculo.familyId !== familyId) {
+        if (req.file) fs.unlinkSync(req.file.path);
         return res.status(403).json({ message: 'Forbidden' });
     }
 
-    refuelRepository.merge(refuel, req.body);
-    await refuelRepository.save(refuel);
+    const refuelData = sanitizeRefuelData(req.body);
+
+    // Handle File Upload if present
+    if (req.file) {
+        const vehicle = refuel.vehiculo;
+        const now = new Date();
+        const timestamp = now.getFullYear().toString() +
+            (now.getMonth() + 1).toString().padStart(2, '0') +
+            now.getDate().toString().padStart(2, '0') + '_' +
+            now.getHours().toString().padStart(2, '0') +
+            now.getMinutes().toString().padStart(2, '0');
+
+        const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
+        const newFileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
+        const newPath = path.join('uploads', newFileName);
+
+        try {
+            fs.renameSync(req.file.path, newPath);
+            refuelData.ticketImageUrl = `uploads/${newFileName}`;
+        } catch (err) {
+            console.error('Error renaming file', err);
+            refuelData.ticketImageUrl = `uploads/${req.file.filename}`;
+        }
+    }
+
+    refuelRepository.merge(refuel, refuelData);
+    const savedRefuel = await refuelRepository.save(refuel);
+
+    // Update Vehicle Mileage if changed
+    if (savedRefuel.kilometraje > refuel.vehiculo.kilometrajeActual) {
+        refuel.vehiculo.kilometrajeActual = savedRefuel.kilometraje;
+        await vehicleRepository.save(refuel.vehiculo);
+    }
 
     // Return with relations
     const fullRefuel = await refuelRepository.findOne({
-        where: { id: refuel.id },
+        where: { id: savedRefuel.id },
         relations: ["vehiculo", "conductor"]
     });
 
