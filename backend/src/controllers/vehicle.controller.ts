@@ -48,7 +48,11 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     const savedVehicle = await vehicleRepository.save(newVehicle);
 
     // Check for alerts immediately (e.g. if ITV/Insurance dates are already close)
-    await alertService.checkAndSendAlerts(savedVehicle.id);
+    try {
+        await alertService.checkAndSendAlerts(savedVehicle.id);
+    } catch (error) {
+        console.error(`[AlertService] Failed to send alerts for vehicle ${savedVehicle.id}:`, error);
+    }
 
     res.status(201).json(savedVehicle);
 });
@@ -78,7 +82,11 @@ export const updateVehicle = asyncHandler(async (req: Request, res: Response) =>
     const results = await vehicleRepository.save(vehicle);
 
     // Check for alerts immediately
-    await alertService.checkAndSendAlerts(vehicle.id);
+    try {
+        await alertService.checkAndSendAlerts(vehicle.id);
+    } catch (error) {
+        console.error(`[AlertService] Failed to send alerts for vehicle ${vehicle.id}:`, error);
+    }
 
     res.json(results);
 });

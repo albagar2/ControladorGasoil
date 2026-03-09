@@ -26,26 +26,26 @@ export class Vehicle {
 
     // Seguro (Flattened)
     @Column({ name: 'seguro_compañia', nullable: true })
-    seguroCompañia!: string;
+    seguro_compañia!: string;
 
     @Column({ name: 'seguro_numero_poliza', nullable: true })
-    seguroNumeroPoliza!: string;
+    seguro_numero_poliza!: string;
 
     @Column({ type: 'date', name: 'seguro_fecha_vencimiento', nullable: true })
-    seguroFechaVencimiento!: Date;
+    seguro_fecha_vencimiento!: Date;
 
     @Column({ type: 'enum', enum: ['Terceros', 'Terceros ampliado', 'Todo riesgo', 'Todo riesgo con franquicia'], name: 'seguro_cobertura', nullable: true })
-    seguroCobertura!: CoberturaType;
+    seguro_cobertura!: CoberturaType;
 
     // ITV (Flattened)
     @Column({ type: 'enum', enum: ['Pasada', 'Pendiente', 'Caducada', 'Favorable', 'Desfavorable'], default: 'Pendiente', name: 'itv_estado' })
-    itvEstado!: ItvEstadoType;
+    itv_estado!: ItvEstadoType;
 
     @Column({ type: 'date', name: 'itv_fecha_caducidad', nullable: true })
-    itvFechaCaducidad!: Date;
+    itv_fecha_caducidad!: Date;
 
     @Column({ default: 0, name: 'itv_kilometraje' })
-    itvKilometraje!: number;
+    itv_kilometraje!: number;
 
     @Column({ name: 'ano_matriculacion' })
     anioMatriculacion!: number;

@@ -88,8 +88,8 @@ class AlertService {
         }
 
         // 2. Check ITV
-        if (vehicle.itvFechaCaducidad) {
-            const itvDate = new Date(vehicle.itvFechaCaducidad);
+        if (vehicle.itv_fecha_caducidad) {
+            const itvDate = new Date(vehicle.itv_fecha_caducidad);
             if (itvDate <= thirtyDaysFromNow) {
                 await emailService.sendAutomatedAlert(vehicle.propietario.email, {
                     title: `ITV Próxima a Caducar: ${vehicle.matricula}`,
@@ -101,8 +101,8 @@ class AlertService {
         }
 
         // 3. Check Insurance
-        if (vehicle.seguroFechaVencimiento) {
-            const insuranceDate = new Date(vehicle.seguroFechaVencimiento);
+        if (vehicle.seguro_fecha_vencimiento) {
+            const insuranceDate = new Date(vehicle.seguro_fecha_vencimiento);
             if (insuranceDate <= thirtyDaysFromNow) {
                 await emailService.sendAutomatedAlert(vehicle.propietario.email, {
                     title: `Seguro Próximo a Vencer: ${vehicle.matricula}`,
