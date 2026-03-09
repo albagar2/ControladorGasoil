@@ -12,6 +12,9 @@ class EmailService {
                 user: process.env.SMTP_USER || 'tucorreo@gmail.com',
                 pass: process.env.SMTP_PASS || 'tu_contraseña_de_aplicacion',
             },
+            connectionTimeout: 10000, // 10 seconds
+            greetingTimeout: 10000,
+            socketTimeout: 10000
         });
     }
 
@@ -108,8 +111,14 @@ class EmailService {
             const info = await this.transporter.sendMail(mailOptions);
             console.log('✅ Automated alert sent:', info.messageId);
             return info;
-        } catch (error) {
-            console.error('❌ Error in sendAutomatedAlert:', error);
+        } catch (error: any) {
+            console.error('❌ Error in sendAutomatedAlert:', {
+                message: error.message,
+                code: error.code,
+                command: error.command,
+                response: error.response,
+                status: error.status
+            });
             throw error;
         }
     }

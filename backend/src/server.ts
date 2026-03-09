@@ -9,6 +9,7 @@ import { setupSwagger } from './config/swagger';
 import { setupCronJobs } from './config/cron';
 import { startKeepAlive } from './services/keep-alive.service';
 import { errorMiddleware } from './middleware/error.middleware';
+import { emailService } from './services/email.service';
 
 dotenv.config();
 
@@ -76,6 +77,15 @@ app.listen(Number(PORT), '0.0.0.0', () => {
             setupSwagger(app);
             setupCronJobs();
             startKeepAlive();
+
+            // Verify Email Connection
+            emailService.verifyConnection().then(success => {
+                if (success) {
+                    console.log("📧 Email service is ready to send alerts");
+                } else {
+                    console.warn("⚠️ Email service connection failed - check SMTP credentials in Render env");
+                }
+            });
         })
         .catch((err) => {
             console.error("Error during Data Source initialization:", err);
