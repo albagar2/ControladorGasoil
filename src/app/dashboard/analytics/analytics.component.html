@@ -10,13 +10,17 @@
         </div>
     </div>
 
-    <!-- Month Selector -->
+    <!-- Modern Month Selector -->
     <div class="month-selector-bar">
-        <button class="month-nav-btn" (click)="prevMonth()">
+        <button class="month-nav-btn" (click)="prevMonth()" title="Mes Anterior">
             <span class="material-icons">chevron_left</span>
         </button>
-        <div class="current-month-label">{{ monthName | titlecase }}</div>
-        <button class="month-nav-btn" (click)="nextMonth()">
+        <div class="current-month-label">
+            <span class="material-icons"
+                style="vertical-align: middle; margin-right: 8px; font-size: 1.2rem; color: var(--text-muted);">calendar_today</span>
+            {{ monthName | titlecase }}
+        </div>
+        <button class="month-nav-btn" (click)="nextMonth()" title="Siguiente Mes">
             <span class="material-icons">chevron_right</span>
         </button>
     </div>

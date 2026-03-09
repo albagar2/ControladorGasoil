@@ -5,26 +5,34 @@
         </button>
     </div>
 
-    <!-- Month Selector -->
-    <div class="month-selector-bar">
-        <button class="month-nav-btn" (click)="prevMonth()">
-            <span class="material-icons">chevron_left</span>
-        </button>
-        <div class="current-month-label">{{ monthName | titlecase }}</div>
-        <button class="month-nav-btn" (click)="nextMonth()">
-            <span class="material-icons">chevron_right</span>
-        </button>
-    </div>
-
-    <!-- Monthly Stats Summary -->
-    <div class="stats-summary-bar">
-        <div class="stat-pill">
-            <span class="label">Total Litros:</span>
-            <span class="value">{{ monthlyTotalLitros | number:'1.2-2' }} L</span>
+    <!-- Modern Month Selector -->
+    <div class="month-selector-container mb-3">
+        <div class="month-selector-bar">
+            <button class="month-nav-btn" (click)="prevMonth()" title="Mes Anterior">
+                <span class="material-icons">chevron_left</span>
+            </button>
+            <div class="current-month-label">
+                <span class="material-icons"
+                    style="vertical-align: middle; margin-right: 8px; font-size: 1.2rem; color: var(--text-muted);">calendar_today</span>
+                {{ monthName | titlecase }}
+            </div>
+            <button class="month-nav-btn" (click)="nextMonth()" title="Siguiente Mes">
+                <span class="material-icons">chevron_right</span>
+            </button>
         </div>
-        <div class="stat-pill">
-            <span class="label">Gasto Total:</span>
-            <span class="value">{{ monthlyTotalCoste | currency:'EUR' }}</span>
+
+        <!-- Monthly Stats Summary -->
+        <div class="stats-summary-bar">
+            <div class="stat-pill">
+                <span class="material-icons" style="font-size: 1rem; color: var(--success);">opacity</span>
+                <span class="label">Total Litros:</span>
+                <span class="value">{{ monthlyTotalLitros | number:'1.2-2' }} L</span>
+            </div>
+            <div class="stat-pill">
+                <span class="material-icons" style="font-size: 1rem; color: var(--warning);">payments</span>
+                <span class="label">Gasto Total:</span>
+                <span class="value">{{ monthlyTotalCoste | currency:'EUR' }}</span>
+            </div>
         </div>
     </div>
     <div class="table-container">
