@@ -648,6 +648,11 @@
     /* Blur effect behind modal */
 }
 
+.vehicle-group {
+    margin-bottom: 3rem;
+    /* More space between vehicle blocks */
+}
+
 .group-header {
     background: #ffffff;
     padding: 1rem 1.5rem;
