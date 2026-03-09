@@ -7,6 +7,7 @@ import { AppDataSource } from './data-source';
 import apiRoutes from './routes/api.routes';
 import { setupSwagger } from './config/swagger';
 import { setupCronJobs } from './config/cron';
+import { startKeepAlive } from './services/keep-alive.service';
 import { errorMiddleware } from './middleware/error.middleware';
 
 dotenv.config();
@@ -74,6 +75,7 @@ app.listen(Number(PORT), '0.0.0.0', () => {
             console.log("Data Source has been initialized!");
             setupSwagger(app);
             setupCronJobs();
+            startKeepAlive();
         })
         .catch((err) => {
             console.error("Error during Data Source initialization:", err);
