@@ -4,6 +4,29 @@
             <span class="material-icons">add</span> Nuevo Repostaje
         </button>
     </div>
+
+    <!-- Month Selector -->
+    <div class="month-selector-bar">
+        <button class="month-nav-btn" (click)="prevMonth()">
+            <span class="material-icons">chevron_left</span>
+        </button>
+        <div class="current-month-label">{{ monthName | titlecase }}</div>
+        <button class="month-nav-btn" (click)="nextMonth()">
+            <span class="material-icons">chevron_right</span>
+        </button>
+    </div>
+
+    <!-- Monthly Stats Summary -->
+    <div class="stats-summary-bar">
+        <div class="stat-pill">
+            <span class="label">Total Litros:</span>
+            <span class="value">{{ monthlyTotalLitros | number:'1.2-2' }} L</span>
+        </div>
+        <div class="stat-pill">
+            <span class="label">Gasto Total:</span>
+            <span class="value">{{ monthlyTotalCoste | currency:'EUR' }}</span>
+        </div>
+    </div>
     <div class="table-container">
         <table class="data-table">
             <thead>
@@ -19,7 +42,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let load of dataService.refuels()">
+                <tr *ngFor="let load of filteredRefuels">
                     <td>{{ load.fecha | date:'dd/MM/yyyy' }}</td>
                     <td>{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
                     <td>{{ load.kilometraje | number }} km</td>
@@ -42,7 +65,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr *ngIf="dataService.refuels().length === 0">
+                <tr *ngIf="filteredRefuels.length === 0">
                     <td colspan="8" style="text-align: center; padding: 2rem;">No hay registros de repostaje.</td>
                 </tr>
             </tbody>

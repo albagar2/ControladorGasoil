@@ -11,6 +11,20 @@
         </button>
     </div>
 
+    <!-- Month Selector -->
+    <div
+        class="month-navigation flex justify-center items-center gap-6 mb-8 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+        <button class="nav-btn" (click)="prevMonth()">
+            <span class="material-icons">chevron_left</span>
+        </button>
+        <div class="current-month-display text-xl font-bold text-gray-800 min-w-[200px] text-center">
+            {{ monthName | titlecase }}
+        </div>
+        <button class="nav-btn" (click)="nextMonth()">
+            <span class="material-icons">chevron_right</span>
+        </button>
+    </div>
+
     <!-- Loading State -->
     <div *ngIf="dataService.loading()" class="loading-spinner">
         <div class="spinner"></div>
@@ -24,8 +38,8 @@
                     <span class="material-icons text-blue-600">euro</span>
                 </div>
                 <div>
-                    <p class="stat-label">Total Gastado</p>
-                    <p class="stat-value">{{ stats().totalSpent | currency:'EUR' }}</p>
+                    <p class="stat-label">Gastado este Mes</p>
+                    <p class="stat-value text-blue-600">{{ stats().totalSpent | currency:'EUR' }}</p>
                 </div>
             </div>
             <div class="stat-card">

@@ -29,6 +29,9 @@ export class RefuelsComponent {
     currentRefuel: Refuel = this.getEmptyRefuel();
     ticketFile: File | null = null;
 
+    // Monthly navigation
+    selectedMonth: string = new Date().toISOString().substring(0, 7); // YYYY-MM
+
     showReceiptModal = false;
     selectedReceiptUrl = '';
 
@@ -146,5 +149,38 @@ export class RefuelsComponent {
     viewTicket(ticketPath: string) {
         this.selectedReceiptUrl = `${environment.apiUrl.replace('/api', '')}/${ticketPath}`;
         this.showReceiptModal = true;
+    }
+
+    get filteredRefuels(): Refuel[] {
+        return this.dataService.refuels().filter(r => {
+            const date = new Date(r.fecha);
+            return date.toISOString().startsWith(this.selectedMonth);
+        });
+    }
+
+    get monthlyTotalLitros(): number {
+        return this.filteredRefuels.reduce((acc, r) => acc + (Number(r.litros) || 0), 0);
+    }
+
+    get monthlyTotalCoste(): number {
+        return this.filteredRefuels.reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
+    }
+
+    get monthName(): string {
+        const [year, month] = this.selectedMonth.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    }
+
+    prevMonth() {
+        const [year, month] = this.selectedMonth.split('-').map(Number);
+        const date = new Date(year, month - 2, 1);
+        this.selectedMonth = date.toISOString().substring(0, 7);
+    }
+
+    nextMonth() {
+        const [year, month] = this.selectedMonth.split('-').map(Number);
+        const date = new Date(year, month, 1);
+        this.selectedMonth = date.toISOString().substring(0, 7);
     }
 }

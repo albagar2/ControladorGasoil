@@ -33,6 +33,9 @@ export class MaintenanceComponent implements OnInit {
     filterDateFrom = signal('');
     filterDateTo = signal('');
 
+    // Monthly navigation
+    selectedMonth = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
+
     showModal = false;
     currentMaintenance?: Maintenance;
 
@@ -58,6 +61,13 @@ export class MaintenanceComponent implements OnInit {
         if (type) filtered = filtered.filter(m => m.tipo === type);
         if (from) filtered = filtered.filter(m => new Date(m.fecha) >= new Date(from));
         if (to) filtered = filtered.filter(m => new Date(m.fecha) <= new Date(to));
+
+        // Apply Monthly Filter (Primary organization)
+        const month = this.selectedMonth();
+        filtered = filtered.filter(m => {
+            const date = new Date(m.fecha);
+            return date.toISOString().startsWith(month);
+        });
 
         return filtered;
     });
@@ -265,5 +275,23 @@ export class MaintenanceComponent implements OnInit {
                 this.dataService.loading.set(false);
             }
         });
+    }
+
+    get monthName(): string {
+        const [year, month] = this.selectedMonth().split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    }
+
+    prevMonth() {
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+        const date = new Date(year, month - 2, 1);
+        this.selectedMonth.set(date.toISOString().substring(0, 7));
+    }
+
+    nextMonth() {
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+        const date = new Date(year, month, 1);
+        this.selectedMonth.set(date.toISOString().substring(0, 7));
     }
 }

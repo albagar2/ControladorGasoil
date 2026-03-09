@@ -18,6 +18,9 @@ export class AnalyticsComponent implements OnInit {
     public dataService = inject(DataService);
     private exportService = inject(ExportService);
 
+    // Monthly navigation
+    selectedMonth = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
+
     exportData() {
         this.exportService.generateCostReport(
             this.dataService.vehicles(),
@@ -27,22 +30,36 @@ export class AnalyticsComponent implements OnInit {
     }
 
     totalSpent = computed(() => {
-        const refuels = this.dataService.refuels();
-        const maintenances = this.dataService.maintenances();
-        const fuelCost = refuels.reduce((acc, r) => acc + (r.costeTotal || 0), 0);
-        const maintCost = maintenances.reduce((acc, m) => acc + (m.costePieza || 0) + (m.costeTaller || 0), 0);
+        const month = this.selectedMonth();
+        const refuels = this.dataService.refuels().filter(r => new Date(r.fecha).toISOString().startsWith(month));
+        const maintenances = this.dataService.maintenances().filter(m => new Date(m.fecha).toISOString().startsWith(month));
+
+        const fuelCost = refuels.reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
+        const maintCost = maintenances.reduce((acc, m) => acc + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0), 0);
         return fuelCost + maintCost;
     });
 
     averageEfficiency = computed(() => {
-        const refuels = this.dataService.refuels();
-        if (refuels.length < 2) return 0;
+        const month = this.selectedMonth();
+        const allRefuels = this.dataService.refuels();
+        // Efficiency needs historical context to calculate KM difference, 
+        // but we'll scope the "usage" (liters) and "traveled" to current context if possible
+        // For simplicity as requested, we'll filter refuels of the month
+        const refuels = allRefuels.filter(r => new Date(r.fecha).toISOString().startsWith(month));
 
-        // Simplistic calculation: (Sum of Liters / Total KM traveled) * 100
-        // Better: Per vehicle average
-        const totalLiters = refuels.reduce((acc, r) => acc + r.litros, 0);
-        const sorted = [...refuels].sort((a, b) => a.kilometraje - b.kilometraje);
-        const totalKm = sorted[sorted.length - 1].kilometraje - sorted[0].kilometraje;
+        if (refuels.length < 1) return 0;
+
+        const totalLiters = refuels.reduce((acc, r) => acc + Number(r.litros), 0);
+
+        // Find the refuel immediately before this month to get starting KM
+        const sortedAll = [...allRefuels].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+        const firstOfMonth = refuels.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0];
+        const lastOfMonth = refuels.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())[0];
+
+        const index = sortedAll.findIndex(r => r.id === firstOfMonth.id);
+        const startKm = index > 0 ? sortedAll[index - 1].kilometraje : firstOfMonth.kilometraje;
+        const endKm = lastOfMonth.kilometraje;
+        const totalKm = endKm - startKm;
 
         return totalKm > 0 ? (totalLiters / totalKm) * 100 : 0;
     });
@@ -90,20 +107,11 @@ export class AnalyticsComponent implements OnInit {
         }
     };
 
-    // Chart Data: Share by vehicle
-    public pieChartData: ChartData<'pie'> = {
-        labels: [],
-        datasets: [{ data: [], backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#0ea5e9'] }]
-    };
-
-    ngOnInit() {
-        this.prepareChartData();
-    }
-
-    prepareChartData() {
-        // We still use prepareChartData for Pie chart as it's not computed yet (could be refactored too)
+    // Chart Data: Share by vehicle (Computed & Monthly)
+    public pieChartData = computed<ChartData<'pie'>>(() => {
+        const month = this.selectedMonth();
         const vehicles = this.dataService.vehicles();
-        const refuels = this.dataService.refuels();
+        const refuels = this.dataService.refuels().filter(r => new Date(r.fecha).toISOString().startsWith(month));
 
         const vehicleLabels: string[] = [];
         const vehicleData: number[] = [];
@@ -111,7 +119,7 @@ export class AnalyticsComponent implements OnInit {
         vehicles.forEach(v => {
             const spent = refuels
                 .filter(r => r.vehiculoId === v.id)
-                .reduce((acc, r) => acc + (r.costeTotal || 0), 0);
+                .reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
 
             if (spent > 0) {
                 vehicleLabels.push(v.modelo);
@@ -119,12 +127,41 @@ export class AnalyticsComponent implements OnInit {
             }
         });
 
-        this.pieChartData = {
+        return {
             labels: vehicleLabels,
             datasets: [{
                 data: vehicleData,
                 backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#0ea5e9']
             }]
         };
+    });
+
+    ngOnInit() {
+        // No manual trigger needed, using computed
+    }
+
+    get monthName(): string {
+        const [year, month] = this.selectedMonth().split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    }
+
+    monthlyRecordsCount = computed(() => {
+        const month = this.selectedMonth();
+        const refuels = this.dataService.refuels().filter(r => new Date(r.fecha).toISOString().startsWith(month));
+        const maintenances = this.dataService.maintenances().filter(m => new Date(m.fecha).toISOString().startsWith(month));
+        return refuels.length + maintenances.length;
+    });
+
+    prevMonth() {
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+        const date = new Date(year, month - 2, 1);
+        this.selectedMonth.set(date.toISOString().substring(0, 7));
+    }
+
+    nextMonth() {
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+        const date = new Date(year, month, 1);
+        this.selectedMonth.set(date.toISOString().substring(0, 7));
     }
 }

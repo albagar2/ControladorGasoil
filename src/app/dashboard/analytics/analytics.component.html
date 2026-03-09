@@ -1,10 +1,23 @@
 <div class="analytics-container fade-in">
     <div class="analytics-header">
-        <button class="btn-primary" (click)="exportData()" style="display: flex; align-items: center; gap: 0.5rem;">
-            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-            </svg>
-            Exportar Informe PDF
+        <div class="header-actions">
+            <button class="btn-primary" (click)="exportData()" style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                Exportar Informe PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Month Selector -->
+    <div class="month-selector-bar">
+        <button class="month-nav-btn" (click)="prevMonth()">
+            <span class="material-icons">chevron_left</span>
+        </button>
+        <div class="current-month-label">{{ monthName | titlecase }}</div>
+        <button class="month-nav-btn" (click)="nextMonth()">
+            <span class="material-icons">chevron_right</span>
         </button>
     </div>
     <div class="stats-grid">
@@ -16,7 +29,7 @@
                 </svg>
             </div>
             <div class="stat-info">
-                <label>Gasto Total Acumulado</label>
+                <label>Gasto del Mes</label>
                 <h3>{{ totalSpent() | number:'1.2-2' }}€</h3>
             </div>
         </div>
@@ -40,8 +53,8 @@
                 </svg>
             </div>
             <div class="stat-info">
-                <label>Registros Totales</label>
-                <h3>{{ dataService.refuels().length + dataService.maintenances().length }}</h3>
+                <label>Registros este Mes</label>
+                <h3>{{ monthlyRecordsCount() }}</h3>
             </div>
         </div>
     </div>
@@ -59,10 +72,10 @@
 
         <div class="chart-card">
             <div class="card-header">
-                <h3>Distribución por Vehículo</h3>
+                <h3>Gastos por Vehículo (Mes)</h3>
             </div>
             <div class="chart-wrapper">
-                <canvas baseChart [data]="pieChartData" [type]="'pie'">
+                <canvas baseChart [data]="pieChartData()" [type]="'pie'">
                 </canvas>
             </div>
         </div>
