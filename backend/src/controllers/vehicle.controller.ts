@@ -50,7 +50,9 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     const driver = await driverRepository.findOneBy({ id: userId });
 
     // Sanitize data: convert empty strings to null
+    console.log('[DEBUG] Incoming Vehicle Body:', JSON.stringify(req.body, null, 2));
     const vehicleData: any = sanitizeVehicleData(req.body);
+    console.log('[DEBUG] Sanitized Vehicle Data:', JSON.stringify(vehicleData, null, 2));
 
     // Check if matricula already exists
     if (vehicleData.matricula) {
@@ -66,7 +68,10 @@ export const createVehicle = asyncHandler(async (req: Request, res: Response) =>
     vehicleData.propietarioId = vehicleData.propietarioId || userId;
 
     const newVehicle = vehicleRepository.create(vehicleData as Vehicle);
+    console.log('[DEBUG] Created Vehicle Entity:', JSON.stringify(newVehicle, null, 2));
+
     const savedVehicle = await vehicleRepository.save(newVehicle);
+    console.log('[DEBUG] Saved Vehicle Entity:', JSON.stringify(savedVehicle, null, 2));
 
     // Check for alerts immediately (e.g. if ITV/Insurance dates are already close)
     try {
