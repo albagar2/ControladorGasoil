@@ -71,17 +71,22 @@
         </div>
         <div class="grid-2">
             <div class="form-group">
+                <label>Kilometraje Actual</label>
+                <input type="number" [(ngModel)]="currentRefuel.kilometraje" class="form-control"
+                    placeholder="Ej: 125000">
+            </div>
+            <div class="form-group">
                 <label>Conductor</label>
                 <select [(ngModel)]="currentRefuel.conductorId" class="form-control">
                     <option [ngValue]="undefined" disabled>Selecciona Conductor</option>
                     <option *ngFor="let d of dataService.drivers()" [ngValue]="d.id">{{d.nombre}}</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Proveedor</label>
-                <input type="text" [(ngModel)]="currentRefuel.proveedor" class="form-control"
-                    placeholder="Cepsa, Repsol...">
-            </div>
+        </div>
+        <div class="form-group">
+            <label>Proveedor</label>
+            <input type="text" [(ngModel)]="currentRefuel.proveedor" class="form-control"
+                placeholder="Cepsa, Repsol...">
         </div>
         <div class="grid-3">
             <div class="form-group">

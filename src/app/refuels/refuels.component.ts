@@ -124,6 +124,7 @@ export class RefuelsComponent {
     validateRefuel(): string | null {
         const r = this.currentRefuel;
         if (!r.vehiculoId) return 'Debes seleccionar un vehículo.';
+        if (r.kilometraje < 0) return 'Los kilómetros no pueden ser negativos.';
         if (r.litros <= 0) return 'Los litros deben ser mayor a 0.';
         if (r.precioPorLitro <= 0) return 'El precio por litro debe ser mayor a 0.';
         return null;
