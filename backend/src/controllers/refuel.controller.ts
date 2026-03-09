@@ -12,6 +12,39 @@ const refuelRepository = AppDataSource.getRepository(Refuel);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
 const maintenanceRepository = AppDataSource.getRepository(Maintenance);
 
+const sanitizeRefuelData = (data: any) => {
+    const sanitized = { ...data };
+
+    // Convert empty strings to null
+    for (const key in sanitized) {
+        if (sanitized[key] === '') {
+            sanitized[key] = null;
+        }
+    }
+
+    // Ensure numbers are really numbers
+    if (sanitized.vehiculoId) sanitized.vehiculoId = parseInt(sanitized.vehiculoId.toString());
+    if (sanitized.kilometraje) sanitized.kilometraje = parseInt(sanitized.kilometraje.toString());
+    if (sanitized.litros) sanitized.litros = parseFloat(sanitized.litros.toString());
+    if (sanitized.precioPorLitro) sanitized.precioPorLitro = parseFloat(sanitized.precioPorLitro.toString());
+    if (sanitized.costeTotal) sanitized.costeTotal = parseFloat(sanitized.costeTotal.toString());
+
+    // ConductorId 0 -> null
+    if (sanitized.conductorId) {
+        const cId = parseInt(sanitized.conductorId.toString());
+        sanitized.conductorId = cId !== 0 ? cId : null;
+    }
+
+    // Explicit Date Parsing
+    if (typeof sanitized.fecha === 'string' && sanitized.fecha.trim() !== '') {
+        sanitized.fecha = new Date(sanitized.fecha);
+    } else if (!sanitized.fecha) {
+        sanitized.fecha = new Date();
+    }
+
+    return sanitized;
+};
+
 export const getRefuels = asyncHandler(async (req: Request, res: Response) => {
     // @ts-ignore
     const { role, familyId } = req.user;
@@ -30,110 +63,84 @@ export const getRefuels = asyncHandler(async (req: Request, res: Response) => {
     res.json(refuels);
 });
 
-export const createRefuel = async (req: Request, res: Response) => {
-    try {
-        console.log('Creating refuel with body:', req.body);
-        let { vehiculoId, kilometraje, litros, precioPorLitro, costeTotal, proveedor, tipoCombustible, conductorId } = req.body;
+export const createRefuel = asyncHandler(async (req: Request, res: Response) => {
+    // @ts-ignore
+    const { role, familyId } = req.user;
 
-        // Ensure numbers
-        vehiculoId = parseInt(vehiculoId.toString());
-        kilometraje = parseInt(kilometraje.toString());
-        litros = parseFloat(litros.toString());
-        precioPorLitro = parseFloat(precioPorLitro.toString());
-        costeTotal = parseFloat(costeTotal.toString());
+    const refuelData = sanitizeRefuelData(req.body);
+    const { vehiculoId, kilometraje, litros, precioPorLitro, costeTotal, proveedor, tipoCombustible, conductorId, fecha } = refuelData;
 
-        // Tratar 0 como undefined para evitar errores de FK
-        if (conductorId) {
-            const cId = parseInt(conductorId.toString());
-            conductorId = cId !== 0 ? cId : undefined;
-        } else {
-            conductorId = undefined;
-        }
-
-        const vehicle = await vehicleRepository.findOneBy({ id: vehiculoId });
-        if (!vehicle) {
-            // Limpiar archivo si el vehículo no existe
-            if (req.file) fs.unlinkSync(req.file.path);
-            return res.status(404).json({ message: "Vehicle not found" });
-        }
-
-        // Security Check: Vehicle must belong to same family
-        // @ts-ignore
-        const { role, familyId } = req.user;
-        if (role !== 'admin' && vehicle.familyId !== familyId) {
-            if (req.file) fs.unlinkSync(req.file.path);
-            return res.status(403).json({ message: "Forbidden: Vehicle belongs to another family" });
-        }
-
-        let ticketImageUrl = undefined;
-        if (req.file) {
-            const now = new Date();
-            const timestamp = now.getFullYear().toString() +
-                (now.getMonth() + 1).toString().padStart(2, '0') +
-                now.getDate().toString().padStart(2, '0') + '_' +
-                now.getHours().toString().padStart(2, '0') +
-                now.getMinutes().toString().padStart(2, '0');
-
-            // Limpiar matrícula de espacios y caracteres raros
-            const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
-            const newFileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
-            const newPath = path.join('uploads', newFileName);
-
-            try {
-                fs.renameSync(req.file.path, newPath);
-                ticketImageUrl = `uploads/${newFileName}`;
-            } catch (err) {
-                console.error('Error renaming file', err);
-                ticketImageUrl = `uploads/${req.file.filename}`;
-            }
-        }
-
-        const newRefuel = refuelRepository.create({
-            vehiculoId,
-            kilometraje,
-            litros,
-            precioPorLitro,
-            costeTotal,
-            proveedor,
-            tipoCombustible,
-            conductorId,
-            ticketImageUrl
-        });
-
-        const savedRefuel = await refuelRepository.save(newRefuel);
-
-        // Update Vehicle Mileage
-        if (kilometraje > vehicle.kilometrajeActual) {
-            vehicle.kilometrajeActual = kilometraje;
-            await vehicleRepository.save(vehicle);
-        }
-
-        // Check for Maintenance Alert (e.g., Oil change every 15000km)
-        const lastMaintenance = await maintenanceRepository.findOne({
-            where: { vehiculoId: vehiculoId, tipo: 'Aceite' },
-            order: { kilometraje: 'DESC' }
-        });
-
-        let maintenanceAlert = false;
-        if (lastMaintenance) {
-            if ((kilometraje - lastMaintenance.kilometraje) >= 15000) {
-                maintenanceAlert = true;
-            }
-        } else {
-            // If no maintenance record, assumes 15k limit from 0? or just ignore. 
-            // Let's assume if mileage > 15000 and no record, alert.
-            if (kilometraje > 15000) maintenanceAlert = true;
-        }
-
-        // Check for alerts immediately
-        await alertService.checkAndSendAlerts(vehiculoId);
-
-        res.status(201).json({ ...savedRefuel, maintenanceAlert });
-
-    } catch (error) {
-        res.status(400).json({ message: 'Error creating refuel', error });
+    const vehicle = await vehicleRepository.findOneBy({ id: vehiculoId });
+    if (!vehicle) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        return res.status(404).json({ message: "Vehicle not found" });
     }
-};
+
+    // Security Check
+    if (role !== 'admin' && vehicle.familyId !== familyId) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        return res.status(403).json({ message: "Forbidden: Vehicle belongs to another family" });
+    }
+
+    let ticketImageUrl = undefined;
+    if (req.file) {
+        const now = new Date();
+        const timestamp = now.getFullYear().toString() +
+            (now.getMonth() + 1).toString().padStart(2, '0') +
+            now.getDate().toString().padStart(2, '0') + '_' +
+            now.getHours().toString().padStart(2, '0') +
+            now.getMinutes().toString().padStart(2, '0');
+
+        const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
+        const newFileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
+        const newPath = path.join('uploads', newFileName);
+
+        try {
+            fs.renameSync(req.file.path, newPath);
+            ticketImageUrl = `uploads/${newFileName}`;
+        } catch (err) {
+            console.error('Error renaming file', err);
+            ticketImageUrl = `uploads/${req.file.filename}`;
+        }
+    }
+
+    const newRefuel = refuelRepository.create({
+        ...refuelData,
+        ticketImageUrl
+    });
+
+    const savedRefuel = await refuelRepository.save(newRefuel);
+
+    // Update Vehicle Mileage
+    if (kilometraje > vehicle.kilometrajeActual) {
+        vehicle.kilometrajeActual = kilometraje;
+        await vehicleRepository.save(vehicle);
+    }
+
+    // Maintenance Alert Logic
+    const lastMaintenance = await maintenanceRepository.findOne({
+        where: { vehiculoId: vehiculoId, tipo: 'Aceite' },
+        order: { kilometraje: 'DESC' }
+    });
+
+    let maintenanceAlert = false;
+    if (lastMaintenance) {
+        if ((kilometraje - lastMaintenance.kilometraje) >= 15000) {
+            maintenanceAlert = true;
+        }
+    } else if (kilometraje > 15000) {
+        maintenanceAlert = true;
+    }
+
+    // Check for alerts immediately (Wrapped in try-catch to satisfy approved plan)
+    try {
+        await alertService.checkAndSendAlerts(vehiculoId);
+    } catch (error) {
+        console.error(`[AlertService] Failed to send alerts for vehicle ${vehiculoId}:`, error);
+    }
+
+    res.status(201).json({ ...savedRefuel, maintenanceAlert });
+});
 
 export const updateRefuel = asyncHandler(async (req: Request, res: Response) => {
     // @ts-ignore
