@@ -1,54 +1,73 @@
 import nodemailer from 'nodemailer';
 
 class EmailService {
-    private readonly RESEND_API_KEY = process.env.RESEND_API_KEY;
-    private readonly FROM_EMAIL = 'onboarding@resend.dev'; // Resend Default Test Sender
-    private readonly ADMIN_EMAIL = process.env.SMTP_USER || 'controlgasoilfamiliar@gmail.com';
+    private transporter: nodemailer.Transporter | null = null;
+    private readonly user = process.env.SMTP_USER || 'baciapez@gmail.com';
+    private readonly clientId = process.env.GOOGLE_CLIENT_ID;
+    private readonly clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    private readonly refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
 
     constructor() {
-        console.log('[EmailService] Initialized with Resend HTTP API.');
+        this.initTransporter();
+    }
+
+    private initTransporter() {
+        if (!this.clientId || !this.clientSecret || !this.refreshToken) {
+            console.warn('⚠️ Gmail OAuth2 credentials missing. Email service will not be available.');
+            return;
+        }
+
+        this.transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: this.user,
+                clientId: this.clientId,
+                clientSecret: this.clientSecret,
+                refreshToken: this.refreshToken
+            }
+        });
+
+        console.log('[EmailService] Initialized with Gmail OAuth2.');
     }
 
     async verifyConnection() {
-        if (!this.RESEND_API_KEY) {
-            console.error('❌ Resend API Key missing (RESEND_API_KEY)');
+        if (!this.transporter) {
+            this.initTransporter();
+        }
+
+        if (!this.transporter) return false;
+
+        try {
+            await this.transporter.verify();
+            console.log('📧 Gmail OAuth2 service is ready');
+            return true;
+        } catch (error) {
+            console.error('❌ Gmail OAuth2 verification failed:', error);
             return false;
         }
-        return true;
     }
 
     private async sendMail(to: string, subject: string, html: string) {
-        if (!this.RESEND_API_KEY) {
-            throw new Error('Missing RESEND_API_KEY in environment variables');
+        if (!this.transporter) {
+            this.initTransporter();
+            if (!this.transporter) throw new Error('Email transporter not initialized');
         }
 
-        console.log(`[EmailService] Sending email to ${to} via Resend API...`);
+        console.log(`[EmailService] Sending email to ${to} via Gmail OAuth2...`);
 
         try {
-            const response = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.RESEND_API_KEY}`
-                },
-                body: JSON.stringify({
-                    from: this.FROM_EMAIL,
-                    to: [to],
-                    subject: subject,
-                    html: html
-                })
+            const info = await this.transporter.sendMail({
+                from: `"Garaje Familiar" <${this.user}>`,
+                to: to,
+                subject: subject,
+                html: html
             });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(`Resend API Error: ${JSON.stringify(result)}`);
-            }
-
-            console.log('[EmailService] Email sent successfully:', result.id);
-            return result;
+            console.log('[EmailService] Email sent successfully:', info.messageId);
+            return info;
         } catch (error: any) {
-            console.error('❌ Error in Resend API:', error.message || error);
+            console.error('❌ Error sending email via Gmail OAuth2:', error.message || error);
             throw error;
         }
     }
