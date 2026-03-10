@@ -8,5 +8,7 @@ router.use(checkJwt);
 
 router.post('/maintenance-alert', emailController.sendMaintenanceAlert);
 router.post('/report', emailController.sendMonthlyReport);
+router.post('/test-alerts', emailController.triggerAllAlerts);
+router.post('/test-summary', emailController.triggerMonthlySummary);
 
 export default router;
