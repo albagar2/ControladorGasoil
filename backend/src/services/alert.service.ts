@@ -195,6 +195,46 @@ class AlertService {
         console.log('[AlertService] Monthly summary sent to admin.');
     }
 
+    async checkDriverAlerts(driverId: number) {
+        console.log(`[AlertService] Checking alerts for driver ${driverId}...`);
+        const driverRepository = AppDataSource.getRepository(Driver);
+        const driver = await driverRepository.findOneBy({ id: driverId });
+
+        if (!driver || !driver.email) return;
+
+        const today = new Date();
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(today.getDate() + 30);
+
+        if (driver.fechaRenovacionCarnet) {
+            const licenseDate = new Date(driver.fechaRenovacionCarnet);
+            if (licenseDate <= thirtyDaysFromNow) {
+                console.log(`[AlertService] License Alert triggered for ${driver.nombre}. Expiry: ${licenseDate.toLocaleDateString()}`);
+                try {
+                    await emailService.sendAutomatedAlert(driver.email, {
+                        title: `Carnet de Conducir Próximo a Caducar`,
+                        message: `Hola ${driver.nombre}, tu carnet de conducir caduca pronto o ya ha caducado.`,
+                        detailLabel: 'Fecha de Renovación',
+                        detailValue: licenseDate.toLocaleDateString('es-ES')
+                    });
+
+                    // Shadow copy to admin if not the same
+                    const adminEmail = process.env.SMTP_USER;
+                    if (adminEmail && driver.email !== adminEmail) {
+                        await emailService.sendAutomatedAlert(adminEmail, {
+                            title: `COPIA ADMIN: Caducidad Carnet - ${driver.nombre}`,
+                            message: `El carnet de conducir de ${driver.nombre} caduca el ${licenseDate.toLocaleDateString('es-ES')}.`,
+                            detailLabel: 'Conductor',
+                            detailValue: driver.nombre
+                        });
+                    }
+                } catch (err) {
+                    console.error(`[AlertService] Failed to send License email:`, err);
+                }
+            }
+        }
+    }
+
     private monthDiff(d1: Date, d2: Date) {
         let months;
         months = (d2.getFullYear() - d1.getFullYear()) * 12;
