@@ -79,10 +79,26 @@ export class ExportService {
                 doc.text(img.title, 14, currentY);
 
                 try {
-                    // Ajustar tamaño del gráfico (más pequeño y centrado)
-                    const imgWidth = 150;
-                    const imgHeight = 75;
+                    // Obtener propiedades reales de la imagen para calcular la altura correcta
+                    const imgProps = doc.getImageProperties(img.image);
                     const pageWidth = doc.internal.pageSize.getWidth();
+
+                    // Ajustar ancho del gráfico
+                    const maxImgWidth = 160;
+                    const imgWidth = Math.min(maxImgWidth, pageWidth - 28); // 14 padding on each side
+
+                    // Calcular altura manteniendo la proporción
+                    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+                    // Asegurar que cabe en la página con el nuevo alto, si no, crear nueva
+                    if (currentY + imgHeight > 280) {
+                        doc.addPage();
+                        currentY = 20;
+                        doc.setFontSize(14);
+                        doc.setTextColor(40);
+                        doc.text(img.title, 14, currentY);
+                    }
+
                     const xPos = (pageWidth - imgWidth) / 2;
 
                     doc.addImage(img.image, 'PNG', xPos, currentY + 8, imgWidth, imgHeight);

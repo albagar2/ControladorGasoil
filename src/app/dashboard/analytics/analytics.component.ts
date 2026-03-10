@@ -57,8 +57,8 @@ export class AnalyticsComponent implements OnInit {
                 : d.getFullYear() === year;
         });
 
-        const lineChartImage = this.lineChart?.chart?.toBase64Image();
-        const pieChartImage = this.pieChart?.chart?.toBase64Image();
+        const lineChartImage = this.lineChart?.chart?.toBase64Image('image/png', 1.0);
+        const pieChartImage = this.pieChart?.chart?.toBase64Image('image/png', 1.0);
 
         this.exportService.generateCostReport(
             this.dataService.vehicles(),
