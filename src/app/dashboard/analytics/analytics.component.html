@@ -2,10 +2,10 @@
     <div class="analytics-header">
         <div class="header-actions">
             <!-- Period Toggle -->
-            <div class="period-toggle" style="display: flex; gap: 0.5rem; margin-right: 1rem;">
-                <button [class]="filterMode() === 'month' ? 'btn-primary' : 'btn-outline'"
+            <div class="period-toggle">
+                <button class="period-btn" [class.active]="filterMode() === 'month'"
                     (click)="setFilterMode('month')">Mes</button>
-                <button [class]="filterMode() === 'year' ? 'btn-primary' : 'btn-outline'"
+                <button class="period-btn" [class.active]="filterMode() === 'year'"
                     (click)="setFilterMode('year')">Año</button>
             </div>
 
