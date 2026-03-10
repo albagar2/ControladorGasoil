@@ -1,54 +1,54 @@
 import nodemailer from 'nodemailer';
 
 class EmailService {
-    private transporter: nodemailer.Transporter;
-    private readonly SMTP_USER = process.env.SMTP_USER;
-    private readonly SMTP_PASS = process.env.SMTP_PASS;
+    private readonly RESEND_API_KEY = process.env.RESEND_API_KEY;
+    private readonly FROM_EMAIL = 'onboarding@resend.dev'; // Resend Default Test Sender
+    private readonly ADMIN_EMAIL = process.env.SMTP_USER || 'controlgasoilfamiliar@gmail.com';
 
     constructor() {
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: this.SMTP_USER,
-                pass: this.SMTP_PASS
-            },
-            // Increased timeouts for better reliability on slow connections (Render/Cloud)
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 30000
-        });
-        console.log('[EmailService] Initialized with Gmail SMTP transport.');
+        console.log('[EmailService] Initialized with Resend HTTP API.');
     }
 
     async verifyConnection() {
-        try {
-            await this.transporter.verify();
-            console.log('✅ Conexión SMTP con Gmail verificada correctamente');
-            return true;
-        } catch (error) {
-            console.error('❌ Error al conectar con el servidor SMTP de Gmail:', error);
+        if (!this.RESEND_API_KEY) {
+            console.error('❌ Resend API Key missing (RESEND_API_KEY)');
             return false;
         }
+        return true;
     }
 
     private async sendMail(to: string, subject: string, html: string) {
-        if (!this.SMTP_USER || !this.SMTP_PASS) {
-            throw new Error('Missing SMTP_USER or SMTP_PASS in environment variables');
+        if (!this.RESEND_API_KEY) {
+            throw new Error('Missing RESEND_API_KEY in environment variables');
         }
 
-        const mailOptions = {
-            from: `"Garaje Familiar" <${this.SMTP_USER}>`,
-            to,
-            subject,
-            html
-        };
+        console.log(`[EmailService] Sending email to ${to} via Resend API...`);
 
         try {
-            const info = await this.transporter.sendMail(mailOptions);
-            console.log('[EmailService] Mensaje enviado: %s', info.messageId);
-            return info;
+            const response = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.RESEND_API_KEY}`
+                },
+                body: JSON.stringify({
+                    from: `Garaje Familiar <${this.FROM_EMAIL}>`,
+                    to: [to],
+                    subject: subject,
+                    html: html
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`Resend API Error: ${JSON.stringify(result)}`);
+            }
+
+            console.log('[EmailService] Email sent successfully:', result.id);
+            return result;
         } catch (error: any) {
-            console.error('❌ Error enviando correo:', error.message || error);
+            console.error('❌ Error in Resend API:', error.message || error);
             throw error;
         }
     }
@@ -73,7 +73,6 @@ class EmailService {
             </div>
         `;
 
-        console.log(`[EmailService] Sending Maintenance Alert via SMTP to: ${to}`);
         return this.sendMail(to, subject, html);
     }
 
@@ -93,7 +92,6 @@ class EmailService {
             </div>
         `;
 
-        console.log(`[EmailService] Sending Monthly Report via SMTP to: ${to}`);
         return this.sendMail(to, subject, html);
     }
 
@@ -112,7 +110,6 @@ class EmailService {
             </div>
         `;
 
-        console.log(`[EmailService] Sending Automated Alert via SMTP to: ${to}`);
         return this.sendMail(to, subject, html);
     }
 }
