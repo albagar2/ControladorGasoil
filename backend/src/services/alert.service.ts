@@ -121,7 +121,7 @@ class AlertService {
             }
         }
 
-        // 3. Check Insurance
+        // Check Insurance
         if (vehicle.seguro_fecha_vencimiento) {
             const insuranceDate = new Date(vehicle.seguro_fecha_vencimiento);
             if (insuranceDate <= thirtyDaysFromNow) {
@@ -138,6 +138,59 @@ class AlertService {
                 }
             }
         }
+
+        // 4. Always notify ADMIN for any triggered alert if not the same person
+        const adminEmail = process.env.SMTP_USER;
+        if (adminEmail && vehicle.propietario?.email !== adminEmail) {
+            console.log(`[AlertService] Sending shadow copy to Admin: ${adminEmail}`);
+            try {
+                await emailService.sendAutomatedAlert(adminEmail, {
+                    title: `COPIA ADMIN: Alerta Vehículo ${vehicle.matricula}`,
+                    message: `Se ha generado una alerta automática para el coche de ${vehicle.propietario?.nombre || 'usuario'}.`,
+                    detailLabel: 'Vehículo',
+                    detailValue: `${vehicle.modelo} (${vehicle.matricula})`
+                });
+            } catch (e) {
+                console.error('[AlertService] Failed to send admin copy', e);
+            }
+        }
+    }
+
+    async sendMonthlyAdminSummary() {
+        console.log('[AlertService] Generating Monthly Admin Summary...');
+        const adminEmail = process.env.SMTP_USER;
+        if (!adminEmail) return;
+
+        const vehicleRepository = AppDataSource.getRepository(Vehicle);
+        const refuelRepository = AppDataSource.getRepository(Refuel);
+        const maintenanceRepository = AppDataSource.getRepository(Maintenance);
+
+        // Get last month's date range
+        const now = new Date();
+        const firstOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const firstOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+        const refuels = await refuelRepository.createQueryBuilder("r")
+            .where("r.fecha >= :start AND r.fecha < :end", { start: firstOfLastMonth, end: firstOfCurrentMonth })
+            .getMany();
+
+        const maintenances = await maintenanceRepository.createQueryBuilder("m")
+            .where("m.fecha >= :start AND m.fecha < :end", { start: firstOfLastMonth, end: firstOfCurrentMonth })
+            .getMany();
+
+        const totalFuel = refuels.reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
+        const totalMaint = maintenances.reduce((acc, m) => acc + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0), 0);
+
+        const monthName = firstOfLastMonth.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+
+        await emailService.sendAutomatedAlert(adminEmail, {
+            title: `Resumen de Gastos: ${monthName}`,
+            message: `Aquí tienes el resumen automático de gastos de toda tu flota para el mes pasado.`,
+            detailLabel: 'Total Invertido (Combustible + Mantenimiento)',
+            detailValue: `${(totalFuel + totalMaint).toFixed(2)} €`
+        });
+
+        console.log('[AlertService] Monthly summary sent to admin.');
     }
 
     private monthDiff(d1: Date, d2: Date) {
