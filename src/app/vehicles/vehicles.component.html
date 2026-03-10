@@ -9,28 +9,29 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Matrícula</th>
+          <th class="text-nowrap">Matrícula</th>
           <th>Modelo</th>
-          <th>Propietario</th>
-          <th>Combustible</th>
-          <th>Kilometraje</th>
-          <th>Distintivo</th>
-          <th>ITV</th>
-          <th>Seguro</th>
+          <th class="hide-mobile">Propietario</th>
+          <th class="hide-tablet">Combustible</th>
+          <th class="text-nowrap">Kilometraje</th>
+          <th class="hide-mobile">Distintivo</th>
+          <th class="hide-tablet">ITV</th>
+          <th class="hide-tablet">Seguro</th>
           <th class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let car of dataService.vehicles()">
-          <td style="font-weight: 600;">{{ car.matricula }}</td>
-          <td>{{ car.modelo }}</td>
-          <td>{{ car.propietario?.nombre || ' - ' }}</td>
-          <td>{{ car.combustible }}</td>
-          <td><span class="km-text">{{ car.kilometrajeActual | number }} km</span></td>
-          <td><span class="status-badge badge-distintivo" [attr.data-type]="car.distintivo">{{ car.distintivo }}</span>
+          <td class="text-nowrap" style="font-weight: 600;">{{ car.matricula }}</td>
+          <td class="text-wrap" style="min-width: 100px;">{{ car.modelo }}</td>
+          <td class="hide-mobile text-wrap">{{ car.propietario?.nombre || ' - ' }}</td>
+          <td class="hide-tablet">{{ car.combustible }}</td>
+          <td class="text-nowrap"><span class="km-text">{{ car.kilometrajeActual | number }} km</span></td>
+          <td class="hide-mobile"><span class="status-badge badge-distintivo" [attr.data-type]="car.distintivo">{{
+              car.distintivo }}</span>
           </td>
-          <td>{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
-          <td>{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
+          <td class="hide-tablet">{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
+          <td class="hide-tablet">{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
           <td class="text-right">
             <div class="actions-wrapper">
               <button class="icon-btn edit" (click)="openEditModal(car)">

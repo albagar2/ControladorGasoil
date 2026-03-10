@@ -41,24 +41,24 @@
                 <tr>
                     <th>Fecha</th>
                     <th>Vehículo</th>
-                    <th>KM</th>
-                    <th>Proveedor</th>
-                    <th>Litros</th>
-                    <th>Precio/L</th>
+                    <th class="hide-mobile">KM</th>
+                    <th class="hide-tablet">Proveedor</th>
+                    <th class="hide-mobile">Litros</th>
+                    <th class="hide-tablet">Precio/L</th>
                     <th>Total</th>
-                    <th>Acciones</th>
+                    <th class="text-right">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let load of filteredRefuels">
-                    <td>{{ load.fecha | date:'dd/MM/yyyy' }}</td>
-                    <td>{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
-                    <td>{{ load.kilometraje | number }} km</td>
-                    <td>{{ load.proveedor }}</td>
-                    <td>{{ load.litros }} L</td>
-                    <td>{{ load.precioPorLitro | currency:'EUR' }}</td>
+                    <td class="text-nowrap">{{ load.fecha | date:'dd/MM/yyyy' }}</td>
+                    <td class="text-wrap">{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
+                    <td class="hide-mobile">{{ load.kilometraje | number }} km</td>
+                    <td class="hide-tablet">{{ load.proveedor }}</td>
+                    <td class="hide-mobile">{{ load.litros }} L</td>
+                    <td class="hide-tablet">{{ load.precioPorLitro | currency:'EUR' }}</td>
                     <td style="font-weight: 600; color: var(--primary);">{{ load.costeTotal | currency:'EUR' }}</td>
-                    <td class="actions-cell">
+                    <td class="actions-cell text-right">
                         <div style="display: flex; gap: 0.5rem;">
                             <button *ngIf="load.ticketImageUrl" class="icon-btn info"
                                 (click)="viewTicket(load.ticketImageUrl)" title="Ver Ticket">

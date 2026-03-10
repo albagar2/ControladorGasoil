@@ -344,27 +344,26 @@ label {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
 }
 
 .data-table th {
   background: var(--bg-color);
-  padding: 16px;
+  padding: 12px 8px;
   text-align: left;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border-color);
 }
 
 .data-table td {
-  padding: 16px;
+  padding: 12px 8px;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-main);
   vertical-align: middle;
+  font-size: 0.85rem;
 }
 
 .data-table tr:hover td {
@@ -393,6 +392,34 @@ label {
 }
 
 /* Utilities */
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.text-wrap {
+  white-space: normal;
+}
+
+.hide-mobile {
+  display: table-cell;
+}
+
+@media (max-width: 640px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  display: table-cell;
+}
+
+@media (max-width: 1024px) {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
 .fade-in {
   animation: fadeIn 0.4s ease-out;
 }
