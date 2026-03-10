@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
 import { emailService } from '../services/email.service';
+import { AppDataSource } from '../data-source';
+import { Vehicle } from '../entities/Vehicle';
+import { Driver } from '../entities/Driver';
+import { alertService } from '../services/alert.service';
 
 export const emailController = {
     async sendMaintenanceAlert(req: Request, res: Response) {
