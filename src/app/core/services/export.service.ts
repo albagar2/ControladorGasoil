@@ -97,7 +97,7 @@ export class ExportService {
         doc.save(filename);
     }
 
-    generateCostReport(vehicles: any[], refuels: any[], maintenance: any[], images?: { image: string, title: string }[]) {
+    generateCostReport(vehicles: any[], refuels: any[], maintenance: any[], reportTitle?: string, images?: { image: string, title: string }[]) {
         const columns = ['Mes/Año', 'Tipo', 'Vehículo', 'Detalle', 'Coste (€)'];
 
         // Combinar datos con fecha para poder ordenar
@@ -134,11 +134,11 @@ export class ExportService {
             `${item.coste.toFixed(2)}€`
         ]);
 
-        const reportTitle = combinedData.length > 0
+        const finalReportTitle = reportTitle || (combinedData.length > 0
             ? `Informe de Gastos - ${combinedData[0].fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`
-            : 'Informe de Gastos - Garaje Familiar';
+            : 'Informe de Gastos - Garaje Familiar');
 
-        this.exportToPdf('reporte_gastos_gasoil.pdf', reportTitle, columns, reportData, images);
+        this.exportToPdf('reporte_gastos_gasoil.pdf', finalReportTitle, columns, reportData, images);
     }
 }
 

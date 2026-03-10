@@ -21,21 +21,40 @@ export class AnalyticsComponent implements OnInit {
     @ViewChild('lineChart') lineChart?: BaseChartDirective;
     @ViewChild('pieChart') pieChart?: BaseChartDirective;
 
-    // Monthly navigation
-    selectedMonth = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
+    // Time period filtering
+    filterMode = signal<'month' | 'year'>('month');
+    selectedPeriod = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM or YYYY
+
+    setFilterMode(mode: 'month' | 'year') {
+        this.filterMode.set(mode);
+        const currentDate = new Date();
+        if (mode === 'month') {
+            this.selectedPeriod.set(currentDate.toISOString().substring(0, 7));
+        } else {
+            this.selectedPeriod.set(currentDate.getFullYear().toString());
+        }
+    }
 
     exportData() {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
+        let year: number, month: number | null = null;
+        if (this.filterMode() === 'month') {
+            [year, month] = this.selectedPeriod().split('-').map(Number);
+        } else {
+            year = Number(this.selectedPeriod());
+        }
 
-        // Filter data to match the selected month
         const filteredRefuels = this.dataService.refuels().filter(r => {
             const d = new Date(r.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
 
         const filteredMaintenances = this.dataService.maintenances().filter(m => {
             const d = new Date(m.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
 
         const lineChartImage = this.lineChart?.chart?.toBase64Image();
@@ -45,22 +64,33 @@ export class AnalyticsComponent implements OnInit {
             this.dataService.vehicles(),
             filteredRefuels,
             filteredMaintenances,
+            `Informe de Gastos - ${this.currentPeriodName}`,
             [
                 { image: lineChartImage, title: 'Histórico de Gastos' },
-                { image: pieChartImage, title: `Desglose de Gastos - ${this.monthName}` }
+                { image: pieChartImage, title: `Desglose de Gastos - ${this.currentPeriodName}` }
             ].filter(img => !!img.image) as { image: string, title: string }[]
         );
     }
 
     totalSpent = computed(() => {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
+        let year: number, month: number | null = null;
+        if (this.filterMode() === 'month') {
+            [year, month] = this.selectedPeriod().split('-').map(Number);
+        } else {
+            year = Number(this.selectedPeriod());
+        }
+
         const refuels = this.dataService.refuels().filter(r => {
             const d = new Date(r.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
         const maintenances = this.dataService.maintenances().filter(m => {
             const d = new Date(m.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
 
         const fuelCost = refuels.reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
@@ -69,67 +99,77 @@ export class AnalyticsComponent implements OnInit {
     });
 
     averageEfficiency = computed(() => {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
+        let year: number, month: number | null = null;
+        if (this.filterMode() === 'month') {
+            [year, month] = this.selectedPeriod().split('-').map(Number);
+        } else {
+            year = Number(this.selectedPeriod());
+        }
+
         const allRefuels = this.dataService.refuels();
-        // Efficiency needs historical context to calculate KM difference, 
-        // but we'll scope the "usage" (liters) and "traveled" to current context if possible
-        // For simplicity as requested, we'll filter refuels of the month
         const refuels = allRefuels.filter(r => {
             const d = new Date(r.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
 
         if (refuels.length < 1) return 0;
 
         const totalLiters = refuels.reduce((acc, r) => acc + Number(r.litros), 0);
 
-        // Find the refuel immediately before this month to get starting KM
         const sortedAll = [...allRefuels].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
-        const firstOfMonth = refuels.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0];
-        const lastOfMonth = refuels.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())[0];
+        const firstOfPeriod = refuels.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())[0];
+        const lastOfPeriod = refuels.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())[0];
 
-        const index = sortedAll.findIndex(r => r.id === firstOfMonth.id);
-        const startKm = index > 0 ? sortedAll[index - 1].kilometraje : firstOfMonth.kilometraje;
-        const endKm = lastOfMonth.kilometraje;
+        const index = sortedAll.findIndex(r => r.id === firstOfPeriod.id);
+        const startKm = index > 0 ? sortedAll[index - 1].kilometraje : firstOfPeriod.kilometraje;
+        const endKm = lastOfPeriod.kilometraje;
         const totalKm = endKm - startKm;
 
         return totalKm > 0 ? (totalLiters / totalKm) * 100 : 0;
     });
 
-    // Chart Data: Expenditure by Month
+    // Chart Data: Expenditure by Time
     public lineChartData = computed<ChartData<'line'>>(() => {
         const refuels = this.dataService.refuels();
         const maintenances = this.dataService.maintenances();
-        const monthlyData: Record<string, number> = {};
+        const periodData: Record<string, number> = {};
 
-        // Group everything by 'YYYY-MM' to ensure chronological sorting and year separation
+        // Group everything by 'YYYY-MM' or 'YYYY' to ensure chronological sorting
         refuels.forEach(r => {
             const date = new Date(r.fecha);
-            const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            monthlyData[key] = (monthlyData[key] || 0) + (Number(r.costeTotal) || 0);
+            const key = this.filterMode() === 'month'
+                ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+                : `${date.getFullYear()}`;
+            periodData[key] = (periodData[key] || 0) + (Number(r.costeTotal) || 0);
         });
 
         maintenances.forEach(m => {
             const date = new Date(m.fecha);
-            const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            monthlyData[key] = (monthlyData[key] || 0) + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0);
+            const key = this.filterMode() === 'month'
+                ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+                : `${date.getFullYear()}`;
+            periodData[key] = (periodData[key] || 0) + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0);
         });
 
-        // Sort keys (YYYY-MM) chronologically
-        const sortedKeys = Object.keys(monthlyData).sort();
+        const sortedKeys = Object.keys(periodData).sort();
 
-        // Format labels for display (e.g., "ene 24")
         const labels = sortedKeys.map(key => {
-            const [year, month] = key.split('-');
-            const date = new Date(parseInt(year), parseInt(month) - 1);
-            return date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+            if (this.filterMode() === 'month') {
+                const [year, month] = key.split('-');
+                const date = new Date(parseInt(year), parseInt(month) - 1);
+                return date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+            } else {
+                return key; // Just the year
+            }
         });
 
         return {
             labels,
             datasets: [
                 {
-                    data: sortedKeys.map(key => monthlyData[key]),
+                    data: sortedKeys.map(key => periodData[key]),
                     label: 'Gastos Totales (€)',
                     fill: true,
                     borderColor: '#4f46e5',
@@ -148,13 +188,21 @@ export class AnalyticsComponent implements OnInit {
         }
     };
 
-    // Chart Data: Share by vehicle (Computed & Monthly)
+    // Chart Data: Share by vehicle
     public pieChartData = computed<ChartData<'pie'>>(() => {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
+        let year: number, month: number | null = null;
+        if (this.filterMode() === 'month') {
+            [year, month] = this.selectedPeriod().split('-').map(Number);
+        } else {
+            year = Number(this.selectedPeriod());
+        }
+
         const vehicles = this.dataService.vehicles();
         const refuels = this.dataService.refuels().filter(r => {
             const d = new Date(r.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
 
         const vehicleLabels: string[] = [];
@@ -184,38 +232,62 @@ export class AnalyticsComponent implements OnInit {
         // No manual trigger needed, using computed
     }
 
-    get monthName(): string {
-        const [year, month] = this.selectedMonth().split('-');
-        const date = new Date(parseInt(year), parseInt(month) - 1);
-        return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    get currentPeriodName(): string {
+        if (this.filterMode() === 'month') {
+            const [year, month] = this.selectedPeriod().split('-');
+            const date = new Date(parseInt(year), parseInt(month) - 1);
+            return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+        } else {
+            return `Año ${this.selectedPeriod()}`;
+        }
     }
 
-    monthlyRecordsCount = computed(() => {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
+    periodRecordsCount = computed(() => {
+        let year: number, month: number | null = null;
+        if (this.filterMode() === 'month') {
+            [year, month] = this.selectedPeriod().split('-').map(Number);
+        } else {
+            year = Number(this.selectedPeriod());
+        }
+
         const refuels = this.dataService.refuels().filter(r => {
             const d = new Date(r.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
         const maintenances = this.dataService.maintenances().filter(m => {
             const d = new Date(m.fecha);
-            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            return this.filterMode() === 'month'
+                ? d.getFullYear() === year && (d.getMonth() + 1) === month
+                : d.getFullYear() === year;
         });
         return refuels.length + maintenances.length;
     });
 
-    prevMonth() {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
-        const date = new Date(year, month - 2, 1);
-        const newYear = date.getFullYear();
-        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-        this.selectedMonth.set(`${newYear}-${newMonth}`);
+    prevPeriod() {
+        if (this.filterMode() === 'month') {
+            const [year, month] = this.selectedPeriod().split('-').map(Number);
+            const date = new Date(year, month - 2, 1);
+            const newYear = date.getFullYear();
+            const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+            this.selectedPeriod.set(`${newYear}-${newMonth}`);
+        } else {
+            const year = Number(this.selectedPeriod());
+            this.selectedPeriod.set((year - 1).toString());
+        }
     }
 
-    nextMonth() {
-        const [year, month] = this.selectedMonth().split('-').map(Number);
-        const date = new Date(year, month, 1);
-        const newYear = date.getFullYear();
-        const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-        this.selectedMonth.set(`${newYear}-${newMonth}`);
+    nextPeriod() {
+        if (this.filterMode() === 'month') {
+            const [year, month] = this.selectedPeriod().split('-').map(Number);
+            const date = new Date(year, month, 1);
+            const newYear = date.getFullYear();
+            const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+            this.selectedPeriod.set(`${newYear}-${newMonth}`);
+        } else {
+            const year = Number(this.selectedPeriod());
+            this.selectedPeriod.set((year + 1).toString());
+        }
     }
 }
