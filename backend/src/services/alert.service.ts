@@ -104,7 +104,7 @@ class AlertService {
                     });
                     console.log(`[AlertService] Email notification sent to ${vehicle.propietario.email}`);
                     // Rate limit protection for Resend (2 req/sec max)
-                    await this.sleep(600);
+                    await this.sleep(1000);
                 } catch (err) {
                     console.error(`[AlertService] Failed to send email to ${vehicle.propietario.email}:`, err);
                 }
@@ -123,7 +123,7 @@ class AlertService {
                         detailLabel: 'Fecha de Caducidad',
                         detailValue: itvDate.toLocaleDateString()
                     });
-                    await this.sleep(600);
+                    await this.sleep(1000);
                 } catch (err) {
                     console.error(`[AlertService] Failed to send ITV email:`, err);
                 }
@@ -142,7 +142,7 @@ class AlertService {
                         detailLabel: 'Fecha de Vencimiento',
                         detailValue: insuranceDate.toLocaleDateString()
                     });
-                    await this.sleep(600);
+                    await this.sleep(1000);
                 } catch (err) {
                     console.error(`[AlertService] Failed to send Insurance email:`, err);
                 }
