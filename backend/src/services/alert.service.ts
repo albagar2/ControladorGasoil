@@ -56,8 +56,8 @@ class AlertService {
         });
 
         const today = new Date();
-        const thirtyDaysFromNow = new Date();
-        thirtyDaysFromNow.setDate(today.getDate() + 30);
+        const fortyFiveDaysFromNow = new Date();
+        fortyFiveDaysFromNow.setDate(today.getDate() + 45);
 
         // 1. Check Maintenance Rules
         for (const rule of this.RULES) {
@@ -86,9 +86,10 @@ class AlertService {
 
                 if (rule.intervalMonths && !isDue) {
                     const monthsSinceLast = this.monthDiff(new Date(lastMaint.fecha), today);
-                    if (monthsSinceLast >= rule.intervalMonths - 1) {
+                    // Alert if within 1.5 months (approx 45 days) of the interval
+                    if (monthsSinceLast >= rule.intervalMonths - 1.5) {
                         isDue = true;
-                        reason = `${monthsSinceLast} meses desde el último`;
+                        reason = `${monthsSinceLast} meses desde el último (Límite: ${rule.intervalMonths})`;
                     }
                 }
             }
@@ -114,7 +115,7 @@ class AlertService {
         // 2. Check ITV
         if (vehicle.itv_fecha_caducidad) {
             const itvDate = new Date(vehicle.itv_fecha_caducidad);
-            if (itvDate <= thirtyDaysFromNow) {
+            if (itvDate <= fortyFiveDaysFromNow) {
                 console.log(`[AlertService] ITV Alert triggered for ${vehicle.matricula}. Expiry: ${itvDate.toLocaleDateString()}`);
                 try {
                     await emailService.sendAutomatedAlert(vehicle.propietario.email, {
@@ -133,7 +134,7 @@ class AlertService {
         // Check Insurance
         if (vehicle.seguro_fecha_vencimiento) {
             const insuranceDate = new Date(vehicle.seguro_fecha_vencimiento);
-            if (insuranceDate <= thirtyDaysFromNow) {
+            if (insuranceDate <= fortyFiveDaysFromNow) {
                 console.log(`[AlertService] Insurance Alert triggered for ${vehicle.matricula}. Expiry: ${insuranceDate.toLocaleDateString()}`);
                 try {
                     await emailService.sendAutomatedAlert(vehicle.propietario.email, {
@@ -212,12 +213,12 @@ class AlertService {
         if (!driver || !driver.email) return;
 
         const today = new Date();
-        const thirtyDaysFromNow = new Date();
-        thirtyDaysFromNow.setDate(today.getDate() + 30);
+        const fortyFiveDaysFromNow = new Date();
+        fortyFiveDaysFromNow.setDate(today.getDate() + 45);
 
         if (driver.fechaRenovacionCarnet) {
             const licenseDate = new Date(driver.fechaRenovacionCarnet);
-            if (licenseDate <= thirtyDaysFromNow) {
+            if (licenseDate <= fortyFiveDaysFromNow) {
                 console.log(`[AlertService] License Alert triggered for ${driver.nombre}. Expiry: ${licenseDate.toLocaleDateString()}`);
                 try {
                     await emailService.sendAutomatedAlert(driver.email, {
