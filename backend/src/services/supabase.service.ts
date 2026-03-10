@@ -4,15 +4,21 @@ import fs from 'fs';
 
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_KEY || '';
+const supabaseUrl = (process.env.SUPABASE_URL || '').trim();
+const supabaseKey = (process.env.SUPABASE_KEY || '').trim();
 
 let supabase: any = null;
 
-if (supabaseUrl && supabaseKey) {
-    supabase = createClient(supabaseUrl, supabaseKey);
+const isValidUrl = /^https?:\/\//i.test(supabaseUrl);
+
+if (isValidUrl && supabaseKey) {
+    try {
+        supabase = createClient(supabaseUrl, supabaseKey);
+    } catch (e) {
+        console.error('❌ Failed to create Supabase client:', e);
+    }
 } else {
-    console.warn('⚠️ Supabase URL or Key missing. Storage service will not be available.');
+    console.warn('⚠️ Supabase URL or Key missing or invalid. Storage service will not be available.');
 }
 
 export class SupabaseService {

@@ -1,73 +1,98 @@
-import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
 
 class EmailService {
-    private transporter: nodemailer.Transporter | null = null;
+    private gmail: any = null;
     private readonly user = process.env.SMTP_USER || 'baciapez@gmail.com';
     private readonly clientId = process.env.GOOGLE_CLIENT_ID;
     private readonly clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     private readonly refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
 
     constructor() {
-        this.initTransporter();
+        this.initGmail();
     }
 
-    private initTransporter() {
+    private initGmail() {
         if (!this.clientId || !this.clientSecret || !this.refreshToken) {
             console.warn('⚠️ Gmail OAuth2 credentials missing. Email service will not be available.');
             return;
         }
 
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAuth2',
-                user: this.user,
-                clientId: this.clientId,
-                clientSecret: this.clientSecret,
-                refreshToken: this.refreshToken
-            }
-        });
+        try {
+            const oauth2Client = new google.auth.OAuth2(
+                this.clientId,
+                this.clientSecret,
+                'https://developers.google.com/oauthplayground' // Common redirect URI for manual setup
+            );
 
-        console.log('[EmailService] Initialized with Gmail OAuth2.');
+            oauth2Client.setCredentials({
+                refresh_token: this.refreshToken
+            });
+
+            this.gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+            console.log('[EmailService] Initialized with Gmail HTTP API (REST).');
+        } catch (error) {
+            console.error('❌ Failed to initialize Gmail API:', error);
+        }
     }
 
     async verifyConnection() {
-        if (!this.transporter) {
-            this.initTransporter();
+        if (!this.gmail) {
+            this.initGmail();
         }
 
-        if (!this.transporter) return false;
+        if (!this.gmail) return false;
 
         try {
-            await this.transporter.verify();
-            console.log('📧 Gmail OAuth2 service is ready');
+            // Test by getting profile or similar light operation
+            await this.gmail.users.getProfile({ userId: 'me' });
+            console.log('📧 Gmail HTTP API is ready');
             return true;
         } catch (error) {
-            console.error('❌ Gmail OAuth2 verification failed:', error);
+            console.error('❌ Gmail HTTP API verification failed:', error);
             return false;
         }
     }
 
     private async sendMail(to: string, subject: string, html: string) {
-        if (!this.transporter) {
-            this.initTransporter();
-            if (!this.transporter) throw new Error('Email transporter not initialized');
+        if (!this.gmail) {
+            this.initGmail();
+            if (!this.gmail) throw new Error('Gmail API not initialized');
         }
 
-        console.log(`[EmailService] Sending email to ${to} via Gmail OAuth2...`);
+        console.log(`[EmailService] Sending email to ${to} via Gmail HTTP API...`);
 
         try {
-            const info = await this.transporter.sendMail({
-                from: `"Garaje Familiar" <${this.user}>`,
-                to: to,
-                subject: subject,
-                html: html
+            // Create RFC 2822 message
+            const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
+            const messageParts = [
+                `From: "Garaje Familiar" <${this.user}>`,
+                `To: ${to}`,
+                `Content-Type: text/html; charset=utf-8`,
+                `MIME-Version: 1.0`,
+                `Subject: ${utf8Subject}`,
+                '',
+                html,
+            ];
+            const message = messageParts.join('\n');
+
+            // Encode to base64url
+            const encodedMessage = Buffer.from(message)
+                .toString('base64')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            const res = await this.gmail.users.messages.send({
+                userId: 'me',
+                requestBody: {
+                    raw: encodedMessage,
+                },
             });
 
-            console.log('[EmailService] Email sent successfully:', info.messageId);
-            return info;
+            console.log('[EmailService] Email sent successfully via HTTP API:', res.data.id);
+            return res.data;
         } catch (error: any) {
-            console.error('❌ Error sending email via Gmail OAuth2:', error.message || error);
+            console.error('❌ Error sending email via Gmail HTTP API:', error.message || error);
             throw error;
         }
     }

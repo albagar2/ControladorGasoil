@@ -39,7 +39,7 @@ export class ExportService {
         }
     }
 
-    exportToPdf(filename: string, title: string, columns: string[], data: any[]) {
+    exportToPdf(filename: string, title: string, columns: string[], data: any[], images?: { image: string, title: string }[]) {
         const doc = new jsPDF();
 
         // Estilos del Título
@@ -63,10 +63,38 @@ export class ExportService {
             margin: { top: 35 }
         });
 
+        // Añadir Gráficos después de la tabla
+        if (images && images.length > 0) {
+            let currentY = (doc as any).lastAutoTable.finalY + 20;
+
+            images.forEach((img, index) => {
+                // Comprobar si cabe en la página o crear nueva
+                if (currentY > 240) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+
+                doc.setFontSize(14);
+                doc.setTextColor(40);
+                doc.text(img.title, 14, currentY);
+
+                try {
+                    // Ajustar tamaño del gráfico (manteniendo proporción aprox)
+                    const imgWidth = 180;
+                    const imgHeight = 90;
+                    doc.addImage(img.image, 'PNG', 14, currentY + 5, imgWidth, imgHeight);
+                    currentY += imgHeight + 25;
+                } catch (e) {
+                    console.error('Error al añadir imagen al PDF', e);
+                    currentY += 15;
+                }
+            });
+        }
+
         doc.save(filename);
     }
 
-    generateCostReport(vehicles: any[], refuels: any[], maintenance: any[]) {
+    generateCostReport(vehicles: any[], refuels: any[], maintenance: any[], images?: { image: string, title: string }[]) {
         const columns = ['Mes/Año', 'Tipo', 'Vehículo', 'Detalle', 'Coste (€)'];
 
         // Combinar datos con fecha para poder ordenar
@@ -103,7 +131,7 @@ export class ExportService {
             `${item.coste.toFixed(2)}€`
         ]);
 
-        this.exportToPdf('reporte_gastos_gasoil.pdf', 'Informe de Gastos - Garaje Familiar', columns, reportData);
+        this.exportToPdf('reporte_gastos_gasoil.pdf', 'Informe de Gastos - Garaje Familiar', columns, reportData, images);
     }
 }
 

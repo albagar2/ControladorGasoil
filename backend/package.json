@@ -22,6 +22,7 @@
         "pg": "^8.19.0",
         "reflect-metadata": "^0.2.2",
         "@supabase/supabase-js": "^2.48.5",
+        "googleapis": "^144.0.0",
         "typeorm": "^0.3.20"
     },
     "devDependencies": {

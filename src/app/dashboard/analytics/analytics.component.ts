@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../core/services/data.service';
 import { ExportService } from '../../core/services/export.service';
-import { NgChartsModule } from 'ng2-charts';
+import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
 import { Chart, registerables, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 Chart.register(...registerables);
@@ -18,14 +18,24 @@ export class AnalyticsComponent implements OnInit {
     public dataService = inject(DataService);
     private exportService = inject(ExportService);
 
+    @ViewChild('lineChart') lineChart?: BaseChartDirective;
+    @ViewChild('pieChart') pieChart?: BaseChartDirective;
+
     // Monthly navigation
     selectedMonth = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
 
     exportData() {
+        const lineChartImage = this.lineChart?.chart?.toBase64Image();
+        const pieChartImage = this.pieChart?.chart?.toBase64Image();
+
         this.exportService.generateCostReport(
             this.dataService.vehicles(),
             this.dataService.refuels(),
-            this.dataService.maintenances()
+            this.dataService.maintenances(),
+            [
+                { image: lineChartImage, title: 'Histórico de Gastos' },
+                { image: pieChartImage, title: 'Gastos por Vehículo (Mes)' }
+            ].filter(img => !!img.image) as { image: string, title: string }[]
         );
     }
 
