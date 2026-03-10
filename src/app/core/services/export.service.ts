@@ -67,11 +67,41 @@ export class ExportService {
     }
 
     generateCostReport(vehicles: any[], refuels: any[], maintenance: any[]) {
-        const columns = ['Tipo', 'Vehículo/Nombre', 'Detalle', 'Coste (€)'];
-        const reportData = [
-            ...refuels.map(r => ['Repostaje', r.vehiculo?.modelo || 'N/A', `${r.litros}L`, `${r.costeTotal}€`]),
-            ...maintenance.map(m => ['Mantenimiento', m.vehiculo?.modelo || 'N/A', m.descripcion, `${(m.costePieza || 0) + (m.costeTaller || 0)}€`])
+        const columns = ['Mes/Año', 'Tipo', 'Vehículo', 'Detalle', 'Coste (€)'];
+
+        // Combinar datos con fecha para poder ordenar
+        const combinedData = [
+            ...refuels.map(r => ({
+                fecha: new Date(r.fecha),
+                tipo: 'Repostaje',
+                vehiculo: r.vehiculo?.modelo || r.vehiculo?.matricula || 'N/A',
+                detalle: `${r.litros}L`,
+                coste: Number(r.costeTotal) || 0
+            })),
+            ...maintenance.map(m => ({
+                fecha: new Date(m.fecha),
+                tipo: 'Mantenimiento',
+                vehiculo: m.vehiculo?.modelo || m.vehiculo?.matricula || 'N/A',
+                detalle: m.tipo || 'General',
+                coste: (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0)
+            }))
         ];
+
+        // Ordenar por Año/Mes (Descendente - más reciente arriba) y por Vehículo (Ascendente)
+        combinedData.sort((a, b) => {
+            const timeA = a.fecha.getTime();
+            const timeB = b.fecha.getTime();
+            if (timeA !== timeB) return timeB - timeA;
+            return a.vehiculo.localeCompare(b.vehiculo);
+        });
+
+        const reportData = combinedData.map(item => [
+            item.fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+            item.tipo,
+            item.vehiculo,
+            item.detalle,
+            `${item.coste.toFixed(2)}€`
+        ]);
 
         this.exportToPdf('reporte_gastos_gasoil.pdf', 'Informe de Gastos - Garaje Familiar', columns, reportData);
     }
