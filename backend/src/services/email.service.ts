@@ -32,7 +32,7 @@ class EmailService {
                     'Authorization': `Bearer ${this.RESEND_API_KEY}`
                 },
                 body: JSON.stringify({
-                    from: `Garaje Familiar <${this.FROM_EMAIL}>`,
+                    from: this.FROM_EMAIL,
                     to: [to],
                     subject: subject,
                     html: html

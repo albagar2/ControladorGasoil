@@ -77,7 +77,10 @@ export const emailController = {
                 await alertService.checkDriverAlerts(driver.id);
             }
 
-            res.json({ message: 'Proceso de revisión de alertas finalizado y correos enviados si correspondía.' });
+            res.json({
+                message: 'Proceso de revisión de alertas finalizado.',
+                details: `Se han procesado vehículos y conductores. Revisa los logs para ver envíos individuales.`
+            });
         } catch (error: any) {
             console.error('Error en trigger manual de alertas:', error);
             res.status(500).json({ message: 'Error al procesar las alertas manuales.', error: error.message });
