@@ -106,14 +106,14 @@ export class ExportService {
                 fecha: new Date(r.fecha),
                 tipo: 'Repostaje',
                 vehiculo: r.vehiculo?.modelo || r.vehiculo?.matricula || 'N/A',
-                detalle: `${r.litros}L`,
+                detalle: `${r.litros}L (${Number(r.precioPorLitro).toFixed(3)}€/L)`,
                 coste: Number(r.costeTotal) || 0
             })),
             ...maintenance.map(m => ({
                 fecha: new Date(m.fecha),
                 tipo: 'Mantenimiento',
                 vehiculo: m.vehiculo?.modelo || m.vehiculo?.matricula || 'N/A',
-                detalle: m.tipo || 'General',
+                detalle: `${m.tipo}${m.observaciones ? ' - ' + m.observaciones : ''}`,
                 coste: (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0)
             }))
         ];
@@ -127,14 +127,18 @@ export class ExportService {
         });
 
         const reportData = combinedData.map(item => [
-            item.fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+            item.fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
             item.tipo,
             item.vehiculo,
             item.detalle,
             `${item.coste.toFixed(2)}€`
         ]);
 
-        this.exportToPdf('reporte_gastos_gasoil.pdf', 'Informe de Gastos - Garaje Familiar', columns, reportData, images);
+        const reportTitle = combinedData.length > 0
+            ? `Informe de Gastos - ${combinedData[0].fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`
+            : 'Informe de Gastos - Garaje Familiar';
+
+        this.exportToPdf('reporte_gastos_gasoil.pdf', reportTitle, columns, reportData, images);
     }
 }
 

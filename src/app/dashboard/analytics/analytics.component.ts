@@ -25,16 +25,29 @@ export class AnalyticsComponent implements OnInit {
     selectedMonth = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
 
     exportData() {
+        const [year, month] = this.selectedMonth().split('-').map(Number);
+
+        // Filter data to match the selected month
+        const filteredRefuels = this.dataService.refuels().filter(r => {
+            const d = new Date(r.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
+
+        const filteredMaintenances = this.dataService.maintenances().filter(m => {
+            const d = new Date(m.fecha);
+            return d.getFullYear() === year && (d.getMonth() + 1) === month;
+        });
+
         const lineChartImage = this.lineChart?.chart?.toBase64Image();
         const pieChartImage = this.pieChart?.chart?.toBase64Image();
 
         this.exportService.generateCostReport(
             this.dataService.vehicles(),
-            this.dataService.refuels(),
-            this.dataService.maintenances(),
+            filteredRefuels,
+            filteredMaintenances,
             [
                 { image: lineChartImage, title: 'Histórico de Gastos' },
-                { image: pieChartImage, title: 'Gastos por Vehículo (Mes)' }
+                { image: pieChartImage, title: `Desglose de Gastos - ${this.monthName}` }
             ].filter(img => !!img.image) as { image: string, title: string }[]
         );
     }
