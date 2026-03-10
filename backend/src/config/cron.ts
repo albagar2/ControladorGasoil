@@ -4,19 +4,23 @@ import { Vehicle } from '../entities/Vehicle';
 import { alertService } from '../services/alert.service';
 
 export const setupCronJobs = () => {
-    // Run daily at 08:00 AM for maintenance alerts
+    // Run daily at 08:00 AM for maintenance and document alerts
     cron.schedule('0 8 * * *', async () => {
-        console.log('[Cron] Running daily vehicle alerts check...');
+        console.log('[Cron] Running daily alerts check (Vehicles & Drivers)...');
         try {
             const vehicleRepository = AppDataSource.getRepository(Vehicle);
-            const vehicles = await vehicleRepository.find({
-                relations: ['propietario']
-            });
+            const driverRepository = AppDataSource.getRepository(Driver);
 
+            // 1. Check Vehicle Alerts (ITV, Insurance, Maintenance)
+            const vehicles = await vehicleRepository.find({ relations: ['propietario'] });
             for (const vehicle of vehicles) {
-                if (vehicle.propietario?.email) {
-                    await alertService.checkAndSendAlerts(vehicle.id);
-                }
+                await alertService.checkAndSendAlerts(vehicle.id);
+            }
+
+            // 2. Check Driver Alerts (License)
+            const drivers = await driverRepository.find();
+            for (const driver of drivers) {
+                await alertService.checkDriverAlerts(driver.id);
             }
 
             console.log('[Cron] Daily check completed.');

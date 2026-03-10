@@ -3,6 +3,8 @@ import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
 import { emailService } from './email.service';
 import { LessThanOrEqual } from 'typeorm';
+import { Refuel } from '../entities/Refuel';
+import { Driver } from '../entities/Driver';
 
 interface MaintenanceRule {
     id: string;
