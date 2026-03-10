@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { AppDataSource } from '../data-source';
 import { Vehicle } from '../entities/Vehicle';
+import { Driver } from '../entities/Driver';
 import { alertService } from '../services/alert.service';
 
 export const setupCronJobs = () => {
