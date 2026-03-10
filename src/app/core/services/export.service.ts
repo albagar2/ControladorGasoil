@@ -79,11 +79,14 @@ export class ExportService {
                 doc.text(img.title, 14, currentY);
 
                 try {
-                    // Ajustar tamaño del gráfico (manteniendo proporción aprox)
-                    const imgWidth = 180;
-                    const imgHeight = 90;
-                    doc.addImage(img.image, 'PNG', 14, currentY + 5, imgWidth, imgHeight);
-                    currentY += imgHeight + 25;
+                    // Ajustar tamaño del gráfico (más pequeño y centrado)
+                    const imgWidth = 150;
+                    const imgHeight = 75;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const xPos = (pageWidth - imgWidth) / 2;
+
+                    doc.addImage(img.image, 'PNG', xPos, currentY + 8, imgWidth, imgHeight);
+                    currentY += imgHeight + 30;
                 } catch (e) {
                     console.error('Error al añadir imagen al PDF', e);
                     currentY += 15;

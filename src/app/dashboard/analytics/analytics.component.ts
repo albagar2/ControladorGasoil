@@ -89,25 +89,34 @@ export class AnalyticsComponent implements OnInit {
         const maintenances = this.dataService.maintenances();
         const monthlyData: Record<string, number> = {};
 
-        // Group everything by month
+        // Group everything by 'YYYY-MM' to ensure chronological sorting and year separation
         refuels.forEach(r => {
             const date = new Date(r.fecha);
-            const key = date.toLocaleString('default', { month: 'short' });
-            monthlyData[key] = (monthlyData[key] || 0) + (r.costeTotal || 0);
+            const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            monthlyData[key] = (monthlyData[key] || 0) + (Number(r.costeTotal) || 0);
         });
 
         maintenances.forEach(m => {
             const date = new Date(m.fecha);
-            const key = date.toLocaleString('default', { month: 'short' });
-            monthlyData[key] = (monthlyData[key] || 0) + (m.costePieza || 0) + (m.costeTaller || 0);
+            const key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            monthlyData[key] = (monthlyData[key] || 0) + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0);
         });
 
-        const labels = Object.keys(monthlyData);
+        // Sort keys (YYYY-MM) chronologically
+        const sortedKeys = Object.keys(monthlyData).sort();
+
+        // Format labels for display (e.g., "ene 24")
+        const labels = sortedKeys.map(key => {
+            const [year, month] = key.split('-');
+            const date = new Date(parseInt(year), parseInt(month) - 1);
+            return date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+        });
+
         return {
             labels,
             datasets: [
                 {
-                    data: labels.map(l => monthlyData[l]),
+                    data: sortedKeys.map(key => monthlyData[key]),
                     label: 'Gastos Totales (€)',
                     fill: true,
                     borderColor: '#4f46e5',
