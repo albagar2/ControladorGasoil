@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { emailService } from '../services/email.service';
 import { AppDataSource } from '../data-source';
 import { Vehicle } from '../entities/Vehicle';
@@ -6,7 +6,7 @@ import { Driver } from '../entities/Driver';
 import { alertService } from '../services/alert.service';
 
 export const emailController = {
-    async sendMaintenanceAlert(req: Request, res: Response) {
+    async sendMaintenanceAlert(req: ExpressRequest, res: ExpressResponse) {
         try {
             const { to, vehicleName, maintenanceType, date } = req.body;
 
@@ -30,7 +30,7 @@ export const emailController = {
         }
     },
 
-    async sendMonthlyReport(req: Request, res: Response) {
+    async sendMonthlyReport(req: ExpressRequest, res: ExpressResponse) {
         try {
             const { to, reportUrl, month } = req.body;
 
@@ -59,7 +59,7 @@ export const emailController = {
         }
     },
 
-    async triggerAllAlerts(req: Request, res: Response) {
+    async triggerAllAlerts(req: ExpressRequest, res: ExpressResponse) {
         try {
             console.log('[EmailController] Manual trigger: Checking all alerts...');
             const vehicleRepository = AppDataSource.getRepository(Vehicle);
@@ -84,7 +84,7 @@ export const emailController = {
         }
     },
 
-    async triggerMonthlySummary(req: Request, res: Response) {
+    async triggerMonthlySummary(req: ExpressRequest, res: ExpressResponse) {
         try {
             console.log('[EmailController] Manual trigger: Sending monthly admin summary...');
             await alertService.sendMonthlyAdminSummary();
