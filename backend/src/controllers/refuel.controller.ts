@@ -200,16 +200,22 @@ export const updateRefuel = asyncHandler(async (req: Request, res: Response) => 
     refuelRepository.merge(refuel, refuelData);
     const savedRefuel = await refuelRepository.save(refuel);
 
-    // Update Vehicle Mileage if changed
-    if (savedRefuel.kilometraje > refuel.vehiculo.kilometrajeActual) {
-        refuel.vehiculo.kilometrajeActual = savedRefuel.kilometraje;
-        await vehicleRepository.save(refuel.vehiculo);
+    // Update Vehicle Mileage (fetch the vehicle of the SAVED refuel to ensure it's the correct one)
+    const activeVehicle = await vehicleRepository.findOneBy({ id: savedRefuel.vehiculoId });
+    if (activeVehicle && savedRefuel.kilometraje > activeVehicle.kilometrajeActual) {
+        activeVehicle.kilometrajeActual = savedRefuel.kilometraje;
+        await vehicleRepository.save(activeVehicle);
     }
 
     // Return with relations
     const fullRefuel = await refuelRepository.findOne({
         where: { id: savedRefuel.id },
         relations: ["vehiculo", "conductor"]
+    });
+
+    // Check for alerts in background (non-blocking)
+    alertService.checkAndSendAlerts(savedRefuel.vehiculoId).catch(error => {
+        console.error(`[AlertService] Failed to send alerts for vehicle ${savedRefuel.vehiculoId}:`, error);
     });
 
     res.json(fullRefuel);
