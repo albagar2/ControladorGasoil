@@ -14,6 +14,10 @@ interface MaintenanceRule {
 }
 
 class AlertService {
+    private sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     private readonly RULES: MaintenanceRule[] = [
         { id: 'Aceite', label: 'Cambio de Aceite y Filtros', intervalKm: 15000, intervalMonths: 12 },
         { id: 'Aire', label: 'Filtro de Aire', intervalKm: 30000 },
@@ -99,6 +103,8 @@ class AlertService {
                         detailValue: reason
                     });
                     console.log(`[AlertService] Email notification sent to ${vehicle.propietario.email}`);
+                    // Rate limit protection for Resend (2 req/sec max)
+                    await this.sleep(600);
                 } catch (err) {
                     console.error(`[AlertService] Failed to send email to ${vehicle.propietario.email}:`, err);
                 }
@@ -117,6 +123,7 @@ class AlertService {
                         detailLabel: 'Fecha de Caducidad',
                         detailValue: itvDate.toLocaleDateString()
                     });
+                    await this.sleep(600);
                 } catch (err) {
                     console.error(`[AlertService] Failed to send ITV email:`, err);
                 }
@@ -135,6 +142,7 @@ class AlertService {
                         detailLabel: 'Fecha de Vencimiento',
                         detailValue: insuranceDate.toLocaleDateString()
                     });
+                    await this.sleep(600);
                 } catch (err) {
                     console.error(`[AlertService] Failed to send Insurance email:`, err);
                 }
@@ -152,6 +160,7 @@ class AlertService {
                     detailLabel: 'Vehículo',
                     detailValue: `${vehicle.modelo} (${vehicle.matricula})`
                 });
+                await this.sleep(600);
             } catch (e) {
                 console.error('[AlertService] Failed to send admin copy', e);
             }
