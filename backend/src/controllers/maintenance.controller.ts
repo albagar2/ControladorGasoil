@@ -4,6 +4,8 @@ import { Maintenance } from '../entities/Maintenance';
 import { Vehicle } from '../entities/Vehicle';
 import { asyncHandler } from '../utils/asyncHandler';
 import { alertService } from '../services/alert.service';
+import { SupabaseService } from '../services/supabase.service';
+import path from 'path';
 
 const maintenanceRepository = AppDataSource.getRepository(Maintenance);
 const vehicleRepository = AppDataSource.getRepository(Vehicle);
@@ -51,6 +53,12 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
         return res.status(403).json({ message: "Forbidden: Vehicle belongs to another family" });
     }
 
+    let ticketImageUrl = undefined;
+    if (req.file) {
+        const fileName = `MNT_${Date.now()}_${vId}${path.extname(req.file.originalname)}`;
+        ticketImageUrl = await SupabaseService.uploadFile(req.file.path, fileName) || undefined;
+    }
+
     const maintenance = maintenanceRepository.create({
         vehiculoId: vId,
         conductorId: cId,
@@ -61,7 +69,7 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
         observaciones,
         kilometraje: km,
         proveedor,
-        ticketImageUrl: req.file ? `uploads/${req.file.filename}` : undefined
+        ticketImageUrl: ticketImageUrl
     });
 
     await maintenanceRepository.save(maintenance);
@@ -125,7 +133,8 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
     maintenance.proveedor = proveedor;
 
     if (req.file) {
-        maintenance.ticketImageUrl = `/uploads/${req.file.filename}`;
+        const fileName = `MNT_UPD_${Date.now()}_${vId}${path.extname(req.file.originalname)}`;
+        maintenance.ticketImageUrl = await SupabaseService.uploadFile(req.file.path, fileName) || undefined;
     }
 
     await maintenanceRepository.save(maintenance);

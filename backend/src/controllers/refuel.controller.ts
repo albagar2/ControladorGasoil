@@ -5,6 +5,7 @@ import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
 import { asyncHandler } from '../utils/asyncHandler';
 import { alertService } from '../services/alert.service';
+import { SupabaseService } from '../services/supabase.service';
 import fs from 'fs';
 import path from 'path';
 
@@ -101,14 +102,14 @@ export const createRefuel = asyncHandler(async (req: Request, res: Response) => 
             now.getMinutes().toString().padStart(2, '0');
 
         const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
-        const newFileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
-        const newPath = path.join('uploads', newFileName);
+        const fileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
 
-        try {
-            fs.renameSync(req.file.path, newPath);
-            ticketImageUrl = `uploads/${newFileName}`;
-        } catch (err) {
-            console.error('Error renaming file', err);
+        // Upload to Supabase Storage
+        const publicUrl = await SupabaseService.uploadFile(req.file.path, fileName);
+        if (publicUrl) {
+            ticketImageUrl = publicUrl;
+        } else {
+            // Fallback to local if Supabase fails (though it will be ephemeral)
             ticketImageUrl = `uploads/${req.file.filename}`;
         }
     }
@@ -185,14 +186,13 @@ export const updateRefuel = asyncHandler(async (req: Request, res: Response) => 
             now.getMinutes().toString().padStart(2, '0');
 
         const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
-        const newFileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
-        const newPath = path.join('uploads', newFileName);
+        const fileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
 
-        try {
-            fs.renameSync(req.file.path, newPath);
-            refuelData.ticketImageUrl = `uploads/${newFileName}`;
-        } catch (err) {
-            console.error('Error renaming file', err);
+        // Upload to Supabase Storage
+        const publicUrl = await SupabaseService.uploadFile(req.file.path, fileName);
+        if (publicUrl) {
+            refuelData.ticketImageUrl = publicUrl;
+        } else {
             refuelData.ticketImageUrl = `uploads/${req.file.filename}`;
         }
     }
