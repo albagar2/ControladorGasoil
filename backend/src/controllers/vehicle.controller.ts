@@ -10,11 +10,21 @@ const driverRepository = AppDataSource.getRepository(Driver);
 
 const sanitizeVehicleData = (data: any) => {
     const sanitized = { ...data };
+
+    // Remove relation objects that might conflict with IDs during update
+    delete sanitized.propietario;
+    delete sanitized.family;
+
     for (const key in sanitized) {
         // Convert empty strings to null for database compatibility
         if (sanitized[key] === '') {
             sanitized[key] = null;
         }
+    }
+
+    // Ensure IDs are numbers
+    if (sanitized.propietarioId !== undefined && sanitized.propietarioId !== null) {
+        sanitized.propietarioId = parseInt(sanitized.propietarioId.toString());
     }
 
     // Explicit Date Parsing for ITV and Insurance
