@@ -7,16 +7,22 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_KEY || '';
 
-if (!supabaseUrl || !supabaseKey) {
+let supabase: any = null;
+
+if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+} else {
     console.warn('⚠️ Supabase URL or Key missing. Storage service will not be available.');
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export class SupabaseService {
     private static bucketName = 'uploads';
 
     static async uploadFile(localPath: string, fileName: string): Promise<string | null> {
+        if (!supabase) {
+            console.error('❌ Supabase service not initialized. Check environment variables.');
+            return null;
+        }
         try {
             const fileBuffer = fs.readFileSync(localPath);
 
