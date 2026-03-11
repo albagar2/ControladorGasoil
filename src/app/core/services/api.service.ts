@@ -159,6 +159,10 @@ export class ApiService {
         return this.http.post(`${this.apiUrl}/admin/photos/migrate`, {});
     }
 
+    matchLocalTickets(): Observable<any> {
+        return this.http.post(`${this.apiUrl}/admin/photos/match_local_tickets`, {});
+    }
+
     // Email
     sendMaintenanceAlert(data: any): Observable<any> {
         return this.http.post(`${this.apiUrl}/email/maintenance-alert`, data);

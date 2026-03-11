@@ -28,6 +28,7 @@ export class FamilyComponent implements OnInit {
     isLeader = false;
     isCleaningUp = false;
     isMigrating = false;
+    isMatchingLocal = false;
     private toastService = inject(ToastService);
     private apiService = inject(ApiService);
 
@@ -198,6 +199,30 @@ export class FamilyComponent implements OnInit {
                 console.error('Error migrating photos:', err);
                 this.toastService.error('Error durante la migración.');
                 this.isMigrating = false;
+                this.dataService.loading.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    matchLocalTickets() {
+        if (!confirm('¿Sincronizar la carpeta local "TICKETS" con los repostajes en la base de datos? Esto subirá cada foto de la carpeta automáticamente a Google Drive.')) {
+            return;
+        }
+
+        this.isMatchingLocal = true;
+        this.dataService.loading.set(true);
+        this.apiService.matchLocalTickets().subscribe({
+            next: (res: any) => {
+                this.toastService.success(`Sincronización completada: ${res.uploadedCount || 0} tickets subidos.`);
+                this.isMatchingLocal = false;
+                this.dataService.loading.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error matching local tickets:', err);
+                this.toastService.error('Error al sincronizar los tickets locales.');
+                this.isMatchingLocal = false;
                 this.dataService.loading.set(false);
                 this.cdr.detectChanges();
             }

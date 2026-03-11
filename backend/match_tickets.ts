@@ -1,7 +1,11 @@
-import { AppDataSource } from './src/data-source';
-import { Refuel } from './src/entities/Refuel';
+import 'reflect-metadata';
 import fs from 'fs';
 import path from 'path';
+import { AppDataSource } from './src/data-source';
+import { Refuel } from './src/entities/Refuel';
+import { DriveService } from './src/services/drive.service';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const ticketsPath = 'c:/Users/bacia/Desktop/controlGasoilFamiliar/tickets';
 const monthsMap: { [key: string]: number } = {
@@ -9,69 +13,98 @@ const monthsMap: { [key: string]: number } = {
     'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
 };
 
-async function checkMatches() {
-    await AppDataSource.initialize();
-    const refuelRepo = AppDataSource.getRepository(Refuel);
-    const allRefuels = await refuelRepo.find({ relations: ['vehiculo'] });
-
-    console.log(`Loaded ${allRefuels.length} refuels from DB.`);
-
-    const getFiles = (dir: string) => {
-        let results: string[] = [];
-        const list = fs.readdirSync(dir);
-        list.forEach(file => {
-            file = path.join(dir, file);
-            const stat = fs.statSync(file);
-            if (stat && stat.isDirectory()) {
-                results = results.concat(getFiles(file));
-            } else {
-                results.push(file);
-            }
-        });
-        return results;
+async function matchTickets() {
+    let logs: string[] = [];
+    const _log = (msg: string) => {
+        console.log(msg);
+        logs.push(msg);
     };
 
-    const files = getFiles(ticketsPath);
-    console.log(`Found ${files.length} ticket files.`);
+    try {
+        await AppDataSource.initialize();
+        const refuelRepository = AppDataSource.getRepository(Refuel);
+        const allRefuels = await refuelRepository.find({ relations: ['vehiculo'] });
+        _log(`[DB] Connected successfully. Found ${allRefuels.length} refuels.`);
 
-    for (const file of files) {
-        const basename = path.basename(file, path.extname(file)).toLowerCase().trim(); // e.g. "19 de enero"
-
-        let matchDay: number | null = null;
-        let matchMonth: number | null = null;
-
-        // Try to parse "19 de enero" or "3 enero" or "02 de marzo"
-        const parts = basename.split(/[\sde]+/);
-
-        for (const part of parts) {
-            const num = parseInt(part);
-            if (!isNaN(num) && matchDay === null) {
-                matchDay = num;
-            } else if (monthsMap[part] !== undefined) {
-                matchMonth = monthsMap[part];
-            }
-        }
-
-        if (matchDay !== null && matchMonth !== null) {
-            // Find refuel
-            const matches = allRefuels.filter(r => {
-                const d = new Date(r.fecha);
-                return d.getDate() === matchDay && d.getMonth() === matchMonth;
+        const getFiles = (dir: string): string[] => {
+            let results: string[] = [];
+            if (!fs.existsSync(dir)) return [];
+            const list = fs.readdirSync(dir);
+            list.forEach(file => {
+                const fPath = path.join(dir, file);
+                if (fs.statSync(fPath).isDirectory()) {
+                    results = results.concat(getFiles(fPath));
+                } else {
+                    results.push(fPath);
+                }
             });
+            return results;
+        };
 
-            if (matches.length === 1) {
-                console.log(`[OK] Matched ${basename} -> Refuel ID ${matches[0].id} (${matches[0].vehiculo?.matricula}) on ${matches[0].fecha}`);
-            } else if (matches.length > 1) {
-                console.log(`[!] Multiple matches for ${basename}: found ${matches.length} refuels on that day.`);
-            } else {
-                console.log(`[X] No match found for ${basename}`);
+        const files = getFiles(ticketsPath);
+        _log(`[FS] Found ${files.length} ticket images.`);
+        let uploadedCount = 0;
+
+        for (const file of files) {
+            const basename = path.basename(file, path.extname(file)).toLowerCase().trim();
+            let matchDay: number | null = null;
+            let matchMonth: number | null = null;
+
+            const parts = basename.split(/[\sde]+/);
+            for (const part of parts) {
+                const num = parseInt(part);
+                if (!isNaN(num) && matchDay === null) {
+                    matchDay = num;
+                } else if (monthsMap[part] !== undefined) {
+                    matchMonth = monthsMap[part];
+                }
             }
-        } else {
-            console.log(`[?] Could not parse date from ${basename}`);
-        }
-    }
 
+            if (matchDay !== null && matchMonth !== null) {
+                const matches = allRefuels.filter(r => {
+                    const d = new Date(r.fecha);
+                    return d.getDate() === matchDay && d.getMonth() === matchMonth;
+                });
+
+                if (matches.length === 1) {
+                    const refuel = matches[0];
+                    if (!refuel.ticketImageUrl || !refuel.ticketImageUrl.includes('drive.google.com')) {
+                        _log(`Uploading ${basename} for refuel ${refuel.id}...`);
+                        const dt = new Date(refuel.fecha);
+                        const timestamp = `${dt.getFullYear()}-${(dt.getMonth() + 1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}_${dt.getHours().toString().padStart(2, '0')}-${dt.getMinutes().toString().padStart(2, '0')}`;
+                        const customName = `${timestamp}_${refuel.vehiculo?.matricula.replace(/\s+/g, '').toUpperCase() || 'UNKNOWN'}${path.extname(file)}`;
+
+                        // IMPORTANT: Need to copy the file to a tmp path, because DriveService deletes the local file on upload
+                        const tmpPath = file + '.tmp';
+                        fs.copyFileSync(file, tmpPath);
+
+                        const driveUrl = await DriveService.uploadFile(tmpPath, customName);
+                        if (driveUrl) {
+                            refuel.ticketImageUrl = driveUrl;
+                            await refuelRepository.save(refuel);
+                            uploadedCount++;
+                            _log(`[OK] Matched ${basename} -> Uploaded! URL: ${driveUrl}`);
+                        } else {
+                            _log(`[ERROR] Drive upload failed for ${basename}`);
+                        }
+                    } else {
+                        _log(`[SKIPPED] Refuel ID ${refuel.id} already has a Drive image`);
+                    }
+                } else if (matches.length > 1) {
+                    _log(`[!] Multiple DB matches for ${basename}`);
+                } else {
+                    _log(`[X] No DB match found for ${basename}`);
+                }
+            } else {
+                _log(`[?] Could not parse date from ${basename}`);
+            }
+        }
+        _log(`Done. Uploaded ${uploadedCount} tickets.`);
+    } catch (err) {
+        _log("CRITICAL ERROR: " + String(err));
+    }
+    fs.writeFileSync('match_results.txt', logs.join('\n'));
     process.exit(0);
 }
 
-checkMatches().catch(console.error);
+matchTickets();

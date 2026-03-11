@@ -65,10 +65,16 @@
                             {{ isCleaningUp ? 'Limpiando...' : 'Borrar Fotos Antiguas' }}
                         </button>
                         <button class="btn-secondary"
-                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #10b981; color: white; border: none;"
-                            (click)="migrateDrivePhotos()" [disabled]="isMigrating || isCleaningUp">
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #10b981; color: white; border: none; margin-bottom: 8px;"
+                            (click)="migrateDrivePhotos()" [disabled]="isMigrating || isCleaningUp || isMatchingLocal">
                             <span class="material-icons">cloud_upload</span>
                             {{ isMigrating ? 'Migrando...' : 'Migrar Archivos a Drive' }}
+                        </button>
+                        <button class="btn-secondary"
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #3b82f6; color: white; border: none;"
+                            (click)="matchLocalTickets()" [disabled]="isMatchingLocal || isMigrating || isCleaningUp">
+                            <span class="material-icons">sync</span>
+                            {{ isMatchingLocal ? 'Sincronizando...' : 'Sincronizar Tickets Locales' }}
                         </button>
                     </div>
                 </div>
