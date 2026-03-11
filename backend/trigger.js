@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 
 const req = http.request({
-    hostname: 'localhost',
+    hostname: '127.0.0.1',
     port: 3001,
     path: '/api/admin/photos/match_local_tickets',
     method: 'POST'
@@ -11,7 +11,7 @@ const req = http.request({
     res.on('data', (chunk) => { data += chunk; });
     res.on('end', () => {
         fs.writeFileSync('trigger_result.json', data);
-        console.log("Finished HTTP request");
+        console.log("Finished HTTP request successfully");
     });
 });
 

@@ -200,9 +200,12 @@ export const matchTicketsFolder = asyncHandler(async (req: Request, res: Respons
                 results.push(`[X] No DB match found for ${basename}`);
             }
         } else {
-            results.push(`[?] Could not parse date from ${basename}`);
+            const msg = `[?] Could not parse date from ${basename}`;
+            results.push(msg);
+            console.log(msg);
         }
     }
 
+    console.log("MIGRATION RESULTS:", results);
     res.json({ message: "Ticket matching complete", uploadedCount, results });
 });
