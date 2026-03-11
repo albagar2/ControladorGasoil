@@ -27,6 +27,7 @@ export class FamilyComponent implements OnInit {
     isAdmin = false;
     isLeader = false;
     isCleaningUp = false;
+    isMigrating = false;
     private toastService = inject(ToastService);
     private apiService = inject(ApiService);
 
@@ -173,6 +174,30 @@ export class FamilyComponent implements OnInit {
                 console.error('Error cleaning up photos:', err);
                 this.toastService.error('Error al limpiar las fotos antiguas de Drive. Revisa tu consola para más detalles.');
                 this.isCleaningUp = false;
+                this.dataService.loading.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    migrateDrivePhotos() {
+        if (!confirm('¿Migrar recibos antiguos a Google Drive? Las fotos que estuvieran guardadas en bases de datos antiguas se descargarán y serán resubidas automáticamente a Google Drive.')) {
+            return;
+        }
+
+        this.isMigrating = true;
+        this.dataService.loading.set(true);
+        this.apiService.migrateDrivePhotos().subscribe({
+            next: (res: any) => {
+                this.toastService.success(`Migración completada: ${res.migratedCount || 0} fotos migradas.`);
+                this.isMigrating = false;
+                this.dataService.loading.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error migrating photos:', err);
+                this.toastService.error('Error durante la migración.');
+                this.isMigrating = false;
                 this.dataService.loading.set(false);
                 this.cdr.detectChanges();
             }

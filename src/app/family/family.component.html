@@ -59,10 +59,16 @@
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Libera espacio en
                             Google Drive borrando recibos antiguos (> 1 año).</p>
                         <button class="btn-primary"
-                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #ef4444;"
-                            (click)="cleanupDrivePhotos()" [disabled]="isCleaningUp">
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #ef4444; margin-bottom: 8px;"
+                            (click)="cleanupDrivePhotos()" [disabled]="isCleaningUp || isMigrating">
                             <span class="material-icons">delete_sweep</span>
                             {{ isCleaningUp ? 'Limpiando...' : 'Borrar Fotos Antiguas' }}
+                        </button>
+                        <button class="btn-secondary"
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #10b981; color: white; border: none;"
+                            (click)="migrateDrivePhotos()" [disabled]="isMigrating || isCleaningUp">
+                            <span class="material-icons">cloud_upload</span>
+                            {{ isMigrating ? 'Migrando...' : 'Migrar Archivos a Drive' }}
                         </button>
                     </div>
                 </div>

@@ -55,7 +55,10 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
 
     let ticketImageUrl = undefined;
     if (req.file) {
-        const fileName = `MNT_${Date.now()}_${vId}${path.extname(req.file.originalname)}`;
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}`;
+        const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
+        const fileName = `MNT_${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
         ticketImageUrl = await DriveService.uploadFile(req.file.path, fileName) || undefined;
     }
 
@@ -133,7 +136,11 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
     maintenance.proveedor = proveedor;
 
     if (req.file) {
-        const fileName = `MNT_UPD_${Date.now()}_${vId}${path.extname(req.file.originalname)}`;
+        const vehicle = await vehicleRepository.findOneBy({ id: maintenance.vehiculoId });
+        const cleanMatricula = vehicle ? vehicle.matricula.replace(/\s+/g, '').toUpperCase() : vId.toString();
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}`;
+        const fileName = `MNT_UPD_${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
         maintenance.ticketImageUrl = await DriveService.uploadFile(req.file.path, fileName) || undefined;
     }
 

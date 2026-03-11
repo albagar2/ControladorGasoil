@@ -155,6 +155,10 @@ export class ApiService {
         return this.http.delete(`${this.apiUrl}/admin/photos/cleanup`);
     }
 
+    migrateDrivePhotos(): Observable<any> {
+        return this.http.post(`${this.apiUrl}/admin/photos/migrate`, {});
+    }
+
     // Email
     sendMaintenanceAlert(data: any): Observable<any> {
         return this.http.post(`${this.apiUrl}/email/maintenance-alert`, data);
