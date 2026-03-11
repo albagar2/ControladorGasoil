@@ -51,6 +51,20 @@
                             </button>
                         </div>
                     </div>
+
+                    <div class="sidebar-header"
+                        style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                        <h3><span class="material-icons" style="vertical-align: middle;">cloud_off</span> Almacenamiento
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Libera espacio en
+                            Google Drive borrando recibos antiguos (> 1 año).</p>
+                        <button class="btn-primary"
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #ef4444;"
+                            (click)="cleanupDrivePhotos()" [disabled]="isCleaningUp">
+                            <span class="material-icons">delete_sweep</span>
+                            {{ isCleaningUp ? 'Limpiando...' : 'Borrar Fotos Antiguas' }}
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Main Content: Details -->

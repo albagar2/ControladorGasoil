@@ -7,6 +7,7 @@ import maintenanceRoutes from './maintenance.routes';
 import familyRoutes from './family.routes';
 import emailRoutes from './email.routes';
 import * as DriverController from '../controllers/driver.controller';
+import adminRoutes from './admin.routes';
 import { checkJwt } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -28,6 +29,7 @@ router.use('/maintenances', maintenanceRoutes);
 router.use('/family', familyRoutes);
 router.use('/families', familyRoutes);
 router.use('/email', emailRoutes);
+router.use('/admin', adminRoutes);
 
 // Profile routes (Legacy / Shared)
 router.patch('/profile', checkJwt, DriverController.updateProfile);

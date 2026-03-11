@@ -95,7 +95,9 @@ export class ExportService {
                 // Texto de fecha
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth - 14, 20, { align: 'right' });
+                const pd = new Date();
+                const pDate = `${pd.getDate().toString().padStart(2, '0')}/${(pd.getMonth() + 1).toString().padStart(2, '0')}/${pd.getFullYear()}`;
+                doc.text(`Generado: ${pDate}`, pageWidth - 14, 20, { align: 'right' });
             },
             didDrawPage: (data) => {
                 // Footer con Num. Página
@@ -190,6 +192,7 @@ export class ExportService {
                 fecha: new Date(r.fecha),
                 tipo: 'Repostaje',
                 vehiculo: r.vehiculo?.modelo || r.vehiculo?.matricula || 'N/A',
+                litros: Number(r.litros) || 0,
                 detalle: `${r.litros}L (${Number(r.precioPorLitro).toFixed(3)}€/L)`,
                 coste: Number(r.costeTotal) || 0
             })),
@@ -197,35 +200,78 @@ export class ExportService {
                 fecha: new Date(m.fecha),
                 tipo: 'Mantenimiento',
                 vehiculo: m.vehiculo?.modelo || m.vehiculo?.matricula || 'N/A',
+                litros: 0,
                 detalle: `${m.tipo}${m.observaciones ? ' - ' + m.observaciones : ''}`,
                 coste: (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0)
             }))
         ];
 
-        combinedData.sort((a, b) => {
-            const timeA = a.fecha.getTime();
-            const timeB = b.fecha.getTime();
-            if (timeA !== timeB) return timeB - timeA;
-            return a.vehiculo.localeCompare(b.vehiculo);
+        // Sort by date inside groups (newer first)
+        combinedData.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+
+        // Group by vehicle
+        const groupedData: { [key: string]: typeof combinedData } = {};
+        combinedData.forEach(item => {
+            if (!groupedData[item.vehiculo]) {
+                groupedData[item.vehiculo] = [];
+            }
+            groupedData[item.vehiculo].push(item);
         });
 
-        const totalCoste = combinedData.reduce((acc, item) => acc + item.coste, 0);
+        const reportData: any[] = [];
+        let grandTotal = 0;
 
-        const reportData = combinedData.map(item => [
-            item.fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-            item.tipo,
-            item.vehiculo,
-            item.detalle,
-            `${item.coste.toFixed(2)}€`
-        ]);
+        Object.keys(groupedData).forEach(vehiculoName => {
+            const items = groupedData[vehiculoName];
+
+            // Add a header row for the vehicle using autoTable object syntax
+            reportData.push([
+                { content: `Vehículo: ${vehiculoName}`, colSpan: 5, styles: { fillColor: [229, 231, 235], textColor: [17, 24, 39], fontStyle: 'bold' } }
+            ]);
+
+            let vehicleTotal = 0;
+            let vehicleLiters = 0;
+
+            items.forEach(item => {
+                vehicleTotal += item.coste;
+                vehicleLiters += item.litros;
+                const dStr = `${item.fecha.getDate().toString().padStart(2, '0')}/${(item.fecha.getMonth() + 1).toString().padStart(2, '0')}/${item.fecha.getFullYear()}`;
+
+                reportData.push([
+                    dStr,
+                    item.tipo,
+                    item.vehiculo,
+                    item.detalle,
+                    `${item.coste.toFixed(2)}€`
+                ]);
+            });
+
+            grandTotal += vehicleTotal;
+
+            // Add vehicle total row
+            reportData.push([
+                { content: '', colSpan: 2 },
+                { content: `Total ${vehiculoName}:`, styles: { fontStyle: 'bold', halign: 'right' } },
+                { content: vehicleLiters > 0 ? `${vehicleLiters.toFixed(2)}L` : '', styles: { fontStyle: 'bold' } },
+                { content: `${vehicleTotal.toFixed(2)}€`, styles: { fontStyle: 'bold', textColor: [220, 38, 38] } }
+            ]);
+        });
+
+        // Add an empty spacer row
+        if (Object.keys(groupedData).length > 0) {
+            reportData.push([{ content: '', colSpan: 5, styles: { fillColor: [255, 255, 255] } }]);
+        }
 
         const totalsRow = [
-            '', '', '', 'Gasto Total del Periodo:', `${totalCoste.toFixed(2)}€`
+            '', '', '', 'Gasto Total del Periodo:', `${grandTotal.toFixed(2)}€`
         ];
 
-        const finalReportTitle = reportTitle || (combinedData.length > 0
-            ? `Informe de Gastos - ${combinedData[0].fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`
-            : 'Informe de Gastos - Garaje Familiar');
+        let finalReportTitle = reportTitle || 'Informe de Gastos - Garaje Familiar';
+        if (!reportTitle && combinedData.length > 0) {
+            const oldestDate = combinedData[combinedData.length - 1].fecha;
+            const mesStr = oldestDate.toLocaleString('es-ES', { month: 'long' });
+            finalReportTitle = `Informe de Gastos - ${mesStr} ${oldestDate.getFullYear()}`;
+        }
 
         this.exportToPdf('reporte_gastos_gasoil.pdf', finalReportTitle, columns, reportData, totalsRow, images);
     }

@@ -150,6 +150,11 @@ export class ApiService {
         return this.http.delete(`${this.apiUrl}/families/${id}`);
     }
 
+    // Admin Drive
+    cleanupDrivePhotos(): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/admin/photos/cleanup`);
+    }
+
     // Email
     sendMaintenanceAlert(data: any): Observable<any> {
         return this.http.post(`${this.apiUrl}/email/maintenance-alert`, data);

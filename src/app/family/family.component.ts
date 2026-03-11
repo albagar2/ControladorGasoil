@@ -7,6 +7,7 @@ import { VehicleService } from '../core/services/vehicle.service';
 import { DataService } from '../core/services/data.service';
 import { Driver } from '../core/models/driver.model';
 import { ToastService } from '../core/services/toast.service';
+import { ApiService } from '../core/services/api.service';
 
 @Component({
     selector: 'app-family',
@@ -25,7 +26,9 @@ export class FamilyComponent implements OnInit {
 
     isAdmin = false;
     isLeader = false;
+    isCleaningUp = false;
     private toastService = inject(ToastService);
+    private apiService = inject(ApiService);
 
     // Forms
     createName = '';
@@ -147,6 +150,30 @@ export class FamilyComponent implements OnInit {
             },
             error: () => {
                 this.toastService.error('Error eliminando familia');
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    cleanupDrivePhotos() {
+        if (!confirm('¿Estás seguro de que quieres eliminar las fotos y recibos con más de un año de antigüedad en Google Drive? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        this.isCleaningUp = true;
+        this.dataService.loading.set(true);
+        this.apiService.cleanupDrivePhotos().subscribe({
+            next: (res: any) => {
+                this.toastService.success(`Limpieza completada: ${res.deletedCount || 0} fotos eliminadas.`);
+                this.isCleaningUp = false;
+                this.dataService.loading.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error cleaning up photos:', err);
+                this.toastService.error('Error al limpiar las fotos antiguas de Drive. Revisa tu consola para más detalles.');
+                this.isCleaningUp = false;
+                this.dataService.loading.set(false);
                 this.cdr.detectChanges();
             }
         });

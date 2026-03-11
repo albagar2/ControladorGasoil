@@ -159,7 +159,9 @@ export class AnalyticsComponent implements OnInit {
             if (this.filterMode() === 'month') {
                 const [year, month] = key.split('-');
                 const date = new Date(parseInt(year), parseInt(month) - 1);
-                return date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+                const mName = date.toLocaleString('es-ES', { month: 'short' });
+                const yyyy = date.getFullYear().toString().slice(-2);
+                return `${mName} ${yyyy}`;
             } else {
                 return key; // Just the year
             }
@@ -236,7 +238,8 @@ export class AnalyticsComponent implements OnInit {
         if (this.filterMode() === 'month') {
             const [year, month] = this.selectedPeriod().split('-');
             const date = new Date(parseInt(year), parseInt(month) - 1);
-            return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+            const mName = date.toLocaleString('es-ES', { month: 'long' });
+            return `${mName} ${date.getFullYear()}`;
         } else {
             return `Año ${this.selectedPeriod()}`;
         }

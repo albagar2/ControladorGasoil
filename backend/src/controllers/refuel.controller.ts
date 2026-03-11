@@ -5,7 +5,7 @@ import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
 import { asyncHandler } from '../utils/asyncHandler';
 import { alertService } from '../services/alert.service';
-import { SupabaseService } from '../services/supabase.service';
+import { DriveService } from '../services/drive.service';
 import fs from 'fs';
 import path from 'path';
 
@@ -104,12 +104,12 @@ export const createRefuel = asyncHandler(async (req: Request, res: Response) => 
         const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
         const fileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
 
-        // Upload to Supabase Storage
-        const publicUrl = await SupabaseService.uploadFile(req.file.path, fileName);
+        // Upload to Google Drive
+        const publicUrl = await DriveService.uploadFile(req.file.path, fileName);
         if (publicUrl) {
             ticketImageUrl = publicUrl;
         } else {
-            // Fallback to local if Supabase fails (though it will be ephemeral)
+            // Fallback to local if Drive fails (though it will be ephemeral)
             ticketImageUrl = `uploads/${req.file.filename}`;
         }
     }
@@ -188,8 +188,8 @@ export const updateRefuel = asyncHandler(async (req: Request, res: Response) => 
         const cleanMatricula = vehicle.matricula.replace(/\s+/g, '').toUpperCase();
         const fileName = `${timestamp}_${cleanMatricula}${path.extname(req.file.originalname)}`;
 
-        // Upload to Supabase Storage
-        const publicUrl = await SupabaseService.uploadFile(req.file.path, fileName);
+        // Upload to Google Drive
+        const publicUrl = await DriveService.uploadFile(req.file.path, fileName);
         if (publicUrl) {
             refuelData.ticketImageUrl = publicUrl;
         } else {

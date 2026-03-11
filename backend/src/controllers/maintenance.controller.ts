@@ -4,7 +4,7 @@ import { Maintenance } from '../entities/Maintenance';
 import { Vehicle } from '../entities/Vehicle';
 import { asyncHandler } from '../utils/asyncHandler';
 import { alertService } from '../services/alert.service';
-import { SupabaseService } from '../services/supabase.service';
+import { DriveService } from '../services/drive.service';
 import path from 'path';
 
 const maintenanceRepository = AppDataSource.getRepository(Maintenance);
@@ -56,7 +56,7 @@ export const createMaintenance = asyncHandler(async (req: Request, res: Response
     let ticketImageUrl = undefined;
     if (req.file) {
         const fileName = `MNT_${Date.now()}_${vId}${path.extname(req.file.originalname)}`;
-        ticketImageUrl = await SupabaseService.uploadFile(req.file.path, fileName) || undefined;
+        ticketImageUrl = await DriveService.uploadFile(req.file.path, fileName) || undefined;
     }
 
     const maintenance = maintenanceRepository.create({
@@ -134,7 +134,7 @@ export const updateMaintenance = asyncHandler(async (req: Request, res: Response
 
     if (req.file) {
         const fileName = `MNT_UPD_${Date.now()}_${vId}${path.extname(req.file.originalname)}`;
-        maintenance.ticketImageUrl = await SupabaseService.uploadFile(req.file.path, fileName) || undefined;
+        maintenance.ticketImageUrl = await DriveService.uploadFile(req.file.path, fileName) || undefined;
     }
 
     await maintenanceRepository.save(maintenance);

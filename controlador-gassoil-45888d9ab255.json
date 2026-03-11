@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "controlador-gassoil",
+  "private_key_id": "45888d9ab25573b3153e8f7afdc8f9a82be14f0c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDwIWOnzPeSmkF0\nfO+pZI9gks3V/HGEfLRI4QEhMlv0sCLGDON9JEUwLYq3LKDf0L78fXgAN0BnTkfs\nnPcg9AdC90XIbUeae26kz8pR1ctvqXWlHnbCf5+tLgEV8hJl4/tWZtN5qmsttL4L\nPNDCM7/DnZbm9ss+mnHqO2c5eGk0MVqOrWmucMdkCPHtjXblMJG8b5azxEgdAhjd\nBRtvOnNJGhmGz412dye/Hwrcg4ZgC67IQnCPL6+lHPpQGo16qCtvJkifhPjdk4UB\nXviQcCk1bYQ95lyvRpR6/DTKTAzMr419MeQ0UY7EaVYWn9Jy0oWnby+Dki0Evhye\nkS6x3DU9AgMBAAECggEAEqrt1eIueZmqBAB1xeFDmi+KIUa48SKcBgcOm5eQJC4Q\njf1Q2W4uk3JplG2Q63ANdjsved4nEMDlANp/sHKiy+HFmDFn/cpMYt36gwZ6rxQT\n9BcHBtN9b4JM4vleKnNLmz8Zf/MFK65KOz0U7OaxU5JBOcmu1Do/0oSgCjeM/4Ro\n0gXOeT/KfDYdvtk1l0iPj5M7ht3f73WdafhQoTqZpe6d+u7XFVOeoT5zf0WqE7ma\nXktqCMP4g0t3ud1sS6+8B+ACckGgz3bWCytBedGZw7VzwP2UESwcGmtJOF29dgxT\noZVI7vePjdXKZk/81C7SXeb1BF3F/P4w1uRsvycyKwKBgQD6hPvG4cvmUShFResg\nXzNz36kULUstgzNXsjpgh2Y37AfHNt2H2qFS4/cEHy3UoS5Yiz4A7acMRfMGZoMc\n1wJ9WEQ6i0qXG/F1owN8FwsmnkSQTw0co03tUMwEPpiPBLFfaARa+tD/wsA3cO0V\nMjYPuVsAjG57hz6GaIgfTL98mwKBgQD1YjkChoT8V0rMWH9V67kOeuErTMcY4CjF\nH8BOpXDzNQ/HtBaZ1DXn6BL6O86BBz6k0kdOgDYcOj3f6glKpaOIm6Z4ltmHBtDW\n7r5oKYxbkhlpY2E7fJ/gusmyDtsrhVNoGO8R4Bip3mUh0wsbtUkU6JgRsEsYIaVy\nqmCbx/e3BwKBgQDW+TLNEYnVFCOIfl0sJEWU04LVq6BtZ76xLGHn34iZyFNMYgpr\nv/LbnH+l69N6OO36UVJdnZHReFz5SxKLtv2N7iZuToUtcm8bUU12OJf7Bak0ZIGN\n55zBXqoToltrrs0+X5YNNFoQf2BOsvrfS30UtSwgJmHQYtgGosDcixFurQKBgAtl\nuIgpf1vJIixDoAZ5oGrPwk2kj0rUfpBJXUFJ5ekl+cmoz7Pta2OOH/OHe5v6nipB\nqhY3VkwRWHZiBHR3JRVfRWgseYYQBvs0s5ta8q3+JzgB6a49p59kjaG7lup6ktku\n70vBQOQC9GeRyd5LmU1jUEziB1rjlS+yQjJ6I0NZAoGBAN4LH/JDi8U7aBoAJh6+\nPTVUEy4VQQqHQoxW8Qqf7ngGSqJsU2GG18QVGpLrAUkO0iq9B33X5zN/2pA2tftZ\nqRPzmYP1WOj2dl9BAyjL+efFd/aTwZI23ivuqO5+K5Dz7Q5sKMxhxdKUcaNtD04D\nDwhyl8KfmSIh15kW/1Rw0qwm\n-----END PRIVATE KEY-----\n",
+  "client_email": "control-gasoil-backend@controlador-gassoil.iam.gserviceaccount.com",
+  "client_id": "115355110614259605698",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/control-gasoil-backend%40controlador-gassoil.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
