@@ -185,22 +185,24 @@ export class ExportService {
     }
 
     generateCostReport(vehicles: any[], refuels: any[], maintenance: any[], reportTitle?: string, images?: { image: string, title: string }[]) {
-        const columns = ['Mes/Año', 'Tipo', 'Vehículo', 'Detalle', 'Coste (€)'];
+        const columns = ['Fecha', 'Tipo', 'Resumen', 'Odómetro', 'Coste (€)'];
 
         const combinedData = [
             ...refuels.map(r => ({
                 fecha: new Date(r.fecha),
                 tipo: 'Repostaje',
-                vehiculo: r.vehiculo?.modelo || r.vehiculo?.matricula || 'N/A',
+                vehiculo: `${r.vehiculo?.modelo || ''} ${r.vehiculo?.matricula || ''}`.trim() || 'Desconocido',
                 litros: Number(r.litros) || 0,
-                detalle: `${r.litros}L (${Number(r.precioPorLitro).toFixed(3)}€/L)`,
+                kilometraje: Number(r.kilometraje) || 0,
+                detalle: `${r.litros}L a ${Number(r.precioPorLitro).toFixed(3)}€/L`,
                 coste: Number(r.costeTotal) || 0
             })),
             ...maintenance.map(m => ({
                 fecha: new Date(m.fecha),
                 tipo: 'Mantenimiento',
-                vehiculo: m.vehiculo?.modelo || m.vehiculo?.matricula || 'N/A',
+                vehiculo: `${m.vehiculo?.modelo || ''} ${m.vehiculo?.matricula || ''}`.trim() || 'Desconocido',
                 litros: 0,
+                kilometraje: Number(m.kilometraje) || 0,
                 detalle: `${m.tipo}${m.observaciones ? ' - ' + m.observaciones : ''}`,
                 coste: (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0)
             }))
@@ -226,11 +228,13 @@ export class ExportService {
 
             // Add a header row for the vehicle using autoTable object syntax
             reportData.push([
-                { content: `Vehículo: ${vehiculoName}`, colSpan: 5, styles: { fillColor: [229, 231, 235], textColor: [17, 24, 39], fontStyle: 'bold' } }
+                { content: `Vehículo: ${vehiculoName.toUpperCase()}`, colSpan: 5, styles: { fillColor: [229, 231, 235], textColor: [17, 24, 39], fontStyle: 'bold' } }
             ]);
 
             let vehicleTotal = 0;
             let vehicleLiters = 0;
+            const validKms = items.map(i => i.kilometraje).filter(k => k && !isNaN(k) && k > 0);
+            const kmRecorridos = validKms.length > 1 ? Math.max(...validKms) - Math.min(...validKms) : 0;
 
             items.forEach(item => {
                 vehicleTotal += item.coste;
@@ -240,8 +244,8 @@ export class ExportService {
                 reportData.push([
                     dStr,
                     item.tipo,
-                    item.vehiculo,
                     item.detalle,
+                    item.kilometraje > 0 ? `${item.kilometraje} km` : '-',
                     `${item.coste.toFixed(2)}€`
                 ]);
             });
@@ -250,9 +254,9 @@ export class ExportService {
 
             // Add vehicle total row
             reportData.push([
-                { content: '', colSpan: 2 },
-                { content: `Total ${vehiculoName}:`, styles: { fontStyle: 'bold', halign: 'right' } },
-                { content: vehicleLiters > 0 ? `${vehicleLiters.toFixed(2)}L` : '', styles: { fontStyle: 'bold' } },
+                { content: `Totales de ${vehiculoName.toUpperCase()}:`, colSpan: 2, styles: { fontStyle: 'bold', halign: 'right' } },
+                { content: vehicleLiters > 0 ? `${vehicleLiters.toFixed(2)}L repostados` : '', styles: { fontStyle: 'bold', fontSize: 9 } },
+                { content: kmRecorridos > 0 ? `${kmRecorridos} km recorridos` : '', styles: { fontStyle: 'bold', fontSize: 9 } },
                 { content: `${vehicleTotal.toFixed(2)}€`, styles: { fontStyle: 'bold', textColor: [220, 38, 38] } }
             ]);
         });
@@ -263,8 +267,9 @@ export class ExportService {
         }
 
         const totalsRow = [
-            '', '', '', 'Gasto Total del Periodo:', `${grandTotal.toFixed(2)}€`
-        ];
+            { content: 'GASTO TOTAL FAMILIAR:', colSpan: 4, styles: { halign: 'right', fontSize: 11 } },
+            `${grandTotal.toFixed(2)}€`
+        ] as any[];
 
         let finalReportTitle = reportTitle || 'Informe de Gastos - Garaje Familiar';
         if (!reportTitle && combinedData.length > 0) {
