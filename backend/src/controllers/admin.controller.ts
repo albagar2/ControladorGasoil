@@ -122,3 +122,87 @@ export const migratePhotos = asyncHandler(async (req: Request, res: Response) =>
 
     res.json({ message: "Migration complete", migratedCount });
 });
+
+export const matchTicketsFolder = asyncHandler(async (req: Request, res: Response) => {
+    // Temporary bypass for local triggering
+    const ticketsPath = 'c:/Users/bacia/Desktop/controlGasoilFamiliar/tickets';
+    const monthsMap: { [key: string]: number } = {
+        'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+        'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+    };
+
+    const refuelRepository = AppDataSource.getRepository(Refuel);
+    const allRefuels = await refuelRepository.find({ relations: ['vehiculo'] });
+
+    const getFiles = (dir: string): string[] => {
+        let results: string[] = [];
+        if (!fs.existsSync(dir)) return [];
+        const list = fs.readdirSync(dir);
+        list.forEach(file => {
+            const fPath = path.join(dir, file);
+            if (fs.statSync(fPath).isDirectory()) {
+                results = results.concat(getFiles(fPath));
+            } else {
+                results.push(fPath);
+            }
+        });
+        return results;
+    };
+
+    const files = getFiles(ticketsPath);
+    const results = [];
+    let uploadedCount = 0;
+
+    for (const file of files) {
+        const basename = path.basename(file, path.extname(file)).toLowerCase().trim();
+        let matchDay: number | null = null;
+        let matchMonth: number | null = null;
+
+        const parts = basename.split(/[\sde]+/);
+        for (const part of parts) {
+            const num = parseInt(part);
+            if (!isNaN(num) && matchDay === null) {
+                matchDay = num;
+            } else if (monthsMap[part] !== undefined) {
+                matchMonth = monthsMap[part];
+            }
+        }
+
+        if (matchDay !== null && matchMonth !== null) {
+            const matches = allRefuels.filter(r => {
+                const d = new Date(r.fecha);
+                return d.getDate() === matchDay && d.getMonth() === matchMonth;
+            });
+
+            if (matches.length === 1) {
+                const refuel = matches[0];
+                if (!refuel.ticketImageUrl || !refuel.ticketImageUrl.includes('drive.google.com')) {
+                    // Upload via DriveService
+                    const dt = new Date(refuel.fecha);
+                    const timestamp = `${dt.getFullYear()}-${(dt.getMonth() + 1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}_${dt.getHours().toString().padStart(2, '0')}-${dt.getMinutes().toString().padStart(2, '0')}`;
+                    const customName = `${timestamp}_${refuel.vehiculo?.matricula.replace(/\s+/g, '').toUpperCase() || 'UNKNOWN'}${path.extname(file)}`;
+
+                    const driveUrl = await DriveService.uploadFile(file, customName);
+                    if (driveUrl) {
+                        refuel.ticketImageUrl = driveUrl;
+                        await refuelRepository.save(refuel);
+                        uploadedCount++;
+                        results.push(`[OK] Matched ${basename} -> Uploaded for Refuel ID ${refuel.id}`);
+                    } else {
+                        results.push(`[ERROR] Drive upload failed for ${basename}`);
+                    }
+                } else {
+                    results.push(`[SKIPPED] Refuel ID ${refuel.id} already has a Drive image for ${basename}`);
+                }
+            } else if (matches.length > 1) {
+                results.push(`[!] Multiple DB matches for ${basename}`);
+            } else {
+                results.push(`[X] No DB match found for ${basename}`);
+            }
+        } else {
+            results.push(`[?] Could not parse date from ${basename}`);
+        }
+    }
+
+    res.json({ message: "Ticket matching complete", uploadedCount, results });
+});
