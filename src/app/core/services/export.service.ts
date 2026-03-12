@@ -41,7 +41,16 @@ export class ExportService {
 
     exportToPdf(filename: string, title: string, columns: string[], data: any[], totalsRow: string[] = [], images?: { image: string, title: string }[]) {
         const doc = new jsPDF();
-        const primaryColor = [79, 70, 229] as [number, number, number];
+
+        // --- Paleta de Colores Premium ---
+        const colors = {
+            primary: [15, 23, 42] as [number, number, number], // Slate 900
+            accent: [67, 56, 202] as [number, number, number],  // Indigo 700
+            text: [51, 65, 85] as [number, number, number],    // Slate 600
+            lightGray: [248, 250, 252] as [number, number, number], // Slate 50
+            border: [226, 232, 240] as [number, number, number]     // Slate 200
+        };
+
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -50,61 +59,89 @@ export class ExportService {
             tableData.push(totalsRow);
         }
 
-        // --- Configuración de autoTable ---
+        // --- Función para dibujar el Header Premium ---
+        const drawHeader = (pdfDoc: jsPDF, pageTitle: string) => {
+            // Fondo oscuro para el header
+            pdfDoc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+            pdfDoc.rect(0, 0, pageWidth, 40, 'F');
+
+            // Icono Circular Decorativo
+            pdfDoc.setFillColor(colors.accent[0], colors.accent[1], colors.accent[2]);
+            pdfDoc.circle(20, 20, 8, 'F');
+            pdfDoc.setTextColor(255, 255, 255);
+            pdfDoc.setFontSize(12);
+            pdfDoc.setFont('helvetica', 'bold');
+            pdfDoc.text('G', 18, 21.5);
+
+            // Título principal
+            pdfDoc.setFontSize(22);
+            pdfDoc.setTextColor(255, 255, 255);
+            pdfDoc.setFont('helvetica', 'bold');
+            pdfDoc.text(pageTitle, 35, 22);
+
+            // Barra de acento inferior
+            pdfDoc.setFillColor(colors.accent[0], colors.accent[1], colors.accent[2]);
+            pdfDoc.rect(0, 40, pageWidth, 2, 'F');
+
+            // Fecha de generación
+            pdfDoc.setFontSize(9);
+            pdfDoc.setFont('helvetica', 'normal');
+            pdfDoc.setTextColor(148, 163, 184); // Slate 400
+            const pd = new Date();
+            const pDate = `${pd.getDate().toString().padStart(2, '0')}/${(pd.getMonth() + 1).toString().padStart(2, '0')}/${pd.getFullYear()}`;
+            pdfDoc.text(`EMITIDO: ${pDate}`, pageWidth - 14, 22, { align: 'right' });
+        };
+
+        // --- Configuración de autoTable con Estilo Refinado ---
         autoTable(doc, {
-            startY: 45, // Empezar debajo del header principal
+            startY: 50,
             head: [columns],
             body: tableData,
-            theme: 'plain',
+            theme: 'striped',
             headStyles: {
-                fillColor: primaryColor,
+                fillColor: colors.primary,
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
+                fontSize: 10,
+                cellPadding: 4,
                 halign: 'left'
             },
             bodyStyles: {
-                textColor: [55, 65, 81],
+                textColor: colors.text,
+                fontSize: 9,
+                cellPadding: 4
             },
             alternateRowStyles: {
-                fillColor: [249, 250, 251]
+                fillColor: colors.lightGray
             },
-            margin: { top: 45, bottom: 20 },
+            margin: { top: 45, bottom: 25 },
             didParseCell: (hookData) => {
-                // Alineación de la columna de costes a la derecha
+                // Alineación de costes
                 if (hookData.column.index === 4) {
                     hookData.cell.styles.halign = 'right';
                 }
-                // Si esta es la fila de totales (última fila y es body)
+                // Estilo fila de totales
                 if (totalsRow.length > 0 && hookData.row.index === tableData.length - 1 && hookData.section === 'body') {
                     hookData.cell.styles.fontStyle = 'bold';
-                    hookData.cell.styles.fillColor = [243, 244, 246]; // bg-gray-100
-                    hookData.cell.styles.textColor = [17, 24, 39]; // bg-gray-900
+                    hookData.cell.styles.fillColor = colors.primary;
+                    hookData.cell.styles.textColor = [255, 255, 255];
+                    hookData.cell.styles.fontSize = 10;
                 }
             },
-            willDrawPage: (data) => {
-                // Cabecera Geométrica por Página
-                doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-                doc.rect(0, 0, pageWidth, 30, 'F');
-
-                // Texto del Título principal
-                doc.setFontSize(20);
-                doc.setTextColor(255, 255, 255);
-                doc.setFont('helvetica', 'bold');
-                doc.text(title, 14, 20);
-
-                // Texto de fecha
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                const pd = new Date();
-                const pDate = `${pd.getDate().toString().padStart(2, '0')}/${(pd.getMonth() + 1).toString().padStart(2, '0')}/${pd.getFullYear()}`;
-                doc.text(`Generado: ${pDate}`, pageWidth - 14, 20, { align: 'right' });
+            willDrawPage: (hookData) => {
+                drawHeader(doc, title);
             },
-            didDrawPage: (data) => {
-                // Footer con Num. Página
-                const str = `Control Automotor Familiar  •  Página ${doc.getCurrentPageInfo().pageNumber}`;
-                doc.setFontSize(9);
-                doc.setTextColor(156, 163, 175); // gray-400
-                doc.text(str, pageWidth / 2, pageHeight - 10, { align: 'center' });
+            didDrawPage: (hookData) => {
+                // Footer Moderno
+                const pageNumber = doc.getCurrentPageInfo().pageNumber;
+                doc.setFontSize(8);
+                doc.setTextColor(148, 163, 184); // Slate 400
+                doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
+                doc.line(14, pageHeight - 15, pageWidth - 14, pageHeight - 15);
+
+                const footerText = `CONTROL AUTOMOTOR FAMILIAR — Dashboard de Gestión`;
+                doc.text(footerText, 14, pageHeight - 10);
+                doc.text(`Página ${pageNumber}`, pageWidth - 14, pageHeight - 10, { align: 'right' });
             }
         });
 
@@ -127,16 +164,20 @@ export class ExportService {
                     doc.text(title + ' (Gráficos)', 14, 20);
                 }
 
-                // Título Gráfico
+                // Título Gráfico con Estilo
                 doc.setFontSize(14);
-                doc.setTextColor(31, 41, 55); // gray 800
+                doc.setTextColor(15, 23, 42); // primary
                 doc.setFont('helvetica', 'bold');
-                doc.text(img.title, 14, currentY);
+                doc.text(img.title.toUpperCase(), 14, currentY);
 
-                // Línea separadora
-                doc.setDrawColor(229, 231, 235); // gray 200
+                // Línea separadora acentuada
+                doc.setDrawColor(67, 56, 202); // accent
+                doc.setLineWidth(1);
+                doc.line(14, currentY + 3, 40, currentY + 3);
+
+                doc.setDrawColor(226, 232, 240); // text light
                 doc.setLineWidth(0.5);
-                doc.line(14, currentY + 3, pageWidth - 14, currentY + 3);
+                doc.line(40, currentY + 3, pageWidth - 14, currentY + 3);
 
                 try {
                     const imgProps = doc.getImageProperties(img.image);
@@ -160,8 +201,12 @@ export class ExportService {
 
                     const xPos = (pageWidth - imgWidth) / 2;
 
+                    // Dibujar un borde ligero alrededor del gráfico
+                    doc.setDrawColor(226, 232, 240);
+                    doc.rect(xPos - 2, currentY + 8, imgWidth + 4, imgHeight + 4, 'S');
+
                     doc.addImage(img.image, 'PNG', xPos, currentY + 10, imgWidth, imgHeight);
-                    currentY += imgHeight + 25;
+                    currentY += imgHeight + 35;
                 } catch (e) {
                     console.error('Error al añadir imagen al PDF', e);
                     currentY += 15;
@@ -266,19 +311,37 @@ export class ExportService {
             reportData.push([{ content: '', colSpan: 5, styles: { fillColor: [255, 255, 255] } }]);
         }
 
-        const totalsRow = [
-            { content: 'GASTO TOTAL FAMILIAR:', colSpan: 4, styles: { halign: 'right', fontSize: 11 } },
-            `${grandTotal.toFixed(2)}€`
-        ] as any[];
+        // Create Executive Summary Object
+        const totalRefuelCost = refuels.reduce((acc, r) => acc + (Number(r.costeTotal) || 0), 0);
+        const totalMntCost = maintenance.reduce((acc, m) => acc + (Number(m.costePieza) || 0) + (Number(m.costeTaller) || 0), 0);
+        const totalLiters = refuels.reduce((acc, r) => acc + (Number(r.litros) || 0), 0);
+
+        // We'll prepend the executive summary to the reportData
+        const summaryData = [
+            [{ content: 'RESUMEN EJECUTIVO DEL INFORME', colSpan: 5, styles: { halign: 'center', fontStyle: 'bold', fillColor: [67, 56, 202], textColor: [255, 255, 255] } }],
+            [
+                { content: 'Total Repostajes', styles: { fontStyle: 'bold' } },
+                { content: 'Total Mantenimientos', styles: { fontStyle: 'bold' } },
+                { content: 'Litros Totales', styles: { fontStyle: 'bold' } },
+                { content: 'Gasto Total', colSpan: 2, styles: { fontStyle: 'bold', halign: 'right' } }
+            ],
+            [
+                `${totalRefuelCost.toFixed(2)}€`,
+                `${totalMntCost.toFixed(2)}€`,
+                `${totalLiters.toFixed(2)} L`,
+                { content: `${(totalRefuelCost + totalMntCost).toFixed(2)}€`, colSpan: 2, styles: { halign: 'right', fontStyle: 'bold', textColor: [67, 56, 202] } }
+            ],
+            [{ content: '', colSpan: 5, styles: { cellPadding: 2 } }] // Spacer
+        ];
 
         let finalReportTitle = reportTitle || 'Informe de Gastos - Garaje Familiar';
         if (!reportTitle && combinedData.length > 0) {
             const oldestDate = combinedData[combinedData.length - 1].fecha;
             const mesStr = oldestDate.toLocaleString('es-ES', { month: 'long' });
-            finalReportTitle = `Informe de Gastos - ${mesStr} ${oldestDate.getFullYear()}`;
+            finalReportTitle = `Informe de Gastos - ${mesStr.toUpperCase()} ${oldestDate.getFullYear()}`;
         }
 
-        this.exportToPdf('reporte_gastos_gasoil.pdf', finalReportTitle, columns, reportData, totalsRow, images);
+        this.exportToPdf('reporte_gastos_gasoil.pdf', finalReportTitle, columns, [...summaryData, ...reportData], totalsRow, images);
     }
 }
 

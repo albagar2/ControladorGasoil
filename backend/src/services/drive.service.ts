@@ -27,7 +27,7 @@ export class DriveService {
 
     static async uploadFile(localPath: string, fileName: string): Promise<string | null> {
         try {
-            if (!process.env.GOOGLE_CLIENT_EMAIL) {
+            if (!process.env.GOOGLE_CLIENT_ID && !process.env.GOOGLE_CLIENT_EMAIL) {
                 console.error('❌ Drive configuration missing. Skipping upload to Drive.');
                 return null;
             }
@@ -40,7 +40,7 @@ export class DriveService {
             };
 
             const media = {
-                mimeType: 'image/jpeg', // Best effort default, could be derived from extension
+                mimeType: 'image/jpeg',
                 body: fs.createReadStream(localPath)
             };
 
@@ -54,7 +54,7 @@ export class DriveService {
             const fileId = response.data.id;
             if (!fileId) return null;
 
-            // Make it public so frontend can show it in <img> tags
+            // Make it public
             await this.drive.permissions.create({
                 fileId: fileId,
                 requestBody: {
@@ -64,7 +64,9 @@ export class DriveService {
             });
 
             try {
-                fs.unlinkSync(localPath);
+                if (fs.existsSync(localPath)) {
+                    fs.unlinkSync(localPath);
+                }
             } catch (err) {
                 console.warn(`[DriveService] Could not delete local temp file: ${localPath}`);
             }
@@ -76,6 +78,21 @@ export class DriveService {
             console.error('❌ Google Drive upload failed:', error);
             return null;
         }
+    }
+
+    /**
+     * Specialized method to upload a ticket with standardized naming
+     */
+    static async uploadTicket(localPath: string, vehicle: any, prefix: string = ''): Promise<string | null> {
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}`;
+
+        const cleanMatricula = vehicle?.matricula?.replace(/\s+/g, '').toUpperCase() || 'UNKNOWN';
+        const fileExt = path.extname(localPath) || '.jpg';
+
+        const fileName = `${prefix}${prefix ? '_' : ''}${timestamp}_${cleanMatricula}${fileExt}`;
+
+        return this.uploadFile(localPath, fileName);
     }
 
     static async cleanupOldFiles(): Promise<number> {
