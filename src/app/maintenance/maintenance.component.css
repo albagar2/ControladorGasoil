@@ -239,9 +239,7 @@
 }
 
 .compact-alert-card:hover {
-    background: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.8);
 }
 
 :host-context(.dark) .compact-alert-card {
@@ -535,6 +533,7 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.02));
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     isolation: isolate;
+    cursor: default;
 }
 
 .premium-record-card::before {
@@ -1627,6 +1626,7 @@
     transition: all 0.2s;
     min-width: 180px;
     flex: 1;
+    cursor: pointer;
 }
 
 .filter-select:focus,
