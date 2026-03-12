@@ -38,6 +38,7 @@ export class MaintenanceComponent implements OnInit {
 
     showModal = false;
     currentMaintenance?: Maintenance;
+    showNotifications = signal(true);
 
     // Computed Filtered List
     filteredMaintenances = computed(() => {
@@ -107,6 +108,10 @@ export class MaintenanceComponent implements OnInit {
 
         return groups;
     });
+
+    toggleNotifications() {
+        this.showNotifications.set(!this.showNotifications());
+    }
 
     toggleVehicle(vehicleId: number) {
         if (!vehicleId) return;

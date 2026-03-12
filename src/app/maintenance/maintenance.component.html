@@ -1,4 +1,4 @@
-<div class="container mx-auto p-4 animate-slide-in maintenance-view">
+<div class="container mx-auto p-8 animate-slide-in maintenance-view">
     <!-- Header -->
     <div class="page-header flex justify-between items-center">
         <div class="flex flex-col">
@@ -41,7 +41,7 @@
 
     <div *ngIf="!dataService.loading()">
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="stats-cards-container">
             <div class="stat-card premium-card">
                 <div class="stat-icon-wrapper bg-indigo-50">
                     <span class="material-icons text-indigo-600">payments</span>
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Search and Filters -->
-        <div class="filters-container mb-6">
+        <div class="filters-container mb-32">
             <!-- Search Bar -->
             <div class="search-bar">
                 <span class="material-icons">search</span>
@@ -114,32 +114,42 @@
             </div>
         </div>
 
-        <!-- Alerts Section -->
-        <div *ngIf="alerts().length > 0" class="mb-12 space-y-4">
-            <div *ngFor="let alert of alerts()" class="alert-banner p-4 rounded-lg flex items-start"
-                [class.urgent]="alert.urgent">
-                <span class="material-icons mr-3" [class.text-red-600]="alert.urgent"
-                    [class.text-orange-500]="!alert.urgent">
-                    {{ alert.urgent ? 'error' : 'warning' }}
-                </span>
-                <div style="flex: 1;">
-                    <h4 class="font-bold mb-1" [class.text-red-900]="alert.urgent"
-                        [class.text-orange-900]="!alert.urgent">
-                        {{ alert.type }} - {{ alert.vehicle }}
-                    </h4>
-                    <p class="text-sm font-medium text-gray-700">
-                        {{ alert.message }}
-                        <span *ngIf="alert.date" class="ml-2 opacity-70">
-                            ({{ alert.date | date:'dd/MM/yyyy' }})
-                        </span>
-                    </p>
+        <!-- Notification Center: Lean & Toggleable -->
+        <div *ngIf="alerts().length > 0" class="notification-center mb-8" [class.collapsed]="!showNotifications()">
+            <div class="notification-header" (click)="toggleNotifications()">
+                <div class="flex items-center gap-3">
+                    <div class="pulse-icon">
+                        <span class="material-icons">notifications_active</span>
+                    </div>
+                    <div>
+                        <h3 class="notification-title">Recordatorios de Mantenimiento</h3>
+                        <p class="notification-subtitle">Tienes {{ alerts().length }} revisiones pendientes</p>
+                    </div>
                 </div>
-                <button (click)="sendAlertEmail(alert)"
-                    class="ml-4 icon-btn-mini bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                    title="Enviar recordatorio por correo"
-                    style="min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <span class="material-icons" style="font-size: 1.2rem;">mail</span>
+                <button class="toggle-notif-btn">
+                    <span class="material-icons">{{ showNotifications() ? 'expand_less' : 'expand_more' }}</span>
                 </button>
+            </div>
+
+            <div class="notification-body" *ngIf="showNotifications()">
+                <div class="alert-grid-modern">
+                    <div *ngFor="let alert of alerts()" class="compact-alert-card" [class.urgent]="alert.urgent">
+                        <div class="alert-type-icon">
+                            <span class="material-icons">{{ alert.urgent ? 'priority_high' : 'info_outline' }}</span>
+                        </div>
+                        <div class="alert-details">
+                            <div class="alert-subject">
+                                <span class="vehicle">{{ alert.vehicle }}</span>
+                                <span class="dot"></span>
+                                <span class="type">{{ alert.type }}</span>
+                            </div>
+                            <p class="alert-msg">{{ alert.message }}</p>
+                        </div>
+                        <button (click)="sendAlertEmail(alert)" class="alert-action-btn" title="Enviar Email">
+                            <span class="material-icons">mail</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -226,11 +236,12 @@
                                     </div>
 
                                     <div class="main-stats">
-                                        <div class="stat-box mt-4">
+                                        <div class="stat-box">
                                             <span class="label">Kilometraje</span>
                                             <span class="value">{{ m.kilometraje | number }} <small>km</small></span>
                                         </div>
-                                        <div class="stat-box text-right mt-4">
+                                        <div class="divider"></div>
+                                        <div class="stat-box text-right">
                                             <span class="label">Importe Total</span>
                                             <span class="value cost">{{ (toNumber(m.costePieza || 0) +
                                                 toNumber(m.costeTaller || 0)) | currency:'EUR' }}</span>
