@@ -4,15 +4,26 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export class DriveService {
-    private static authClient = new google.auth.GoogleAuth({
-        credentials: {
-            client_email: process.env.GOOGLE_CLIENT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-        scopes: ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive'],
-    });
+    private static getAuthClient() {
+        if (process.env.GOOGLE_REFRESH_TOKEN) {
+            const oAuth2Client = new google.auth.OAuth2(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET
+            );
+            oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+            return oAuth2Client;
+        } else {
+            return new google.auth.GoogleAuth({
+                credentials: {
+                    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+                    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+                },
+                scopes: ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive'],
+            });
+        }
+    }
 
-    private static drive = google.drive({ version: 'v3', auth: DriveService.authClient });
+    private static drive = google.drive({ version: 'v3', auth: DriveService.getAuthClient() });
 
     static async uploadFile(localPath: string, fileName: string): Promise<string | null> {
         try {

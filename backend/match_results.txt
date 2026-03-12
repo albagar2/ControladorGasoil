@@ -1,5 +1,5 @@
 [DB] Connected successfully. Found 15 refuels.
-[FS] Found 14 ticket images.
+[FS] Found 16 ticket images.
 [?] Could not parse date from 19 de enero
 [?] Could not parse date from 22 de enero
 [?] Could not parse date from 3 enero
@@ -14,6 +14,9 @@
 [?] Could not parse date from 8 de febrero
 Uploading 02 de marzo for refuel 38...
 [ERROR] Drive upload failed for 02 de marzo
+[?] Could not parse date from 02 de marzo.jpeg
 Uploading 10 marzo for refuel 37...
 [ERROR] Drive upload failed for 10 marzo
+Uploading 10 marzo .jpeg for refuel 37...
+[ERROR] Drive upload failed for 10 marzo .jpeg
 Done. Uploaded 0 tickets.
