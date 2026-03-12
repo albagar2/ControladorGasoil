@@ -78,6 +78,14 @@ export class MaintenanceFormComponent implements OnInit {
         }
     }
 
+    onDateChange(value: string) {
+        if (value) {
+            // Create date from YYYY-MM-DD string to avoid timezone shifts
+            const [year, month, day] = value.split('-').map(Number);
+            this.localMaintenance.fecha = new Date(year, month - 1, day);
+        }
+    }
+
     selectType(type: string) {
         this.localMaintenance.tipo = type;
     }

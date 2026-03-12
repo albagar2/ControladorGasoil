@@ -41,32 +41,35 @@
 
     <div *ngIf="!dataService.loading()">
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="stat-card">
-                <div class="stat-icon bg-blue-100">
-                    <span class="material-icons text-blue-600">euro</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stat-card premium-card">
+                <div class="stat-icon-wrapper bg-indigo-50">
+                    <span class="material-icons text-indigo-600">payments</span>
                 </div>
-                <div>
+                <div class="stat-content">
                     <p class="stat-label">Gastado este Mes</p>
-                    <p class="stat-value text-blue-600">{{ stats().totalSpent | currency:'EUR' }}</p>
+                    <p class="stat-value text-indigo-600">{{ stats().totalSpent | currency:'EUR' }}</p>
+                    <p class="stat-trend text-green-600">Mes de {{ monthName }}</p>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-green-100">
-                    <span class="material-icons text-green-600">event</span>
+            <div class="stat-card premium-card">
+                <div class="stat-icon-wrapper bg-rose-50">
+                    <span class="material-icons text-rose-600">history</span>
                 </div>
-                <div>
-                    <p class="stat-label">Último Mantenimiento</p>
-                    <p class="stat-value text-base">{{ stats().mostRecentDate }}</p>
+                <div class="stat-content">
+                    <p class="stat-label">Último Servicio</p>
+                    <p class="stat-value text-rose-600">{{ stats().mostRecentDate }}</p>
+                    <p class="stat-trend">Registro más reciente</p>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon bg-orange-100">
-                    <span class="material-icons text-orange-600">directions_car</span>
+            <div class="stat-card premium-card">
+                <div class="stat-icon-wrapper bg-emerald-50">
+                    <span class="material-icons text-emerald-600">stars</span>
                 </div>
-                <div>
-                    <p class="stat-label">V. con Más Mantenim.</p>
-                    <p class="stat-value text-base">{{ stats().vehicleWithMostMaintenances }}</p>
+                <div class="stat-content">
+                    <p class="stat-label">Vehículo Activo</p>
+                    <p class="stat-value text-emerald-600 text-lg">{{ stats().vehicleWithMostMaintenances }}</p>
+                    <p class="stat-trend">Mayor actividad</p>
                 </div>
             </div>
         </div>

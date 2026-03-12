@@ -123,7 +123,7 @@ export class MaintenanceComponent implements OnInit {
 
     // Computed Stats
     stats = computed(() => {
-        const maintenances = this.dataService.maintenances();
+        const maintenances = this.filteredMaintenances();
         const vehicles = this.dataService.vehicles();
 
         if (!maintenances.length) {
