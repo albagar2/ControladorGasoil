@@ -1,22 +1,31 @@
 [DB] Connected successfully. Found 15 refuels.
-[FS] Found 16 ticket images.
-[?] Could not parse date from 19 de enero
-[?] Could not parse date from 22 de enero
-[?] Could not parse date from 3 enero
-[?] Could not parse date from 7 de enero
-[?] Could not parse date from 9 de enero
-[?] Could not parse date from 1 de febrero
-[?] Could not parse date from 15 de febrero
-[?] Could not parse date from 18 de febrero
-[?] Could not parse date from 2 de febrero
-[?] Could not parse date from 22 de febrero
-[?] Could not parse date from 6 de febrero
-[?] Could not parse date from 8 de febrero
+[DRIVE] Authenticated as: baciapez@gmail.com
+[FS] Found 19 ticket images.
+Uploading 19 de enero for refuel 26...
+[OK] Matched 19 de enero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=159FjOVBZ3VYE7ZYNCXxekXLZXCjSxsdl
+Uploading 22 de enero for refuel 27...
+[OK] Matched 22 de enero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=15rFml5XgPor1sPwHZfk3JESKPI3vipQP
+Uploading 3 enero for refuel 23...
+[OK] Matched 3 enero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1-lOIiSBcdq2RWWtKvYyE7MO8FdwsWid0
+Uploading 7 de enero for refuel 24...
+[OK] Matched 7 de enero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1RQXVlSF2sVlrCoGdakjbHa7BrGsM-uBb
+Uploading 9 de enero for refuel 25...
+[OK] Matched 9 de enero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1KN6OgIOUUNH4cYnykJuT18hZu7zO3L4b
+Uploading 1 de febrero for refuel 28...
+[OK] Matched 1 de febrero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=19XmTOES74M4EWyFtH9GDBYdL6YxrYpNF
+Uploading 15 de febrero for refuel 32...
+[OK] Matched 15 de febrero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1t3dNktc3iDpQqVNMkXsT6C8rqmtZrkYH
+Uploading 18 de febrero for refuel 33...
+[OK] Matched 18 de febrero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1t6f4P83beJF9szp8RJnhHWOvVQJOmTSC
+Uploading 2 de febrero for refuel 29...
+[OK] Matched 2 de febrero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1OFQY4HnkfMMi0tIaZyB_PCph-fnNHTEk
+Uploading 22 de febrero for refuel 35...
+[OK] Matched 22 de febrero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1-kLm2Qhq2hhVfz5RYQyupy7yyZT6fwDF
+[!] Multiple DB matches for 6 de febrero
+Uploading 8 de febrero for refuel 30...
+[OK] Matched 8 de febrero -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1QzY60FQ8ScNy-PgiWcfxKKUiQbG2xiA7
 Uploading 02 de marzo for refuel 38...
-[ERROR] Drive upload failed for 02 de marzo
-[?] Could not parse date from 02 de marzo.jpeg
+[OK] Matched 02 de marzo -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1XDfltpENPCD9TMfAyH-YjMsUyMJT8a-s
 Uploading 10 marzo for refuel 37...
-[ERROR] Drive upload failed for 10 marzo
-Uploading 10 marzo .jpeg for refuel 37...
-[ERROR] Drive upload failed for 10 marzo .jpeg
-Done. Uploaded 0 tickets.
+[OK] Matched 10 marzo -> Uploaded! URL: https://drive.google.com/uc?export=view&id=1mZL-NtbpYZOjtnCMrK1x_Tn9MEF3gEJe
+Done. Uploaded 13 tickets.

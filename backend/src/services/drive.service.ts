@@ -32,7 +32,7 @@ export class DriveService {
                 return null;
             }
 
-            const folderId = process.env.GOOGLE_FOLDER_ID;
+            const folderId = process.env.GOOGLE_FOLDER_ID?.replace(/\"/g, '').trim();
 
             const fileMetadata = {
                 name: fileName,
@@ -47,8 +47,9 @@ export class DriveService {
             const response = await this.drive.files.create({
                 requestBody: fileMetadata,
                 media: media,
-                fields: 'id, webViewLink, webContentLink'
-            });
+                fields: 'id, webViewLink, webContentLink',
+                supportsAllDrives: true
+            } as any);
 
             const fileId = response.data.id;
             if (!fileId) return null;
@@ -83,7 +84,7 @@ export class DriveService {
                 throw new Error('Drive configuration missing.');
             }
 
-            const folderId = process.env.GOOGLE_FOLDER_ID;
+            const folderId = process.env.GOOGLE_FOLDER_ID?.replace(/\"/g, '').trim();
             if (!folderId) throw new Error('GOOGLE_FOLDER_ID missing');
 
             const oneYearAgo = new Date();
@@ -96,8 +97,10 @@ export class DriveService {
             const response = await this.drive.files.list({
                 q: query,
                 fields: 'files(id, name)',
-                spaces: 'drive'
-            });
+                spaces: 'drive',
+                supportsAllDrives: true,
+                includeItemsFromAllDrives: true
+            } as any);
 
             const files = response.data.files;
             if (!files || files.length === 0) {

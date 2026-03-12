@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { AppDataSource } from './src/data-source';
 import { Refuel } from './src/entities/Refuel';
+import { google } from 'googleapis';
 import { DriveService } from './src/services/drive.service';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -26,6 +27,16 @@ async function matchTickets() {
         const allRefuels = await refuelRepository.find({ relations: ['vehiculo'] });
         _log(`[DB] Connected successfully. Found ${allRefuels.length} refuels.`);
 
+        // Log Identity
+        try {
+            const auth = (DriveService as any).getAuthClient();
+            const drive = google.drive({ version: 'v3', auth });
+            const about = await drive.about.get({ fields: 'user' });
+            _log(`[DRIVE] Authenticated as: ${about.data.user?.emailAddress || 'Unknown'}`);
+        } catch (e: any) {
+            _log(`[DRIVE] Identity check failed: ${e.message}`);
+        }
+
         const getFiles = (dir: string): string[] => {
             let results: string[] = [];
             if (!fs.existsSync(dir)) return [];
@@ -46,12 +57,14 @@ async function matchTickets() {
         let uploadedCount = 0;
 
         for (const file of files) {
+            if (file.endsWith('.tmp')) continue;
             const basename = path.basename(file, path.extname(file)).toLowerCase().trim();
             let matchDay: number | null = null;
             let matchMonth: number | null = null;
 
-            const parts = basename.split(/[\sde]+/);
+            const parts = basename.split(/[\s\-_/]+/);
             for (const part of parts) {
+                if (!part || part === 'de') continue;
                 const num = parseInt(part);
                 if (!isNaN(num) && matchDay === null) {
                     matchDay = num;
