@@ -156,7 +156,7 @@ export class ExportService {
                     currentY = 40;
 
                     // Redibujamos cabecera en nueva página vacía de gráficos
-                    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                    doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
                     doc.rect(0, 0, pageWidth, 30, 'F');
                     doc.setFontSize(20);
                     doc.setTextColor(255, 255, 255);
@@ -188,7 +188,7 @@ export class ExportService {
                     // Asegurar que cabe con el alto calculado
                     if (currentY + 10 + imgHeight > pageHeight - 20) {
                         doc.addPage();
-                        doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                        doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
                         doc.rect(0, 0, pageWidth, 30, 'F');
 
                         currentY = 40;
@@ -341,7 +341,7 @@ export class ExportService {
             finalReportTitle = `Informe de Gastos - ${mesStr.toUpperCase()} ${oldestDate.getFullYear()}`;
         }
 
-        this.exportToPdf('reporte_gastos_gasoil.pdf', finalReportTitle, columns, [...summaryData, ...reportData], totalsRow, images);
+        this.exportToPdf('reporte_gastos_gasoil.pdf', finalReportTitle, columns, [...summaryData, ...reportData], [], images);
     }
 }
 
