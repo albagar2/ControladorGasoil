@@ -144,55 +144,49 @@
         </div>
 
         <!-- Main Layout: Grouped by Vehicle -->
-        <div class="maintenance-groups">
-            <div *ngFor="let group of groupedMaintenances()" class="vehicle-group"
+        <div class="maintenance-groups space-y-12">
+            <div *ngFor="let group of groupedMaintenances()" class="vehicle-section"
                 [class.collapsed]="isCollapsed(group.vehicle.id!)">
-                <!-- Vehicle Group Header -->
-                <div class="group-header" (click)="toggleVehicle(group.vehicle.id!)">
-                    <div class="flex items-center gap-4">
-                        <div class="vehicle-pill">
+
+                <!-- Vehicle Group Header: Premium Plus Design -->
+                <div class="vehicle-header-group" (click)="toggleVehicle(group.vehicle.id!)"
+                    [attr.aria-expanded]="!isCollapsed(group.vehicle.id!)">
+                    <div class="vehicle-info-main">
+                        <div class="vehicle-avatar">
                             <span class="material-icons">directions_car</span>
-                            <span class="font-bold">{{ group.vehicle.modelo }}</span>
-                            <span class="separator">|</span>
-                            <span class="license">{{ group.vehicle.matricula }}</span>
                         </div>
-                        <span class="count-badge">{{ group.items.length }} Registros</span>
+                        <div class="vehicle-data">
+                            <h3 class="vehicle-name">{{ group.vehicle.modelo }}</h3>
+                            <div class="vehicle-meta">
+                                <span class="license-tag">{{ group.vehicle.matricula }}</span>
+                                <span class="dot-separator"></span>
+                                <span class="km-label">{{ group.vehicle.kilometrajeActual | number }} km</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="group-summary hidden md:flex">
-                            <span class="label">Total Invertido:</span>
+
+                    <div class="group-stats-actions">
+                        <div class="group-total hidden sm:flex">
+                            <span class="label">Inversión este mes</span>
                             <span class="value">{{ group.totalSpent | currency:'EUR' }}</span>
                         </div>
-                        <span class="material-icons collapse-icon">expand_more</span>
+                        <div class="items-count">
+                            <span class="count">{{ group.items.length }}</span>
+                            <span class="label">Registros</span>
+                        </div>
+                        <span class="material-icons chevron-icon">expand_more</span>
                     </div>
                 </div>
 
-                <!-- Group Content -->
-                <div class="group-content" *ngIf="!isCollapsed(group.vehicle.id!)">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-8 pl-2 pr-2">
-                        <!-- Maintenance Card -->
-                        <div *ngFor="let m of group.items" class="maintenance-card group">
-                            <!-- Card Header -->
-                            <div class="card-header">
-                                <div class="date-tag">
-                                    <span class="material-icons">event</span>
-                                    {{ m.fecha | date:'dd MMM yyyy' }}
-                                </div>
-                                <div class="card-actions opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button (click)="openModal(m)" class="icon-btn-mini edit" title="Editar">
-                                        <span class="material-icons">edit</span>
-                                    </button>
-                                    <button (click)="deleteMaintenance(m.id!)" class="icon-btn-mini delete"
-                                        title="Eliminar">
-                                        <span class="material-icons">delete</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Card Body -->
-                            <div class="card-body">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="type-badge" [ngClass]="{
+                <!-- Group Content: Modern Card Grid -->
+                <div class="group-records-area" *ngIf="!isCollapsed(group.vehicle.id!)">
+                    <div class="records-grid">
+                        <div *ngFor="let m of group.items" class="premium-record-card group">
+                            <!-- Card Glow Effect Container -->
+                            <div class="record-content-wrapper">
+                                <!-- Card Header -->
+                                <div class="record-header">
+                                    <div class="type-indicator" [ngClass]="{
                                         'type-oil': m.tipo === 'Aceite',
                                         'type-air': m.tipo === 'Aire',
                                         'type-liquids': m.tipo === 'Liquidos',
@@ -201,47 +195,71 @@
                                         'type-dist': m.tipo === 'Distribucion',
                                         'type-default': !['Aceite', 'Aire', 'Liquidos', 'Neumaticos', 'Bateria', 'Distribucion'].includes(m.tipo)
                                     }">
-                                        <span class="material-icons text-sm mr-1">
-                                            {{ m.tipo === 'Aceite' ? 'water_drop' :
-                                            m.tipo === 'Aire' ? 'air' :
-                                            m.tipo === 'Liquidos' ? 'opacity' :
-                                            m.tipo === 'Neumaticos' ? 'tire_repair' :
-                                            m.tipo === 'Bateria' ? 'battery_charging_full' :
-                                            m.tipo === 'Distribucion' ? 'settings_suggest' : 'build' }}
-                                        </span>
-                                        {{ m.tipo }}
+                                        <div class="type-icon">
+                                            <span class="material-icons">
+                                                {{ m.tipo === 'Aceite' ? 'water_drop' :
+                                                m.tipo === 'Aire' ? 'air' :
+                                                m.tipo === 'Liquidos' ? 'opacity' :
+                                                m.tipo === 'Neumaticos' ? 'tire_repair' :
+                                                m.tipo === 'Bateria' ? 'battery_charging_full' :
+                                                m.tipo === 'Distribucion' ? 'settings_suggest' : 'build' }}
+                                            </span>
+                                        </div>
+                                        <span class="type-text">{{ m.tipo }}</span>
                                     </div>
-                                    <div class="provider-pill">
-                                        <span class="material-icons">store</span>
-                                        {{ m.proveedor || 'Sin taller' }}
-                                    </div>
-                                </div>
-
-                                <div class="info-grid">
-                                    <div class="info-cell">
-                                        <span class="label">Kilometraje</span>
-                                        <span class="value text-lg">{{ m.kilometraje | number }}
-                                            <small>km</small></span>
-                                    </div>
-                                    <div class="info-cell text-right">
-                                        <span class="label">Importe</span>
-                                        <span class="value text-lg cost">{{ (toNumber(m.costePieza || 0) +
-                                            toNumber(m.costeTaller || 0)) | currency:'EUR' }}</span>
+                                    <div class="record-actions">
+                                        <button (click)="openModal(m)" class="action-btn edit" title="Editar">
+                                            <span class="material-icons">edit</span>
+                                        </button>
+                                        <button (click)="deleteMaintenance(m.id!)" class="action-btn delete"
+                                            title="Eliminar">
+                                            <span class="material-icons">delete_outline</span>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div class="observations-box" *ngIf="m.observaciones">
-                                    <p>{{ m.observaciones }}</p>
+                                <!-- Card Body -->
+                                <div class="record-body">
+                                    <div class="date-row">
+                                        <span class="material-icons">calendar_today</span>
+                                        <span>{{ m.fecha | date:'dd MMM, yyyy' }}</span>
+                                    </div>
+
+                                    <div class="main-stats">
+                                        <div class="stat-box mt-4">
+                                            <span class="label">Kilometraje</span>
+                                            <span class="value">{{ m.kilometraje | number }} <small>km</small></span>
+                                        </div>
+                                        <div class="stat-box text-right mt-4">
+                                            <span class="label">Importe Total</span>
+                                            <span class="value cost">{{ (toNumber(m.costePieza || 0) +
+                                                toNumber(m.costeTaller || 0)) | currency:'EUR' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="provider-info" *ngIf="m.proveedor">
+                                        <span class="material-icons">store_mall_directory</span>
+                                        <span class="truncate">{{ m.proveedor }}</span>
+                                    </div>
+
+                                    <div class="observations-block shadow-inner" *ngIf="m.observaciones">
+                                        <p>{{ m.observaciones }}</p>
+                                    </div>
                                 </div>
 
-                                <div
-                                    class="card-footer mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                    <div class="ticket-status" *ngIf="m.ticketImageUrl">
-                                        <span class="material-icons text-green-500">receipt_long</span>
-                                        <span class="text-xs font-bold text-green-600">CON TICKET</span>
+                                <!-- Card Footer -->
+                                <div class="record-footer">
+                                    <div class="ticket-status" [class.has-ticket]="m.ticketImageUrl">
+                                        <span class="material-icons">{{ m.ticketImageUrl ? 'receipt_long' : 'no_receipt'
+                                            }}</span>
+                                        <span class="status-msg">{{ m.ticketImageUrl ? 'CON TICKET' : 'SIN TICKET'
+                                            }}</span>
                                     </div>
-                                    <div class="driver-tag">
-                                        {{ m.conductor?.nombre }}
+                                    <div class="driver-info">
+                                        <div class="driver-avatar">
+                                            {{ (m.conductor?.nombre || 'U')?.charAt(0) }}
+                                        </div>
+                                        <span class="driver-name">{{ m.conductor?.nombre }}</span>
                                     </div>
                                 </div>
                             </div>

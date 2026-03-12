@@ -7,26 +7,28 @@
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 1.5rem;
-    border-radius: 1.25rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    padding: 1.75rem;
+    border-radius: 28px;
+    box-shadow:
+        0 4px 20px -5px rgba(0, 0, 0, 0.05),
+        inset 0 0 20px rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.75rem;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     text-decoration: none;
     color: inherit;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .stat-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: var(--primary-color);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 40px 80px -20px rgba(99, 102, 241, 0.25);
+    background: rgba(255, 255, 255, 0.9);
 }
 
 :host-context(.dark) .stat-card {
@@ -35,21 +37,22 @@
 }
 
 .icon-box {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 1rem;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
 .stat-card:hover .icon-box {
-    transform: rotate(10deg);
+    transform: rotate(-12deg) scale(1.15);
 }
 
 .icon-box .material-icons {
-    font-size: 1.75rem;
+    font-size: 2.25rem;
 }
 
 .stat-value {
@@ -67,22 +70,22 @@
 }
 
 .card-vehicles .icon-box {
-    background: #eef2ff;
+    background: linear-gradient(135deg, #eef2ff, #c7d2fe);
     color: #4f46e5;
 }
 
 .card-drivers .icon-box {
-    background: #ecfdf5;
+    background: linear-gradient(135deg, #ecfdf5, #a7f3d0);
     color: #10b981;
 }
 
 .card-cost .icon-box {
-    background: #fff7ed;
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
     color: #f59e0b;
 }
 
 .maintenance-card .icon-box {
-    background: #fff1f2;
+    background: linear-gradient(135deg, #fff1f2, #fecdd3);
     color: #e11d48;
 }
 
