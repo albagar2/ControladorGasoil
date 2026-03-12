@@ -50,6 +50,6 @@ export class Driver {
     @JoinColumn({ name: 'familyId' })
     family!: Family;
 
-    @OneToMany(() => License, (license) => license.driver, { cascade: true, orphanRemoval: true })
+    @OneToMany(() => License, (license) => license.driver, { cascade: true, orphanRemoval: true } as any)
     licenses!: License[];
 }
