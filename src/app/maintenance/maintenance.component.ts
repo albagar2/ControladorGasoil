@@ -9,11 +9,13 @@ import { Maintenance } from '../core/models/maintenance.model';
 import { Vehicle } from '../core/models/vehicle.model';
 import { MaintenanceFormComponent } from './maintenance-form/maintenance-form.component';
 import { ToastService } from '../core/services/toast.service';
+import { ReceiptModalComponent } from '../shared/components/receipt-modal/receipt-modal.component';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'app-maintenance',
     standalone: true,
-    imports: [CommonModule, FormsModule, MaintenanceFormComponent],
+    imports: [CommonModule, FormsModule, MaintenanceFormComponent, ReceiptModalComponent],
     templateUrl: './maintenance.component.html',
     styleUrls: ['./maintenance.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,6 +41,9 @@ export class MaintenanceComponent implements OnInit {
     showModal = false;
     currentMaintenance?: Maintenance;
     showNotifications = signal(true);
+
+    showReceiptModal = false;
+    selectedReceiptUrl = '';
 
     // Computed Filtered List
     filteredMaintenances = computed(() => {
@@ -305,5 +310,10 @@ export class MaintenanceComponent implements OnInit {
         const newYear = date.getFullYear();
         const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
         this.selectedMonth.set(`${newYear}-${newMonth}`);
+    }
+
+    viewTicket(ticketPath: string) {
+        this.selectedReceiptUrl = `${environment.apiUrl.replace('/api', '')}/${ticketPath}`;
+        this.showReceiptModal = true;
     }
 }

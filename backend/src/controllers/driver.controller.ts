@@ -101,17 +101,17 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
 
     if (!driver) return res.status(404).json({ message: 'User not found' });
 
-    const { password, ...updateData } = req.body;
+    const { password, licenses, ...updateData } = req.body;
 
     if (password) {
         const bcrypt = require('bcryptjs');
         driver.password = await bcrypt.hash(password, 10);
     }
 
-    // Explicitly handle licenses if provided
-    if (req.body.licenses) {
+    // Explicitly handle licenses if provided (orphanRemoval: true handles deletion)
+    if (licenses) {
         const { License } = require('../entities/License');
-        driver.licenses = req.body.licenses.map((l: any) => {
+        driver.licenses = licenses.map((l: any) => {
             const license = new License();
             Object.assign(license, l);
             license.driver = driver;
@@ -120,7 +120,16 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     }
 
     driverRepository.merge(driver, updateData);
-    const result = await driverRepository.save(driver);
+
+    try {
+        const result = await driverRepository.save(driver);
+    } catch (saveError: any) {
+        console.error('Error saving profile changes:', saveError);
+        return res.status(500).json({
+            message: 'Error al guardar los cambios del perfil',
+            details: saveError.message
+        });
+    }
 
     // Reload with relations to return full object
     const updatedDriver = await driverRepository.findOne({
@@ -129,7 +138,7 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     });
 
     // Remove password from response
-    if (!updatedDriver) return res.status(500).json({ message: 'Error reloading driver' });
+    if (!updatedDriver) return res.status(500).json({ message: 'Error al recargar el perfil actualizado' });
     const { password: _, ...driverData } = updatedDriver;
 
     res.json(driverData);

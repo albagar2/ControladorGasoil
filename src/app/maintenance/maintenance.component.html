@@ -265,10 +265,12 @@
 
                                 <!-- Card Footer -->
                                 <div class="record-footer">
-                                    <div class="ticket-status" [class.has-ticket]="m.ticketImageUrl">
+                                    <div class="ticket-status" [class.has-ticket]="m.ticketImageUrl"
+                                        (click)="m.ticketImageUrl ? viewTicket(m.ticketImageUrl) : null"
+                                        [style.cursor]="m.ticketImageUrl ? 'pointer' : 'default'">
                                         <span class="material-icons">{{ m.ticketImageUrl ? 'receipt_long' : 'no_receipt'
                                             }}</span>
-                                        <span class="status-msg">{{ m.ticketImageUrl ? 'CON TICKET' : 'SIN TICKET'
+                                        <span class="status-msg">{{ m.ticketImageUrl ? 'VER TICKET' : 'SIN TICKET'
                                             }}</span>
                                     </div>
                                     <div class="driver-info">

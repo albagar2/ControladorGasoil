@@ -631,6 +631,31 @@
     margin-bottom: 2rem;
 }
 
+.type-ind.ticket-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    transition: all 0.3s ease;
+}
+
+.ticket-status.has-ticket {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.ticket-status.has-ticket:hover {
+    background: #059669;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
 .type-indicator {
     display: flex;
     align-items: center;
