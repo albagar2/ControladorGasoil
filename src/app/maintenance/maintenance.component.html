@@ -19,16 +19,21 @@
         </button>
     </div>
 
-    <!-- Modern Month Selector -->
     <div class="month-selector-bar">
         <button class="month-nav-btn" (click)="prevMonth()" title="Mes Anterior">
             <span class="material-icons">chevron_left</span>
         </button>
-        <div class="current-month-label">
+        <div class="current-month-label" (click)="selectedMonth.set('')" style="cursor: pointer;"
+            title="Clic para ver todo el historial">
             <span class="material-icons"
                 style="vertical-align: middle; margin-right: 8px; font-size: 1.2rem; color: var(--text-muted);">calendar_today</span>
             {{ monthName | titlecase }}
         </div>
+        <button *ngIf="selectedMonth()" (click)="selectedMonth.set('')" class="btn-see-all"
+            title="Ver todo el historial">
+            <span class="material-icons">history</span>
+            <span>Ver Todo</span>
+        </button>
         <button class="month-nav-btn" (click)="nextMonth()" title="Siguiente Mes">
             <span class="material-icons">chevron_right</span>
         </button>
@@ -285,10 +290,14 @@
                 <div class="bg-indigo-50 p-6 rounded-full mb-6 animate-pulse">
                     <span class="material-icons text-6xl text-indigo-400">build_circle</span>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">No se encontraron resultados</h3>
-                <p class="text-gray-500 max-w-md mx-auto">
-                    Intenta ajustar los filtros o la búsqueda para ver más resultados.
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No hay mantenimientos este mes</h3>
+                <p class="text-gray-500 max-w-md mx-auto mb-6">
+                    Has importado datos históricos. ¿Quieres ver todo el historial de mantenimientos?
                 </p>
+                <button (click)="selectedMonth.set('')" class="btn-primary-outline">
+                    <span class="material-icons">history</span>
+                    Explorar todo el historial
+                </button>
             </div>
         </div>
 

@@ -33,7 +33,7 @@ export class MaintenanceComponent implements OnInit {
     filterDateFrom = signal('');
     filterDateTo = signal('');
 
-    // Monthly navigation
+    // Monthly navigation (empty string means "All History")
     selectedMonth = signal<string>(new Date().toISOString().substring(0, 7)); // YYYY-MM
 
     showModal = false;
@@ -63,12 +63,14 @@ export class MaintenanceComponent implements OnInit {
         if (from) filtered = filtered.filter(m => new Date(m.fecha) >= new Date(from));
         if (to) filtered = filtered.filter(m => new Date(m.fecha) <= new Date(to));
 
-        // Apply Monthly Filter (Primary organization)
-        const [year, month] = this.selectedMonth().split('-').map(Number);
-        filtered = filtered.filter(m => {
-            const date = new Date(m.fecha);
-            return date.getFullYear() === year && (date.getMonth() + 1) === month;
-        });
+        // Apply Monthly Filter (Primary organization, only if not viewing "All")
+        if (this.selectedMonth()) {
+            const [year, month] = this.selectedMonth().split('-').map(Number);
+            filtered = filtered.filter(m => {
+                const date = new Date(m.fecha);
+                return date.getFullYear() === year && (date.getMonth() + 1) === month;
+            });
+        }
 
         return filtered;
     });
@@ -283,6 +285,7 @@ export class MaintenanceComponent implements OnInit {
     }
 
     get monthName(): string {
+        if (!this.selectedMonth()) return 'Todo el Historial';
         const [year, month] = this.selectedMonth().split('-');
         const date = new Date(parseInt(year), parseInt(month) - 1);
         return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
