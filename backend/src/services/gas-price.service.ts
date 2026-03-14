@@ -12,13 +12,27 @@ export interface GasStation {
 }
 
 export class GasPriceService {
-    private static API_URL = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/ServiciosRESTCarburante/ListadoGasolineras/';
+    private static readonly BASE_URL = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/ServiciosRESTCarburante';
+    
+    private static readonly PROVINCE_MAP: Record<string, string> = {
+        'Albacete': '02', 'Alicante': '03', 'Almería': '04', 'Ávila': '05', 'Badajoz': '06', 'Islas Baleares': '07', 
+        'Barcelona': '08', 'Burgos': '09', 'Cáceres': '10', 'Cádiz': '11', 'Castellón': '12', 'Ciudad Real': '13', 
+        'Córdoba': '14', 'A Coruña': '15', 'Cuenca': '16', 'Girona': '17', 'Granada': '18', 'Guadalajara': '19', 
+        'Guipúzcoa': '20', 'Huelva': '21', 'Huesca': '22', 'Jaén': '23', 'León': '24', 'Lleida': '25', 'La Rioja': '26', 
+        'Lugo': '27', 'Madrid': '28', 'Málaga': '29', 'Murcia': '30', 'Navarra': '31', 'Ourense': '32', 'Asturias': '33', 
+        'Palencia': '34', 'Las Palmas': '35', 'Pontevedra': '36', 'Salamanca': '37', 'Santa Cruz de Tenerife': '38', 
+        'Cantabria': '39', 'Segovia': '40', 'Sevilla': '41', 'Soria': '42', 'Tarragona': '43', 'Teruel': '44', 
+        'Toledo': '45', 'Valencia': '46', 'Valladolid': '47', 'Vizcaya': '48', 'Zamora': '49', 'Zaragoza': '50', 
+        'Ceuta': '51', 'Melilla': '52'
+    };
 
-    static async getPrices() {
+    private static async fetchFromApi(endpoint: string) {
         try {
+            console.log(`[GasPriceService] Fetching from: ${endpoint}`);
             const response = await request({
-                url: this.API_URL,
-                method: 'GET'
+                url: endpoint,
+                method: 'GET',
+                timeout: 25000
             });
             const data = (response.data as any).ListaEESSPrecio;
 
@@ -27,7 +41,6 @@ export class GasPriceService {
                 return [];
             }
 
-            // Map and filter (e.g. only those with Gasoil A price)
             return data.map((item: any) => ({
                 id: item.IDEESS,
                 rotulo: item.Rotulo,
@@ -39,28 +52,39 @@ export class GasPriceService {
                 horario: item.Horario
             })).filter((item: any) => item.precioGasoilA !== null);
         } catch (error) {
-            console.error('[GasPriceService] Error fetching gas prices:', error);
+            console.error('[GasPriceService] Error:', error);
             return [];
         }
+    }
+
+    static async getPrices() {
+        return this.fetchFromApi(`${this.BASE_URL}/ListadoGasolineras/`);
     }
 
     /**
      * Get cheapest gas stations in a specific province
      */
     static async getCheapestByProvince(province: string, limit: number = 10) {
-        const all = await this.getPrices();
-        console.log(`[GasPriceService] Filtering for province: ${province}. Total stations: ${all.length}`);
-        
-        const filtered = all.filter((s: any) => {
-            if (!s.provincia) return false;
-            // Normalize strings for comparison (lowercase and remove accents)
-            const normalizedProvince = province.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const stationProvince = s.provincia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            return stationProvince.includes(normalizedProvince);
-        });
-        
-        console.log(`[GasPriceService] Found ${filtered.length} stations in ${province}`);
-        
-        return filtered.sort((a: any, b: any) => parseFloat(a.precioGasoilA) - parseFloat(b.precioGasoilA)).slice(0, limit);
+        const normalizedInput = province.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let provinceId = '';
+
+        for (const [name, id] of Object.entries(this.PROVINCE_MAP)) {
+            const normalizedMapName = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (normalizedMapName === normalizedInput || normalizedMapName.includes(normalizedInput)) {
+                provinceId = id;
+                break;
+            }
+        }
+
+        if (!provinceId) {
+            console.warn(`[GasPriceService] No ID found for: ${province}. Filtering manually.`);
+            const all = await this.getPrices();
+            return all.filter((s: any) => s.provincia.toLowerCase().includes(province.toLowerCase()))
+                      .sort((a: any, b: any) => parseFloat(a.precioGasoilA) - parseFloat(b.precioGasoilA))
+                      .slice(0, limit);
+        }
+
+        const data = await this.fetchFromApi(`${this.BASE_URL}/ListadoGasolineras/Provincia/${provinceId}`);
+        return data.sort((a: any, b: any) => parseFloat(a.precioGasoilA) - parseFloat(b.precioGasoilA)).slice(0, limit);
     }
 }

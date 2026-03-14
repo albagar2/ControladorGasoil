@@ -17,8 +17,11 @@ export class GasPricesComponent implements OnInit {
   loading = signal(false);
   province = signal('Madrid');
   provinces = [
-    'Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Alicante', 'Castellón', 'Murcia', 'Cádiz', 'Vizcaya', 'A Coruña', 
-    'Asturias', 'Zaragoza', 'Málaga', 'Pontevedra', 'Granada', 'Tarragona', 'Córdoba', 'Girona', 'Guipúzcoa', 'Almería'
+    'A Coruña', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila', 'Badajoz', 'Barcelona', 'Burgos', 'Cáceres', 
+    'Cádiz', 'Cantabria', 'Castellón', 'Ceuta', 'Ciudad Real', 'Córdoba', 'Cuenca', 'Girona', 'Granada', 'Guadalajara', 
+    'Guipúzcoa', 'Huelva', 'Huesca', 'Islas Baleares', 'Jaén', 'La Rioja', 'Las Palmas', 'León', 'Lleida', 'Lugo', 
+    'Madrid', 'Málaga', 'Melilla', 'Murcia', 'Navarra', 'Ourense', 'Palencia', 'Pontevedra', 'Salamanca', 'Santa Cruz de Tenerife', 
+    'Segovia', 'Sevilla', 'Soria', 'Tarragona', 'Teruel', 'Toledo', 'Valencia', 'Valladolid', 'Vizcaya', 'Zamora', 'Zaragoza'
   ].sort();
 
   ngOnInit() {
@@ -27,11 +30,10 @@ export class GasPricesComponent implements OnInit {
 
   loadPrices() {
     this.loading.set(true);
-    this.gasStations.set([]); // Clear previous results while loading
+    this.gasStations.set([]);
     this.gasService.getCheapestInProvince(this.province()).subscribe({
       next: (data) => {
-        // Double check results if any
-        console.log(`Loaded ${data.length} stations for ${this.province()}`);
+        console.log(`[GasPricesComponent] Received ${data.length} stations for ${this.province()}`);
         this.gasStations.set(data);
         this.loading.set(false);
       },

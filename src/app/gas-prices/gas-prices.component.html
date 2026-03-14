@@ -1,42 +1,94 @@
-<div class="gas-container fade-in">
-    <div class="header-section">
-        <h2>🚀 Precios Diésel Más Baratos</h2>
-        <p>Precios actualizados en tiempo real (Fuente: Ministerio de Energía)</p>
-    </div>
-
-    <div class="controls-card card">
-        <div class="filter-group">
-            <label>Filtrar por Provincia:</label>
-            <select [(ngModel)]="province" (change)="loadPrices()" class="form-control">
-                <option *ngFor="let p of provinces" [value]="p">{{p}}</option>
-            </select>
+<div class="gas-luxury-container fade-in">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="badge">Oficial: Ministerio de Energía</span>
+            <h1 class="main-title">Encuentra el <span class="highlight">Mejor Gasoil</span></h1>
+            <p class="subtitle">Ahorra en cada repostaje con los precios actualizados en tiempo real por provincia.</p>
         </div>
     </div>
 
-    <div *ngIf="loading()" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Buscando las mejores ofertas...</p>
+    <!-- Filter Bar -->
+    <div class="filter-section">
+        <div class="filter-glass-card">
+            <div class="filter-inner">
+                <div class="input-icon">
+                    <span class="material-icons">room</span>
+                </div>
+                <div class="filter-select-wrapper">
+                    <label>Provincia a consultar</label>
+                    <select [(ngModel)]="province" (change)="loadPrices()" class="glass-select">
+                        <option *ngFor="let p of provinces" [value]="p">{{p}}</option>
+                    </select>
+                </div>
+                <button (click)="loadPrices()" class="refresh-btn" [class.rotating]="loading()" title="Actualizar">
+                    <span class="material-icons">refresh</span>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="gas-grid" *ngIf="!loading()">
-        <div class="station-card card" *ngFor="let s of gasStations()">
-            <div class="price-tag">
-                <span class="currency">€</span>
-                <span class="value">{{s.precioGasoilA}}</span>
-                <span class="unit">/L</span>
+    <!-- Results Section -->
+    <div class="results-container">
+        <!-- Loading State -->
+        <div *ngIf="loading()" class="premium-loader">
+            <div class="skeleton-grid">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
             </div>
-            <div class="station-info">
-                <h3>{{s.rotulo}}</h3>
-                <p class="address"><span class="material-icons">place</span> {{s.direccion}}</p>
-                <p class="location">{{s.municipio}} ({{s.provincia}})</p>
-                <div class="additional-info">
-                    <span class="horario"><span class="material-icons">schedule</span> {{s.horario}}</span>
+            <div class="loader-message">
+                <div class="dot-spinner"></div>
+                <p>Analizando los mejores precios en {{province()}}...</p>
+            </div>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="gas-grid" *ngIf="!loading() && gasStations().length > 0">
+            <div class="premium-station-card" *ngFor="let s of gasStations(); let i = index" [style.animation-delay]="(i * 0.1) + 's'">
+                <div class="card-ranking" [class.rank-1]="i === 0">#{{i + 1}}</div>
+                
+                <div class="card-price-overlay">
+                    <div class="price-value">
+                        <span class="val">{{s.precioGasoilA}}</span>
+                        <span class="unit">€/L</span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <h3 class="station-name">{{s.rotulo}}</h3>
+                    
+                    <div class="info-row">
+                        <span class="material-icons info-icon">location_on</span>
+                        <div class="info-text">
+                            <span class="address">{{s.direccion}}</span>
+                            <span class="city">{{s.municipio}}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="material-icons info-icon">schedule</span>
+                        <span class="schedule-text">{{s.horario}}</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="province-tag">{{s.provincia}}</div>
+                        <a [href]="'https://www.google.com/maps/search/?api=1&query=' + s.rotulo + ' ' + s.direccion" target="_blank" class="nav-link">
+                            Cómo llegar
+                            <span class="material-icons">arrow_forward</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div *ngIf="!loading() && gasStations().length === 0" class="no-data">
-        <p>No se encontraron estaciones en esta provincia.</p>
+        <!-- No Data State -->
+        <div *ngIf="!loading() && gasStations().length === 0" class="premium-empty-state">
+            <div class="empty-icon">
+                <span class="material-icons">no_sim</span>
+            </div>
+            <h3>Sin resultados para {{province()}}</h3>
+            <p>No pudimos encontrar estaciones con precios actuales en esta provincia. Intenta con otra cercana.</p>
+            <button (click)="province.set('Madrid'); loadPrices()" class="btn-retry">Ir a Madrid</button>
+        </div>
     </div>
 </div>
