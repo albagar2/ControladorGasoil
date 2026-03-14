@@ -26,6 +26,100 @@ export class DriveService {
 
     private static drive = google.drive({ version: 'v3', auth: DriveService.getAuthClient() });
 
+    /**
+     * Get or create a subfolder by name within a parent folder
+     */
+    static async getOrCreateSubfolder(parentFolderId: string, folderName: string): Promise<string | null> {
+        try {
+            const response = await this.drive.files.list({
+                q: `'${parentFolderId}' in parents and name = '${folderName}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+                fields: 'files(id, name)',
+                spaces: 'drive',
+                supportsAllDrives: true,
+                includeItemsFromAllDrives: true
+            } as any);
+
+            const files = response.data.files;
+            if (files && files.length > 0) {
+                return files[0].id!;
+            }
+
+            // Create it if not found
+            const createResponse = await this.drive.files.create({
+                requestBody: {
+                    name: folderName,
+                    mimeType: 'application/vnd.google-apps.folder',
+                    parents: [parentFolderId]
+                },
+                fields: 'id',
+                supportsAllDrives: true
+            } as any);
+
+            return createResponse.data.id!;
+        } catch (error) {
+            console.error(`[DriveService] Error getting/creating subfolder ${folderName}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Records a driver email in a standard emails.txt file in a 'Drivers' folder
+     */
+    static async recordDriverEmail(email: string): Promise<void> {
+        try {
+            const rootFolderId = process.env.GOOGLE_FOLDER_ID?.replace(/\"/g, '').trim();
+            if (!rootFolderId) return;
+
+            const driversFolderId = await this.getOrCreateSubfolder(rootFolderId, 'Drivers');
+            if (!driversFolderId) return;
+
+            // Look for emails.txt
+            const fileList = await this.drive.files.list({
+                q: `'${driversFolderId}' in parents and name = 'emails.txt' and trashed = false`,
+                fields: 'files(id)',
+                supportsAllDrives: true,
+                includeItemsFromAllDrives: true
+            } as any);
+
+            const files = fileList.data.files;
+            let fileId = files && files.length > 0 ? files[0].id : null;
+
+            if (fileId) {
+                // Download, append if not exists, and upload
+                const contentResponse = await this.drive.files.get({
+                    fileId: fileId,
+                    alt: 'media'
+                }, { responseType: 'text' });
+                
+                const currentContent = contentResponse.data as string;
+                if (!currentContent.includes(email)) {
+                    const newContent = currentContent + (currentContent.endsWith('\n') ? '' : '\n') + email + '\n';
+                    await this.drive.files.update({
+                        fileId: fileId,
+                        media: {
+                            mimeType: 'text/plain',
+                            body: newContent
+                        }
+                    });
+                }
+            } else {
+                // Create new
+                await this.drive.files.create({
+                    requestBody: {
+                        name: 'emails.txt',
+                        parents: [driversFolderId]
+                    },
+                    media: {
+                        mimeType: 'text/plain',
+                        body: email + '\n'
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('[DriveService] Error recording driver email:', error);
+        }
+    }
+
     static async uploadFile(localPath: string, fileName: string): Promise<string | null> {
         try {
             if (!process.env.GOOGLE_CLIENT_ID && !process.env.GOOGLE_CLIENT_EMAIL) {
@@ -33,11 +127,24 @@ export class DriveService {
                 return null;
             }
 
-            const folderId = process.env.GOOGLE_FOLDER_ID?.replace(/\"/g, '').trim();
+            const rootFolderId = process.env.GOOGLE_FOLDER_ID?.replace(/\"/g, '').trim();
+            if (!rootFolderId) return null;
+
+            // Organize by Year/Month
+            const now = new Date();
+            const year = now.getFullYear().toString();
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const month = months[now.getMonth()];
+
+            const yearFolderId = await this.getOrCreateSubfolder(rootFolderId, year);
+            if (!yearFolderId) return null;
+
+            const monthFolderId = await this.getOrCreateSubfolder(yearFolderId, month);
+            if (!monthFolderId) return null;
 
             const fileMetadata = {
                 name: fileName,
-                parents: folderId ? [folderId] : undefined
+                parents: [monthFolderId]
             };
 
             const media = {
@@ -72,7 +179,7 @@ export class DriveService {
                 console.warn(`[DriveService] Could not delete local temp file: ${localPath}`);
             }
 
-            console.log(`[DriveService] File uploaded successfully to Drive, ID: ${fileId}`);
+            console.log(`[DriveService] File uploaded successfully to Drive, ID: ${fileId} in ${year}/${month}`);
             return `https://drive.google.com/uc?export=view&id=${fileId}`;
 
         } catch (error) {
@@ -138,6 +245,29 @@ export class DriveService {
         } catch (error) {
             console.error('❌ Google Drive cleanup failed:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Proactively creates the folder for the current Year and Month
+     */
+    static async prepareMonthlyFolders(): Promise<void> {
+        try {
+            const rootFolderId = process.env.GOOGLE_FOLDER_ID?.replace(/\"/g, '').trim();
+            if (!rootFolderId) return;
+
+            const now = new Date();
+            const year = now.getFullYear().toString();
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const month = months[now.getMonth()];
+
+            console.log(`[DriveService] Preparing folders for ${year}/${month}...`);
+            const yearFolderId = await this.getOrCreateSubfolder(rootFolderId, year);
+            if (yearFolderId) {
+                await this.getOrCreateSubfolder(yearFolderId, month);
+            }
+        } catch (error) {
+            console.error('[DriveService] Error pre-creating monthly folders:', error);
         }
     }
 }

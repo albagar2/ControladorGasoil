@@ -35,6 +35,14 @@
                 <span class="material-icons">handyman</span>
                 <span>Mantenimientos</span>
             </a>
+                <a routerLink="seguros" routerLinkActive="active" class="nav-item">
+                    <span class="material-icons">shield</span>
+                    <span>Seguros</span>
+                </a>
+                <a routerLink="precios-gasoil" routerLinkActive="active" class="nav-item">
+                    <span class="material-icons">local_gas_station</span>
+                    <span>Precios Gasoil</span>
+                </a>
             <a class="nav-item" routerLink="analiticas" routerLinkActive="active">
                 <span class="material-icons">insights</span>
                 <span>Analíticas</span>
@@ -97,6 +105,14 @@
                     <span class="material-icons">insights</span>
                     <span>Analíticas</span>
                 </a>
+                    <a routerLink="seguros" (click)="closeMobileMenu()" class="menu-item">
+                        <span class="material-icons">shield</span>
+                        <span>Seguros</span>
+                    </a>
+                    <a routerLink="precios-gasoil" (click)="closeMobileMenu()" class="menu-item">
+                        <span class="material-icons">local_gas_station</span>
+                        <span>Precios Gasoil</span>
+                    </a>
                 <a class="menu-item" routerLink="familia" (click)="closeMobileMenu()">
                     <span class="material-icons">family_restroom</span>
                     <span>Familia</span>
@@ -127,6 +143,7 @@
                     {{ activeTab === 'familia' ? 'Gestión Familiar' : '' }}
                     {{ activeTab === 'mantenimiento' ? 'Mantenimientos' : '' }}
                     {{ activeTab === 'analiticas' ? 'Análisis y Estadísticas' : '' }}
+                    {{ activeTab === 'seguros' ? 'Gestión de Seguros' : '' }}
                     {{ activeTab === 'perfil' ? 'Mi Perfil' : '' }}
                 </h1>
                 <p>Bienvenido a tu panel de control de gastos.</p>

@@ -17,17 +17,17 @@
             </thead>
             <tbody>
                 <tr *ngFor="let driver of dataService.drivers()">
-                    <td style="font-weight: 600;">{{ driver.dni }}</td>
-                    <td>{{ driver.nombre }}</td>
-                    <td>{{ driver.telefono }}</td>
-                    <td>
+                    <td data-label="DNI" style="font-weight: 600;">{{ driver.dni }}</td>
+                    <td data-label="Nombre">{{ driver.nombre }}</td>
+                    <td data-label="Teléfono">{{ driver.telefono }}</td>
+                    <td data-label="Puntos">
                         <span class="status-badge" [class.active]="driver.puntos >= 12"
                             [class.warning]="driver.puntos < 12 && driver.puntos > 6"
                             [class.danger]="driver.puntos <= 6">
                             {{ driver.puntos }} pts
                         </span>
                     </td>
-                    <td *ngIf="isAdmin">
+                    <td data-label="Acciones" *ngIf="isAdmin">
                         <div style="display: flex; gap: 0.5rem;">
                             <button class="icon-btn edit" (click)="openEditModal(driver)"><span
                                     class="material-icons">edit</span></button>

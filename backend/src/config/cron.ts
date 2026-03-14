@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Vehicle } from '../entities/Vehicle';
 import { Driver } from '../entities/Driver';
 import { alertService } from '../services/alert.service';
+import { DriveService } from '../services/drive.service';
 
 export const setupCronJobs = () => {
     // Run daily at 08:00 AM for maintenance and document alerts
@@ -32,12 +33,13 @@ export const setupCronJobs = () => {
 
     // Run monthly summary for Admin (1st day of month at 09:00 AM)
     cron.schedule('0 9 1 * *', async () => {
-        console.log('[Cron] Running scheduled monthly report...');
+        console.log('[Cron] Running scheduled monthly tasks...');
         try {
             await alertService.sendMonthlyAdminSummary();
-            console.log('[Cron] Monthly report sent successfully.');
+            await DriveService.prepareMonthlyFolders();
+            console.log('[Cron] Monthly tasks completed successfully.');
         } catch (error) {
-            console.error('[Cron] Error in monthly report:', error);
+            console.error('[Cron] Error in monthly tasks:', error);
         }
     });
 

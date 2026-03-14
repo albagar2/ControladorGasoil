@@ -147,7 +147,11 @@ export class RefuelsComponent {
     }
 
     viewTicket(ticketPath: string) {
-        this.selectedReceiptUrl = `${environment.apiUrl.replace('/api', '')}/${ticketPath}`;
+        if (ticketPath.startsWith('http')) {
+            this.selectedReceiptUrl = ticketPath;
+        } else {
+            this.selectedReceiptUrl = `${environment.apiUrl.replace('/api', '')}/${ticketPath}`;
+        }
         this.showReceiptModal = true;
     }
 

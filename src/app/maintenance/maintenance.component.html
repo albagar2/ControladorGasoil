@@ -310,6 +310,9 @@
     </div>
 </div>
 
+<app-receipt-modal *ngIf="showReceiptModal" [receiptUrl]="selectedReceiptUrl" (close)="showReceiptModal = false">
+</app-receipt-modal>
+
 <!-- Modal OUTSIDE the animated container to avoid transform context issues -->
 <app-maintenance-form *ngIf="showModal" [maintenance]="currentMaintenance" [vehicles]="dataService.vehicles()"
     [drivers]="dataService.drivers()" (save)="onSaveMaintenance($event)" (cancel)="closeModal()" class="z-[9999]">

@@ -51,6 +51,14 @@ export const routes: Routes = [
             {
                 path: 'analiticas',
                 loadComponent: () => import('./dashboard/analytics/analytics.component').then(m => m.AnalyticsComponent)
+            },
+            {
+                path: 'seguros',
+                loadComponent: () => import('./seguros/seguros.component').then(m => m.SegurosComponent)
+            },
+            {
+                path: 'precios-gasoil',
+                loadComponent: () => import('./gas-prices/gas-prices.component').then(m => m.GasPricesComponent)
             }
         ]
     },

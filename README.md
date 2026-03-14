@@ -1,40 +1,29 @@
-# Vehicle Management System
+# Mi Garaje - Control de Gastos Familiar
 
-Full-stack application for managing family vehicles, drivers, and refueling logs.
+Aplicación privada para la gestión integral de vehículos, gastos de combustible, mantenimientos y seguros en un entorno familiar.
 
-## Project Structure
-- `src/`: Angular Frontend Application
-- `backend/`: Node.js/Express + MongoDB Backend Application
+> [!IMPORTANT]
+> **Propiedad Privada**: Esta aplicación es propiedad exclusiva del usuario. Todos los derechos reservados. No se permite la distribución o uso por terceros sin autorización.
 
-## Prerequisites
-- Node.js (v18+)
-- MongoDB (running locally or URI provided in `.env`)
+## Características Principales
 
-## Getting Started
+- 🚗 **Gestión de Vehículos**: Registro detallado de matriculación, combustible, distintivo ambiental y kilometraje actual.
+- ⛽ **Control de Repostajes**: Seguimiento de gastos en combustible con estadísticas de consumo y precio medio.
+- 🔧 **Mantenimientos**: Historial detallado de reparaciones, cambios de aceite y revisiones, con almacenamiento de facturas/tickets en Google Drive.
+- 🛡️ **Seguros**: Control de pólizas, precios, coberturas y fechas de renovación. Incluye acceso rápido a teléfonos de asistencia en carretera.
+- 📅 **Alertas Inteligentes**: Notificaciones automáticas para próximas revisiones de ITV y mantenimientos preventivos.
+- 👨‍👩‍👧‍👦 **Entorno Familiar**: Sistema de "Familias" para compartir vehículos y gastos entre varios conductores.
+- 📈 **Analíticas**: Gráficos interactivos de evolución de gastos mensuales y distribución de costes.
+- 🗺️ **Precios de Gasoil**: Consulta en tiempo real de los precios del diésel en gasolineras cercanas (Datos oficiales).
+- 📂 **Gestión en la Nube**: Organización automática de documentos en Google Drive por año y mes.
 
-### 1. Backend Setup
-The backend handles data persistence and API endpoints.
+## Tecnologías Utilizadas
 
-```bash
-cd backend
-npm install
-npm run dev
-```
-The server will start on `http://localhost:3000`.
+- **Frontend**: Angular con Signals para una reactividad moderna y eficiente.
+- **Backend**: Node.js con Express y TypeORM.
+- **Base de Datos**: PostgreSQL / Supabase.
+- **Integraciones**: Google Drive API para almacenamiento de archivos y SMTP para notificaciones por correo.
 
-### 2. Frontend Setup
-The Angular application provides the user interface.
+## Uso y Derechos
 
-```bash
-# In the root directory
-npm install
-ng serve
-```
-Navigate to `http://localhost:4200/`.
-
-## Features
-- **Dashboard**: Summary of vehicles, drivers, and costs.
-- **Vehicles**: Manage vehicle details (ITV, Insurance, etc.).
-- **Drivers**: Manage driver profiles.
-- **Refuels**: Track fuel consumption and costs.
-"# ControladorGasoil" 
+Esta aplicación ha sido desarrollada como un proyecto personalizado. El código y su funcionamiento están sujetos a la privacidad del propietario del repositorio.

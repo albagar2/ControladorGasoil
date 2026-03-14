@@ -22,17 +22,17 @@
       </thead>
       <tbody>
         <tr *ngFor="let car of dataService.vehicles()">
-          <td class="text-nowrap" style="font-weight: 600;">{{ car.matricula }}</td>
-          <td class="text-wrap" style="min-width: 100px;">{{ car.modelo }}</td>
-          <td class="hide-mobile text-wrap">{{ car.propietario?.nombre || ' - ' }}</td>
-          <td class="hide-tablet">{{ car.combustible }}</td>
-          <td class="text-nowrap"><span class="km-text">{{ car.kilometrajeActual | number }} km</span></td>
-          <td class="hide-mobile"><span class="status-badge badge-distintivo" [attr.data-type]="car.distintivo">{{
+          <td data-label="Matrícula" class="text-nowrap" style="font-weight: 600;">{{ car.matricula }}</td>
+          <td data-label="Modelo" class="text-wrap" style="min-width: 100px;">{{ car.modelo }}</td>
+          <td data-label="Propietario" class="hide-mobile text-wrap">{{ car.propietario?.nombre || ' - ' }}</td>
+          <td data-label="Combustible" class="hide-tablet">{{ car.combustible }}</td>
+          <td data-label="Kilometraje" class="text-nowrap"><span class="km-text">{{ car.kilometrajeActual | number }} km</span></td>
+          <td data-label="Distintivo" class="hide-mobile"><span class="status-badge badge-distintivo" [attr.data-type]="car.distintivo">{{
               car.distintivo }}</span>
           </td>
-          <td class="hide-tablet">{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
-          <td class="hide-tablet">{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
-          <td class="text-right">
+          <td data-label="ITV" class="hide-tablet">{{ car.itv_fecha_caducidad | date:'dd/MM/yyyy' }}</td>
+          <td data-label="Seguro" class="hide-tablet">{{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}</td>
+          <td data-label="Acciones" class="text-right">
             <div class="actions-wrapper">
               <button class="icon-btn edit" (click)="openEditModal(car)">
                 <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
@@ -120,6 +120,26 @@
         <label>Seguro Vencimiento</label>
         <input type="date" [ngModel]="currentVehicle.seguro_fecha_vencimiento | date:'yyyy-MM-dd'"
           (ngModelChange)="currentVehicle.seguro_fecha_vencimiento = $event" class="form-control">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Compañía Seguro</label>
+        <input type="text" [(ngModel)]="currentVehicle.seguro_compania" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Número Póliza</label>
+        <input type="text" [(ngModel)]="currentVehicle.seguro_numero_poliza" class="form-control">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Precio Seguro</label>
+        <input type="number" [(ngModel)]="currentVehicle.seguro_precio" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Teléfono Asistencia</label>
+        <input type="text" [(ngModel)]="currentVehicle.seguro_telefono_asistencia" class="form-control">
       </div>
     </div>
   </div>

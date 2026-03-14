@@ -51,14 +51,14 @@
             </thead>
             <tbody>
                 <tr *ngFor="let load of filteredRefuels">
-                    <td class="text-nowrap">{{ load.fecha | date:'dd/MM/yyyy' }}</td>
-                    <td class="text-wrap">{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
-                    <td class="hide-mobile">{{ load.kilometraje | number }} km</td>
-                    <td class="hide-tablet">{{ load.proveedor }}</td>
-                    <td class="hide-mobile">{{ load.litros }} L</td>
-                    <td class="hide-tablet">{{ load.precioPorLitro | currency:'EUR' }}</td>
-                    <td style="font-weight: 600; color: var(--primary);">{{ load.costeTotal | currency:'EUR' }}</td>
-                    <td class="actions-cell text-right">
+                    <td data-label="Fecha" class="text-nowrap">{{ load.fecha | date:'dd/MM/yyyy' }}</td>
+                    <td data-label="Vehículo" class="text-wrap">{{ load.vehiculo?.matricula || '(ID: ' + load.vehiculoId + ')' }}</td>
+                    <td data-label="KM" class="hide-mobile">{{ load.kilometraje | number }} km</td>
+                    <td data-label="Proveedor" class="hide-tablet">{{ load.proveedor }}</td>
+                    <td data-label="Litros" class="hide-mobile">{{ load.litros }} L</td>
+                    <td data-label="Precio/L" class="hide-tablet">{{ load.precioPorLitro | currency:'EUR' }}</td>
+                    <td data-label="Total" style="font-weight: 600; color: var(--primary);">{{ load.costeTotal | currency:'EUR' }}</td>
+                    <td data-label="Acciones" class="actions-cell text-right">
                         <div style="display: flex; gap: 0.5rem;">
                             <button *ngIf="load.ticketImageUrl" class="icon-btn info"
                                 (click)="viewTicket(load.ticketImageUrl)" title="Ver Ticket">

@@ -106,6 +106,7 @@ export class VehicleService {
 
         if (sanitized.itv_fecha_caducidad) sanitized.itv_fecha_caducidad = new Date(sanitized.itv_fecha_caducidad);
         if (sanitized.seguro_fecha_vencimiento) sanitized.seguro_fecha_vencimiento = new Date(sanitized.seguro_fecha_vencimiento);
+        if (sanitized.seguro_precio) sanitized.seguro_precio = parseFloat(sanitized.seguro_precio.toString());
 
         return sanitized;
     }

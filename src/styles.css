@@ -483,8 +483,73 @@ label {
 
   .btn-primary,
   .btn-secondary {
-    padding: 10px 16px;
-    font-size: 0.9rem;
+    padding: 12px 20px;
+    font-size: 1rem;
+    width: 100%; /* Full width buttons on mobile */
+  }
+
+  /* Responsive Table to Cards */
+  .table-responsive {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .data-table, 
+  .data-table thead, 
+  .data-table tbody, 
+  .data-table th, 
+  .data-table td, 
+  .data-table tr { 
+    display: block; 
+  }
+
+  .data-table thead tr { 
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .data-table tr { 
+    margin-bottom: 1.5rem;
+    background: var(--card-bg);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .data-table td { 
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.05); 
+    position: relative;
+    padding-left: 45% !important; 
+    text-align: right;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .data-table td:before { 
+    position: absolute;
+    left: 15px;
+    width: 40%; 
+    padding-right: 10px; 
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-muted);
+    content: attr(data-label);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .data-table td:last-child {
+    border-bottom: none;
+    background: rgba(79, 70, 229, 0.03);
+    padding-left: 12px !important;
+    justify-content: center;
   }
 }
 

@@ -8,6 +8,7 @@ import familyRoutes from './family.routes';
 import emailRoutes from './email.routes';
 import * as DriverController from '../controllers/driver.controller';
 import adminRoutes from './admin.routes';
+import gasRoutes from './gas.routes';
 import { checkJwt } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -30,6 +31,7 @@ router.use('/family', familyRoutes);
 router.use('/families', familyRoutes);
 router.use('/email', emailRoutes);
 router.use('/admin', adminRoutes);
+router.use('/gas-prices', gasRoutes);
 
 // Profile routes (Legacy / Shared)
 router.patch('/profile', checkJwt, DriverController.updateProfile);

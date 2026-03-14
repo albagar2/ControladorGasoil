@@ -49,6 +49,19 @@ export class DashboardComponent implements OnInit {
         });
     }
 
+    private tabTitles: { [key: string]: string } = {
+        'resumen': 'Resumen General',
+        'vehiculos': 'Gestión de Vehículos',
+        'conductores': 'Listado de Conductores',
+        'repostaje': 'Historial de Repostajes',
+        'familia': 'Gestión de Familia',
+        'mantenimiento': 'Registro de Mantenimientos',
+        'perfil': 'Mi Perfil',
+        'analiticas': 'Analíticas de Gastos',
+        'seguros': 'Gestión de Seguros',
+        'precios-gasoil': 'Precios de Gasoil'
+    };
+
     private updateActiveTab(url: string) {
         const parts = url.split('/');
         this.activeTab = parts[parts.length - 1] || 'resumen';

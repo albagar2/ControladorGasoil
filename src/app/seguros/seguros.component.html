@@ -1,0 +1,50 @@
+<app-table-card title="Gestión de Seguros">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Vehículo</th>
+          <th>Compañía</th>
+          <th>Póliza</th>
+          <th class="hide-mobile">Cobertura</th>
+          <th>Vencimiento</th>
+          <th class="hide-mobile">Precio</th>
+          <th>Asistencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let car of vehicles()">
+          <td data-label="Vehículo">
+            <div class="vehicle-info">
+              <span class="matricula">{{ car.matricula }}</span>
+              <span class="modelo hide-mobile">{{ car.modelo }}</span>
+            </div>
+          </td>
+          <td data-label="Compañía">{{ car.seguro_compania || '-' }}</td>
+          <td data-label="Póliza" class="text-nowrap">{{ car.seguro_numero_poliza || '-' }}</td>
+          <td data-label="Cobertura" class="hide-mobile">{{ car.seguro_cobertura || '-' }}</td>
+          <td data-label="Vencimiento">
+            <span class="status-badge" 
+                  [class.urgent]="isExpired(car.seguro_fecha_vencimiento)"
+                  [class.warning]="isExpiringSoon(car.seguro_fecha_vencimiento)">
+              {{ car.seguro_fecha_vencimiento | date:'dd/MM/yyyy' }}
+            </span>
+          </td>
+          <td data-label="Precio" class="hide-mobile text-nowrap">
+            {{ car.seguro_precio ? (car.seguro_precio | currency:'EUR':'symbol':'1.2-2') : '-' }}
+          </td>
+          <td data-label="Asistencia">
+            <a *ngIf="car.seguro_telefono_asistencia" [href]="'tel:' + car.seguro_telefono_asistencia" class="phone-link">
+              <span class="material-icons">phone</span>
+              <span class="hide-mobile">{{ car.seguro_telefono_asistencia }}</span>
+            </a>
+            <span *ngIf="!car.seguro_telefono_asistencia">-</span>
+          </td>
+        </tr>
+        <tr *ngIf="vehicles().length === 0">
+          <td colspan="7" style="text-align: center; padding: 2rem;">No hay vehículos registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</app-table-card>

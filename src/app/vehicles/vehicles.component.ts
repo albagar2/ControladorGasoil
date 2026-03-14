@@ -103,7 +103,7 @@ export class VehiclesComponent {
   private getEmptyVehicle(): Vehicle {
     return {
       matricula: '', modelo: '', combustible: '', distintivo: '',
-      seguro_compañia: '', seguro_numero_poliza: '',
+      seguro_compania: '', seguro_numero_poliza: '',
       seguro_fecha_vencimiento: new Date(), seguro_cobertura: '',
       itv_estado: '', itv_fecha_caducidad: new Date(),
       itv_kilometraje: 0, anioMatriculacion: new Date().getFullYear(),

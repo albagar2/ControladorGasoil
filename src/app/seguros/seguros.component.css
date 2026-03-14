@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.vehicle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.matricula {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modelo {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.status-badge.warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.urgent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.phone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+
+.phone-link:hover {
+  background: var(--bg-hover);
+}
+
+.phone-link .material-icons {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .status-badge {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,42 @@
+<div class="gas-container fade-in">
+    <div class="header-section">
+        <h2>🚀 Precios Diésel Más Baratos</h2>
+        <p>Precios actualizados en tiempo real (Fuente: Ministerio de Energía)</p>
+    </div>
+
+    <div class="controls-card card">
+        <div class="filter-group">
+            <label>Filtrar por Provincia:</label>
+            <select [(ngModel)]="province" (change)="loadPrices()" class="form-control">
+                <option *ngFor="let p of provinces" [value]="p">{{p}}</option>
+            </select>
+        </div>
+    </div>
+
+    <div *ngIf="loading()" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Buscando las mejores ofertas...</p>
+    </div>
+
+    <div class="gas-grid" *ngIf="!loading()">
+        <div class="station-card card" *ngFor="let s of gasStations()">
+            <div class="price-tag">
+                <span class="currency">€</span>
+                <span class="value">{{s.precioGasoilA}}</span>
+                <span class="unit">/L</span>
+            </div>
+            <div class="station-info">
+                <h3>{{s.rotulo}}</h3>
+                <p class="address"><span class="material-icons">place</span> {{s.direccion}}</p>
+                <p class="location">{{s.municipio}} ({{s.provincia}})</p>
+                <div class="additional-info">
+                    <span class="horario"><span class="material-icons">schedule</span> {{s.horario}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!loading() && gasStations().length === 0" class="no-data">
+        <p>No se encontraron estaciones en esta provincia.</p>
+    </div>
+</div>

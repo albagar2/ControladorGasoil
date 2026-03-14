@@ -25,8 +25,8 @@ export class Vehicle {
     distintivo!: DistintivoType;
 
     // Seguro (Flattened)
-    @Column({ name: 'seguro_compañia', nullable: true })
-    seguro_compañia!: string;
+    @Column({ name: 'seguro_compania', nullable: true })
+    seguro_compania!: string;
 
     @Column({ name: 'seguro_numero_poliza', nullable: true })
     seguro_numero_poliza!: string;
@@ -36,6 +36,12 @@ export class Vehicle {
 
     @Column({ type: 'enum', enum: ['Terceros', 'Terceros ampliado', 'Todo riesgo', 'Todo riesgo con franquicia'], name: 'seguro_cobertura', nullable: true })
     seguro_cobertura!: CoberturaType;
+
+    @Column({ type: 'decimal', precision: 10, scale: 2, name: 'seguro_precio', nullable: true })
+    seguro_precio!: number;
+
+    @Column({ name: 'seguro_telefono_asistencia', nullable: true })
+    seguro_telefono_asistencia!: string;
 
     // ITV (Flattened)
     @Column({ type: 'enum', enum: ['Pasada', 'Pendiente', 'Caducada', 'Favorable', 'Desfavorable'], default: 'Pendiente', name: 'itv_estado', nullable: true })

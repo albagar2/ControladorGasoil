@@ -7,10 +7,12 @@ export type Vehicle = {
     modelo: string;
     combustible: string;
     distintivo: string;
-    seguro_compañia: string;
+    seguro_compania: string;
     seguro_numero_poliza: string;
     seguro_fecha_vencimiento: Date;
     seguro_cobertura: string;
+    seguro_precio?: number;
+    seguro_telefono_asistencia?: string;
     itv_estado: string;
     itv_fecha_caducidad: Date;
     itv_kilometraje: number;

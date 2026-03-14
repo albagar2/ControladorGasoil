@@ -1,6 +1,7 @@
 import { AppDataSource } from '../data-source';
 import { Family } from '../entities/Family';
 import { Driver } from '../entities/Driver';
+import { DriveService } from './drive.service';
 
 export class FamilyService {
     private static familyRepository = AppDataSource.getRepository(Family);
@@ -38,6 +39,12 @@ export class FamilyService {
 
         driver.family = family;
         await this.driverRepository.save(driver as any);
+
+        if (driver.email) {
+            DriveService.recordDriverEmail(driver.email).catch(err => 
+                console.error('[FamilyService] Failed to record email in Drive:', err)
+            );
+        }
 
         return family;
     }
