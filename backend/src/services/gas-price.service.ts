@@ -12,7 +12,7 @@ export interface GasStation {
 }
 
 export class GasPriceService {
-    private static readonly BASE_URL = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/ServiciosRESTCarburante';
+    private static readonly BASE_URL = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes';
     
     private static readonly PROVINCE_MAP: Record<string, string> = {
         'Albacete': '02', 'Alicante': '03', 'Almería': '04', 'Ávila': '05', 'Badajoz': '06', 'Islas Baleares': '07', 
@@ -32,7 +32,8 @@ export class GasPriceService {
             const response = await request({
                 url: endpoint,
                 method: 'GET',
-                timeout: 25000
+                headers: { 'Accept': 'application/json' },
+                timeout: 30000
             });
             const data = (response.data as any).ListaEESSPrecio;
 
@@ -58,7 +59,7 @@ export class GasPriceService {
     }
 
     static async getPrices() {
-        return this.fetchFromApi(`${this.BASE_URL}/ListadoGasolineras/`);
+        return this.fetchFromApi(`${this.BASE_URL}/EstacionesTerrestres/`);
     }
 
     /**
@@ -84,7 +85,7 @@ export class GasPriceService {
                       .slice(0, limit);
         }
 
-        const data = await this.fetchFromApi(`${this.BASE_URL}/ListadoGasolineras/Provincia/${provinceId}`);
+        const data = await this.fetchFromApi(`${this.BASE_URL}/EstacionesTerrestres/FiltroProvincia/${provinceId}`);
         return data.sort((a: any, b: any) => parseFloat(a.precioGasoilA) - parseFloat(b.precioGasoilA)).slice(0, limit);
     }
 }
