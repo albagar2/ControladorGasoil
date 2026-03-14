@@ -28,19 +28,32 @@ export class GasPriceService {
 
     private static async fetchFromApi(endpoint: string) {
         try {
-            console.log(`[GasPriceService] Fetching from: ${endpoint}`);
+            console.log(`[GasPriceService] [${new Date().toISOString()}] Fetching from: ${endpoint}`);
             const response = await request({
                 url: endpoint,
                 method: 'GET',
-                headers: { 'Accept': 'application/json' },
+                headers: { 
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                },
                 timeout: 30000
             });
+            
+            console.log(`[GasPriceService] Response Status: ${response.status}`);
+            
+            if (!response.data) {
+                console.error('[GasPriceService] Empty response body');
+                return [];
+            }
+
             const data = (response.data as any).ListaEESSPrecio;
 
             if (!data) {
-                console.warn('[GasPriceService] No data received from API');
+                console.warn('[GasPriceService] No "ListaEESSPrecio" found in JSON. Response keys:', Object.keys(response.data));
                 return [];
             }
+
+            console.log(`[GasPriceService] Success: Found ${data.length} stations`);
 
             return data.map((item: any) => ({
                 id: item.IDEESS,
@@ -52,8 +65,12 @@ export class GasPriceService {
                 precioGasolina95E5: item['Precio Gasolina 95 E5']?.replace(',', '.') || null,
                 horario: item.Horario
             })).filter((item: any) => item.precioGasoilA !== null);
-        } catch (error) {
-            console.error('[GasPriceService] Error:', error);
+        } catch (error: any) {
+            console.error('[GasPriceService] CRITICAL ERROR:', error.message);
+            if (error.response) {
+                console.error('[GasPriceService] Response Status:', error.response.status);
+                console.error('[GasPriceService] Response Data Preview:', String(error.response.data).substring(0, 200));
+            }
             return [];
         }
     }
