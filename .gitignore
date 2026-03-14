@@ -8,6 +8,8 @@
 
 # Node
 /node_modules
+dist
+MIS_ACCESOS_PRIVADOS.md
 npm-debug.log
 yarn-error.log
 
