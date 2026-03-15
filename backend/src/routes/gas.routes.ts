@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { GasPriceService } from '../services/gas-price.service';
+import { checkJwt } from '../middleware/auth.middleware';
 
 const router = Router();
+
+router.use(checkJwt);
 
 router.get('/cheapest', asyncHandler(async (req, res) => {
     const province = (req.query.province as string) || 'Madrid';

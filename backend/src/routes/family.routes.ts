@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as FamilyController from '../controllers/family.controller';
 import { checkJwt } from '../middleware/auth.middleware';
+import { checkAdmin } from '../middleware/admin.middleware';
 
 const router = Router();
 
@@ -12,8 +13,8 @@ router.post('/join', FamilyController.joinFamily);
 router.get('/my-family', FamilyController.getMyFamily);
 
 // Admin routes
-router.get('/admin/all', FamilyController.getAllFamilies);
-router.post('/admin', FamilyController.createFamilyAdmin);
-router.delete('/:id', FamilyController.deleteFamily); // Supports DELETE /api/families/:id
+router.get('/admin/all', checkAdmin, FamilyController.getAllFamilies);
+router.post('/admin', checkAdmin, FamilyController.createFamilyAdmin);
+router.delete('/:id', checkAdmin, FamilyController.deleteFamily); // Supports DELETE /api/families/:id
 
 export default router;
