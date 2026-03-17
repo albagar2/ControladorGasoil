@@ -136,14 +136,23 @@ export class MaintenanceService {
 
     private static sanitize(data: any) {
         const sanitized = { ...data };
+
+        // Clean up nested entities coming from the frontend
+        delete sanitized.vehiculo;
+        delete sanitized.conductor;
+        delete sanitized.ticket;
+
         if (sanitized.vehiculoId) sanitized.vehiculoId = parseInt(sanitized.vehiculoId.toString());
         if (sanitized.kilometraje) sanitized.kilometraje = parseInt(sanitized.kilometraje.toString());
         if (sanitized.costePieza) sanitized.costePieza = parseFloat(sanitized.costePieza.toString());
         if (sanitized.costeTaller) sanitized.costeTaller = parseFloat(sanitized.costeTaller.toString());
 
-        if (sanitized.conductorId) {
-            const cId = parseInt(sanitized.conductorId.toString());
-            sanitized.conductorId = cId !== 0 ? cId : null;
+        if (sanitized.conductorId !== undefined) {
+            if (sanitized.conductorId === null || sanitized.conductorId === 'null' || sanitized.conductorId === 0 || sanitized.conductorId === '0' || sanitized.conductorId === '') {
+                sanitized.conductorId = null;
+            } else {
+                sanitized.conductorId = parseInt(sanitized.conductorId.toString());
+            }
         }
 
         if (sanitized.fecha) sanitized.fecha = new Date(sanitized.fecha);

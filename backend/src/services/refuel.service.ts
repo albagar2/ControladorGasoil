@@ -42,10 +42,9 @@ export class RefuelService {
         }
 
         // Handle File Upload
-        let ticketImageUrl = sanitizedData.ticketImageUrl;
         if (file) {
             const publicUrl = await DriveService.uploadTicket(file.path, vehicle);
-            ticketImageUrl = publicUrl || `uploads/${file.filename}`;
+            sanitizedData.ticketImageUrl = publicUrl || `uploads/${file.filename}`;
         }
 
         const newRefuel = this.refuelRepository.create(sanitizedData as any) as any;
@@ -60,7 +59,10 @@ export class RefuelService {
         // Alerts (Non-blocking)
         alertService.checkAndSendAlerts(savedRefuel.vehiculoId).catch(console.error);
 
-        return savedRefuel;
+        return await this.refuelRepository.findOne({
+            where: { id: savedRefuel.id },
+            relations: ["vehiculo", "conductor"]
+        });
     }
 
     static async update(id: number, data: any, file?: any, user?: any) {
@@ -128,15 +130,24 @@ export class RefuelService {
 
     private static sanitize(data: any) {
         const sanitized = { ...data };
+
+        // Remove nested objects that shouldn't be saved as columns
+        delete sanitized.vehiculo;
+        delete sanitized.conductor;
+        delete sanitized.ticket; // Remove the file field itself if sent as a normal body field
+
         if (sanitized.vehiculoId) sanitized.vehiculoId = parseInt(sanitized.vehiculoId.toString());
         if (sanitized.kilometraje) sanitized.kilometraje = parseInt(sanitized.kilometraje.toString());
         if (sanitized.litros) sanitized.litros = parseFloat(sanitized.litros.toString());
         if (sanitized.precioPorLitro) sanitized.precioPorLitro = parseFloat(sanitized.precioPorLitro.toString());
         if (sanitized.costeTotal) sanitized.costeTotal = parseFloat(sanitized.costeTotal.toString());
 
-        if (sanitized.conductorId) {
-            const cId = parseInt(sanitized.conductorId.toString());
-            sanitized.conductorId = cId !== 0 ? cId : null;
+        if (sanitized.conductorId !== undefined) {
+            if (sanitized.conductorId === null || sanitized.conductorId === 'null' || sanitized.conductorId === 0 || sanitized.conductorId === '0' || sanitized.conductorId === '') {
+                sanitized.conductorId = null;
+            } else {
+                sanitized.conductorId = parseInt(sanitized.conductorId.toString());
+            }
         }
 
         if (typeof sanitized.fecha === 'string' && sanitized.fecha.trim() !== '') {

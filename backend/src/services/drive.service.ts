@@ -137,18 +137,23 @@ export class DriveService {
             const month = months[now.getMonth()];
 
             const yearFolderId = await this.getOrCreateSubfolder(rootFolderId, year);
-            if (!yearFolderId) return null;
+            if (!yearFolderId) throw new Error(`Could not get/create year folder: ${year}`);
 
             const monthFolderId = await this.getOrCreateSubfolder(yearFolderId, month);
-            if (!monthFolderId) return null;
+            if (!monthFolderId) throw new Error(`Could not get/create month folder: ${month}`);
 
             const fileMetadata = {
                 name: fileName,
                 parents: [monthFolderId]
             };
 
+            const ext = path.extname(fileName).toLowerCase();
+            const mimeType = ext === '.pdf' ? 'application/pdf' : (ext === '.png' ? 'image/png' : 'image/jpeg');
+
+            console.log(`[DriveService] Uploading ${fileName} to Drive folder ${monthFolderId} (${month}) with mimeType ${mimeType}...`);
+
             const media = {
-                mimeType: 'image/jpeg',
+                mimeType,
                 body: fs.createReadStream(localPath)
             };
 
