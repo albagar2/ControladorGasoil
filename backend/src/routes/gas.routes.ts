@@ -9,8 +9,9 @@ router.use(checkJwt);
 
 router.get('/cheapest', asyncHandler(async (req, res) => {
     const province = (req.query.province as string) || 'Madrid';
-    const limit = parseInt(req.query.limit as string) || 5;
-    const prices = await GasPriceService.getCheapestByProvince(province, limit);
+    const municipality = req.query.municipality as string;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const prices = await GasPriceService.getCheapestByProvince(province, limit, municipality);
     res.json(prices);
 }));
 

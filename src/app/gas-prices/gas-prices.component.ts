@@ -16,6 +16,7 @@ export class GasPricesComponent implements OnInit {
   gasStations = signal<any[]>([]);
   loading = signal(false);
   province = signal('Madrid');
+  municipality = signal('');
   provinces = [
     'A Coruña', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila', 'Badajoz', 'Barcelona', 'Burgos', 'Cáceres', 
     'Cádiz', 'Cantabria', 'Castellón', 'Ceuta', 'Ciudad Real', 'Córdoba', 'Cuenca', 'Girona', 'Granada', 'Guadalajara', 
@@ -31,9 +32,8 @@ export class GasPricesComponent implements OnInit {
   loadPrices() {
     this.loading.set(true);
     this.gasStations.set([]);
-    this.gasService.getCheapestInProvince(this.province()).subscribe({
+    this.gasService.getCheapestInProvince(this.province(), 25, this.municipality()).subscribe({
       next: (data) => {
-        console.log(`[GasPricesComponent] Received ${data.length} stations for ${this.province()}`);
         this.gasStations.set(data);
         this.loading.set(false);
       },

@@ -17,13 +17,18 @@
                     <span class="material-icons">room</span>
                 </div>
                 <div class="filter-select-wrapper">
-                    <label>Provincia a consultar</label>
+                    <label>Provincia</label>
                     <select [(ngModel)]="province" (change)="loadPrices()" class="glass-select">
                         <option *ngFor="let p of provinces" [value]="p">{{p}}</option>
                     </select>
                 </div>
-                <button (click)="loadPrices()" class="refresh-btn" [class.rotating]="loading()" title="Actualizar">
-                    <span class="material-icons">refresh</span>
+                <div class="filter-input-wrapper">
+                    <label>Pueblo / Municipio</label>
+                    <input type="text" [(ngModel)]="municipality" (keyup.enter)="loadPrices()" placeholder="Ej: Móstoles..." class="glass-input">
+                </div>
+                <button (click)="loadPrices()" class="search-btn">
+                    <span class="material-icons">search</span>
+                    Buscar
                 </button>
             </div>
         </div>

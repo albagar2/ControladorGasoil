@@ -55,6 +55,10 @@
                 <span class="material-icons">manage_accounts</span>
                 <span>Configuración</span>
             </a>
+            <a class="nav-item" routerLink="soporte" routerLinkActive="active">
+                <span class="material-icons">help</span>
+                <span>Soporte</span>
+            </a>
             <div class="nav-spacer"></div>
             <a class="nav-item logout" (click)="logout()">
                 <span class="material-icons">logout</span>
@@ -121,6 +125,10 @@
                     <span class="material-icons">manage_accounts</span>
                     <span>Perfil</span>
                 </a>
+                <a class="menu-item" routerLink="soporte" (click)="closeMobileMenu()">
+                    <span class="material-icons">help</span>
+                    <span>Soporte</span>
+                </a>
                 <a class="menu-item logout" (click)="logout()">
                     <span class="material-icons">logout</span>
                     <span>Cerrar Sesión</span>
@@ -145,6 +153,7 @@
                     {{ activeTab === 'analiticas' ? 'Análisis y Estadísticas' : '' }}
                     {{ activeTab === 'seguros' ? 'Gestión de Seguros' : '' }}
                     {{ activeTab === 'perfil' ? 'Mi Perfil' : '' }}
+                    {{ activeTab === 'soporte' ? 'Ayuda y Soporte' : '' }}
                 </h1>
                 <p>Bienvenido a tu panel de control de gastos.</p>
             </div>

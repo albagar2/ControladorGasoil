@@ -59,6 +59,10 @@ export const routes: Routes = [
             {
                 path: 'precios-gasoil',
                 loadComponent: () => import('./gas-prices/gas-prices.component').then(m => m.GasPricesComponent)
+            },
+            {
+                path: 'soporte',
+                loadComponent: () => import('./support/support.component').then(m => m.SupportComponent)
             }
         ]
     },

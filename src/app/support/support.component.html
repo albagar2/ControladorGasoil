@@ -1,0 +1,35 @@
+<div class="support-container fade-in">
+    <div class="support-header">
+        <h1>Centro de <span class="highlight">Soporte</span></h1>
+        <p>¿Tienes algún problema con la aplicación? Estamos aquí para ayudarte.</p>
+    </div>
+
+    <div class="support-grid">
+        <div class="support-card" *ngFor="let option of supportOptions">
+            <div class="card-icon" [style.background-color]="option.color">
+                <span class="material-icons">{{option.icon}}</span>
+            </div>
+            <h3>{{option.title}}</h3>
+            <p>{{option.description}}</p>
+            <a [href]="option.link" target="_blank" class="support-btn" [style.border-color]="option.color" [style.color]="option.color">
+                Conectar
+            </a>
+        </div>
+    </div>
+
+    <div class="faq-section">
+        <h2>Preguntas Frecuentes</h2>
+        <div class="faq-item">
+            <details>
+                <summary>¿Cómo añado un nuevo vehículo?</summary>
+                <p>Ve a la sección 'Vehículos' y haz clic en el botón '+' para registrar los datos de tu coche o moto.</p>
+            </details>
+        </div>
+        <div class="faq-item">
+            <details>
+                <summary>¿Cómo se calculan los gastos?</summary>
+                <p>La aplicación analiza tus repostajes y reparaciones para mostrarte el coste por kilómetro y el consumo medio.</p>
+            </details>
+        </div>
+    </div>
+</div>

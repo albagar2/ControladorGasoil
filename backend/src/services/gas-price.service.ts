@@ -80,9 +80,9 @@ export class GasPriceService {
     }
 
     /**
-     * Get cheapest gas stations in a specific province
+     * Get cheapest gas stations in a specific province and optionally a municipality
      */
-    static async getCheapestByProvince(province: string, limit: number = 10) {
+    static async getCheapestByProvince(province: string, limit: number = 10, municipality?: string) {
         const normalizedInput = province.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         let provinceId = '';
 
@@ -94,15 +94,23 @@ export class GasPriceService {
             }
         }
 
+        let data: any[] = [];
         if (!provinceId) {
             console.warn(`[GasPriceService] No ID found for: ${province}. Filtering manually.`);
             const all = await this.getPrices();
-            return all.filter((s: any) => s.provincia.toLowerCase().includes(province.toLowerCase()))
-                      .sort((a: any, b: any) => parseFloat(a.precioGasoilA) - parseFloat(b.precioGasoilA))
-                      .slice(0, limit);
+            data = all.filter((s: any) => s.provincia.toLowerCase().includes(province.toLowerCase()));
+        } else {
+            data = await this.fetchFromApi(`${this.BASE_URL}/EstacionesTerrestres/FiltroProvincia/${provinceId}`);
         }
 
-        const data = await this.fetchFromApi(`${this.BASE_URL}/EstacionesTerrestres/FiltroProvincia/${provinceId}`);
+        if (municipality) {
+            const normMuni = municipality.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            data = data.filter((s: any) => {
+                const sMuni = s.municipio.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return sMuni.includes(normMuni);
+            });
+        }
+
         return data.sort((a: any, b: any) => parseFloat(a.precioGasoilA) - parseFloat(b.precioGasoilA)).slice(0, limit);
     }
 }

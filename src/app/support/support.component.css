@@ -1,0 +1,119 @@
+.support-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.support-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.support-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.highlight {
+    color: var(--logo-primary, #4285F4);
+}
+
+.support-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.support-card {
+    background: var(--card-bg, #ffffff);
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.support-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.5rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.support-btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    border: 2px solid;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.support-btn:hover {
+    background: currentColor;
+    color: white !important;
+}
+
+.faq-section {
+    background: var(--card-bg, #ffffff);
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.faq-section h2 {
+    margin-bottom: 2rem;
+}
+
+.faq-item {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 1rem 0;
+}
+
+.faq-item summary {
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    padding-right: 2rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: 'expand_more';
+    font-family: 'Material Icons';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s;
+}
+
+.faq-item details[open] summary::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-item p {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+}

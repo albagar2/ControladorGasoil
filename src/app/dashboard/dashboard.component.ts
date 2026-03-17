@@ -59,7 +59,8 @@ export class DashboardComponent implements OnInit {
         'perfil': 'Mi Perfil',
         'analiticas': 'Analíticas de Gastos',
         'seguros': 'Gestión de Seguros',
-        'precios-gasoil': 'Precios de Gasoil'
+        'precios-gasoil': 'Precios de Gasoil',
+        'soporte': 'Ayuda y Soporte'
     };
 
     private updateActiveTab(url: string) {

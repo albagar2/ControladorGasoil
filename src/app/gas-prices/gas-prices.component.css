@@ -76,6 +76,7 @@
 .main-title .highlight {
     background: linear-gradient(135deg, #a5b4fc 0%, #38bdf8 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -136,15 +137,24 @@
     margin-bottom: 2px;
 }
 
-.glass-select {
+.glass-select, .glass-input {
     background: transparent;
     border: none;
     color: white;
-    font-size: 1.35rem;
+    font-size: 1.15rem;
     font-weight: 700;
     outline: none;
     cursor: pointer;
     width: 100%;
+}
+
+.glass-input {
+    cursor: text;
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
 }
 
 .glass-select option {
@@ -152,20 +162,40 @@
     color: white;
 }
 
-.refresh-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    width: 48px;
-    height: 48px;
+.search-btn {
+    background: white;
+    color: var(--gas-primary);
+    border: none;
+    padding: 0.8rem 1.5rem;
     border-radius: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.refresh-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(30deg);
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    background: #f8faff;
+}
+
+.filter-input-wrapper {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-input-wrapper label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2px;
 }
 
 .rotating span {
@@ -396,8 +426,20 @@
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 768px) {
-    .main-title { font-size: 2.5rem; }
-    .hero-header { height: 300px; }
-    .filter-inner { gap: 1rem; }
+    .main-title { font-size: 2.2rem; }
+    .hero-header { height: 280px; }
+    .filter-inner { 
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
     .input-icon { display: none; }
+    .filter-glass-card {
+        border-radius: 20px;
+        padding: 1.5rem;
+    }
+    .search-btn {
+        justify-content: center;
+        padding: 1rem;
+    }
 }
