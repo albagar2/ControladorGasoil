@@ -24,11 +24,15 @@
                 </div>
                 <div class="filter-input-wrapper">
                     <label>Pueblo / Municipio</label>
-                    <input type="text" [(ngModel)]="municipality" (keyup.enter)="loadPrices()" placeholder="Ej: Móstoles..." class="glass-input">
+                    <div class="input-with-clear">
+                        <input type="text" [(ngModel)]="municipality" (keyup.enter)="loadPrices()" placeholder="Ej: Móstoles..." class="glass-input">
+                        <span class="material-icons clear-icon" *ngIf="municipality()" (click)="municipality.set(''); loadPrices()">close</span>
+                    </div>
                 </div>
-                <button (click)="loadPrices()" class="search-btn">
-                    <span class="material-icons">search</span>
-                    Buscar
+                <button (click)="loadPrices()" class="search-btn" [disabled]="loading()">
+                    <span class="material-icons" *ngIf="!loading()">search</span>
+                    <span class="material-icons rotating" *ngIf="loading()">sync</span>
+                    <span>{{ loading() ? 'Buscando...' : 'Buscar' }}</span>
                 </button>
             </div>
         </div>
