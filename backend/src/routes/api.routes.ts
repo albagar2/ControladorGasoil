@@ -6,6 +6,7 @@ import refuelRoutes from './refuel.routes';
 import maintenanceRoutes from './maintenance.routes';
 import familyRoutes from './family.routes';
 import emailRoutes from './email.routes';
+import { AppDataSource } from '../data-source';
 import * as DriverController from '../controllers/driver.controller';
 import adminRoutes from './admin.routes';
 import gasRoutes from './gas.routes';
@@ -14,10 +15,12 @@ import { checkJwt } from '../middleware/auth.middleware';
 const router = Router();
 
 // API Status Route
-router.get('/status', (req, res) => {
+router.get('/status', async (req, res) => {
+    const dbStatus = AppDataSource.isInitialized ? 'connected' : 'disconnected';
     res.json({
         message: 'Welcome to the Vehicle Management API',
         status: 'operational',
+        database: dbStatus,
         timestamp: new Date()
     });
 });

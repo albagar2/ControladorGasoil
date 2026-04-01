@@ -43,3 +43,25 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Security and Secrets
+.env
+backend/.env
+*.json
+!package.json
+!tsconfig*.json
+!angular.json
+!project.json
+*.key
+*.pem
+MIS_ACCESOS_PRIVADOS.md
+mi_base_de_datos.sql
+backend/controlador-gassoil-*.json
+backend/*.log
+frontend_restart.log
+build_dev.log
+build_output.log
+test_output.txt
+folder_check_result.txt
+match_results.txt
+users_list.txt

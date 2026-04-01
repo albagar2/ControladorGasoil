@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -16,6 +17,17 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Base Security
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            "default-src": ["'self'"],
+            "img-src": ["'self'", "data:", "https://*"],
+        }
+    }
+}));
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '../uploads');
