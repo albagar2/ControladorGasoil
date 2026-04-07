@@ -11,6 +11,7 @@ import * as DriverController from '../controllers/driver.controller';
 import adminRoutes from './admin.routes';
 import gasRoutes from './gas.routes';
 import { checkJwt } from '../middleware/auth.middleware';
+import { dbError } from '../server';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.get('/status', async (req, res) => {
         message: 'Welcome to the Vehicle Management API',
         status: 'operational',
         database: dbStatus,
+        error: dbStatus === 'disconnected' ? dbError : null,
         timestamp: new Date()
     });
 });

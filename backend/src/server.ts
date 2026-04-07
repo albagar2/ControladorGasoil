@@ -86,6 +86,8 @@ app.get('/', (req, res) => {
 // Global Error Handling
 app.use(errorMiddleware);
 
+let dbError: string | null = null;
+
 // Start server immediately
 app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Server is running on http://0.0.0.0:${PORT}`);
@@ -94,6 +96,7 @@ app.listen(Number(PORT), '0.0.0.0', () => {
     AppDataSource.initialize()
         .then(async () => {
             console.log("Data Source has been initialized!");
+            dbError = null;
 
             // Wait a bit for synchronize: true to finish and stable
             console.log("Waiting for database stabilization...");
@@ -114,5 +117,8 @@ app.listen(Number(PORT), '0.0.0.0', () => {
         })
         .catch((err) => {
             console.error("Error during Data Source initialization:", err);
+            dbError = err.message || String(err);
         });
 });
+
+export { dbError };
