@@ -49,8 +49,17 @@ export class LoginComponent implements OnInit {
                 this.isLoading = false;
             },
             error: (err) => {
-                this.toastService.error('Credenciales incorrectas o error de conexión.');
-                console.error(err);
+                const serverMsg = err?.error?.message;
+                if (err.status === 0) {
+                    this.toastService.error('No se puede conectar con el servidor. Comprueba tu conexión.');
+                } else if (err.status === 503) {
+                    this.toastService.error('El servidor está arrancando. Espera unos segundos e inténtalo de nuevo.');
+                } else if (serverMsg) {
+                    this.toastService.error(serverMsg);
+                } else {
+                    this.toastService.error('Credenciales incorrectas o error de conexión.');
+                }
+                console.error('Login error:', err);
                 this.isLoading = false;
             }
         });

@@ -5,7 +5,6 @@ import { AppDataSource } from '../data-source';
 import { Driver } from '../entities/Driver';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
-const driverRepository = AppDataSource.getRepository(Driver);
 
 export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
     const header = req.headers['authorization'];
@@ -21,10 +20,14 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
     }
 
     try {
+        if (!AppDataSource.isInitialized) {
+            return res.status(503).json({ message: 'Base de datos no disponible. Inténtalo de nuevo en unos segundos.' });
+        }
+
         const decoded = jwt.verify(token, JWT_SECRET) as any;
         const userId = decoded.id || decoded.userId;
 
-        // Fetch user to get current familyId and role from DB (more secure than token)
+        const driverRepository = AppDataSource.getRepository(Driver);
         const user = await driverRepository.findOneBy({ id: userId });
 
         if (!user) {
