@@ -136,7 +136,10 @@ export const matchTicketsFolder = asyncHandler(async (req: Request, res: Respons
 
     const getFiles = (dir: string): string[] => {
         let results: string[] = [];
-        if (!fs.existsSync(dir)) return [];
+        if (!fs.existsSync(dir)) {
+            console.warn(`[AdminController] Directory not found: ${dir}`);
+            return [];
+        }
         const list = fs.readdirSync(dir);
         list.forEach(file => {
             const fPath = path.join(dir, file);
@@ -148,6 +151,10 @@ export const matchTicketsFolder = asyncHandler(async (req: Request, res: Respons
         });
         return results;
     };
+
+    if (!fs.existsSync(ticketsPath)) {
+        return res.status(404).json({ message: `Carpeta de tickets no encontrada en el servidor: ${ticketsPath}` });
+    }
 
     const files = getFiles(ticketsPath);
     const results = [];
