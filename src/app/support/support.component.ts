@@ -15,14 +15,14 @@ export class SupportComponent {
       description: 'Asistencia técnica inmediata',
       icon: 'chat',
       color: '#25D366',
-      link: 'https://wa.me/34600000000'
+      link: 'https://wa.me/34606990974'
     },
     {
       title: 'Email',
       description: 'Consultas generales y reportes',
       icon: 'email',
       color: '#EA4335',
-      link: 'mailto:soporte@migaraje.com'
+      link: 'mailto:controlgasoilfamiliar@gmail.com'
     },
     {
       title: 'Manual',
