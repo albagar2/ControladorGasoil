@@ -29,7 +29,7 @@ export class SupportComponent {
       description: 'Guía de uso rápido',
       icon: 'menu_book',
       color: '#4285F4',
-      link: '/assets/manual.pdf'
+      link: '/assets/manual.html'
     }
   ];
 }
