@@ -17,8 +17,8 @@ echo Sincronizando IP %IP% con el codigo...
 echo ######################################################
 
 :: Actualizar apiUrl en los archivos de environment de Angular
-powershell -Command "(gc src/environments/environment.ts) -replace 'apiUrl: .*', 'apiUrl: ''http://%IP%:3001/api''' | Out-File -encoding utf8 src/environments/environment.ts"
-powershell -Command "(gc src/environments/environment.development.ts) -replace 'apiUrl: .*', 'apiUrl: ''http://%IP%:3001/api''' | Out-File -encoding utf8 src/environments/environment.development.ts"
+powershell -Command "(gc src/environments/environment.ts) -replace 'apiUrl: .*', 'apiUrl: ''http://%IP%:3002/api''' | Out-File -encoding utf8 src/environments/environment.ts"
+powershell -Command "(gc src/environments/environment.development.ts) -replace 'apiUrl: .*', 'apiUrl: ''http://%IP%:3002/api''' | Out-File -encoding utf8 src/environments/environment.development.ts"
 
 echo.
 echo ######################################################
