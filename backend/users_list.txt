@@ -1,6 +1,0 @@
----------------------------------------------------
-Existing Users (Passwords are hashed and not visible):
----------------------------------------------------
-ID: 1 | Name: Admin User | Email: admin@example.com | Role: admin
-ID: 2 | Name: Juan Conductor | Email: juan@example.com | Role: conductor
----------------------------------------------------
