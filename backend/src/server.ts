@@ -112,6 +112,10 @@ async function bootstrap() {
             console.warn("⚠️ Email service failure. Check credentials and fallback logs.");
         }
 
+        // Initialize Drive folders in background
+        const { DriveService } = require('./services/drive.service');
+        DriveService.prepareMonthlyFolders().catch(console.error);
+
     } catch (err: any) {
         console.error("❌ Critical failure during bootstrapping:", err);
         dbError = err.message || String(err);

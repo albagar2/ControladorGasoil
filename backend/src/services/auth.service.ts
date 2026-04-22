@@ -64,7 +64,7 @@ export class AuthService {
         if (existing) throw new Error('El DNI o Email ya están registrados.');
 
         let assignedFamilyId: number | undefined;
-        let assignedRole = 'conductor'; // Default role
+        let assignedRole = (role === 'leader' || role === 'conductor') ? role : 'conductor';
 
         // Security: Prevent registering as admin unless no admins exist
         if (role === 'admin') {
@@ -86,7 +86,7 @@ export class AuthService {
             });
             const savedFamily = await familyRepository.save(newFamily);
             assignedFamilyId = savedFamily.id;
-            assignedRole = 'leader'; // First user of a family is the leader
+            assignedRole = 'leader'; // Priority: If creating a family, role is leader
         } else if (familyCodigo) {
             // Join existing family
             const existingFamily = await familyRepository.findOne({ where: { codigo: familyCodigo.toUpperCase() } });

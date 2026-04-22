@@ -150,6 +150,34 @@
 
             <div class="family-section">
                 <div class="licenses-header">
+                    <h3>Tipo de Perfil</h3>
+                </div>
+                <div class="family-options">
+                    <label class="radio-card" [class.active]="driver.role === 'conductor'">
+                        <input type="radio" name="userRole" value="conductor" [(ngModel)]="driver.role" (change)="onRoleChange()">
+                        <div class="radio-content">
+                            <span class="material-icons">person</span>
+                            <span>Conductor</span>
+                        </div>
+                    </label>
+                    <label class="radio-card" [class.active]="driver.role === 'leader'">
+                        <input type="radio" name="userRole" value="leader" [(ngModel)]="driver.role" (change)="onRoleChange()">
+                        <div class="radio-content">
+                            <span class="material-icons">stars</span>
+                            <span>Cabeza de Familia</span>
+                        </div>
+                    </label>
+                </div>
+                <p class="role-description" *ngIf="driver.role === 'leader'">
+                    Como <strong>Cabeza de Familia</strong>, podrás crear una nueva familia y administrar sus vehículos y conductores.
+                </p>
+                <p class="role-description" *ngIf="driver.role === 'conductor'">
+                    Como <strong>Conductor</strong>, podrás unirte a una familia existente o gestionar tus propios repostajes.
+                </p>
+            </div>
+
+            <div class="family-section animate-fade-in" *ngIf="driver.role === 'conductor'">
+                <div class="licenses-header">
                     <h3>Gestión de Familia</h3>
                 </div>
                 
@@ -157,15 +185,8 @@
                     <label class="radio-card" [class.active]="familyOption === 'none'">
                         <input type="radio" name="familyOption" value="none" [(ngModel)]="familyOption">
                         <div class="radio-content">
-                            <span class="material-icons">person</span>
+                            <span class="material-icons">no_accounts</span>
                             <span>Sin familia</span>
-                        </div>
-                    </label>
-                    <label class="radio-card" [class.active]="familyOption === 'create'">
-                        <input type="radio" name="familyOption" value="create" [(ngModel)]="familyOption">
-                        <div class="radio-content">
-                            <span class="material-icons">group_add</span>
-                            <span>Crear nueva</span>
                         </div>
                     </label>
                     <label class="radio-card" [class.active]="familyOption === 'join'">
@@ -177,21 +198,26 @@
                     </label>
                 </div>
 
-                <div *ngIf="familyOption === 'create'" class="form-group mt-3 animate-fade-in">
-                    <label for="familyNombre">Nombre de la Familia</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="familyNombre" [(ngModel)]="driver.familyNombre" name="familyNombre" 
-                               placeholder="Ej: Los Pérez" required>
-                    </div>
-                    <small class="form-hint">Se generará un código único para que otros se unan.</small>
-                </div>
-
                 <div *ngIf="familyOption === 'join'" class="form-group mt-3 animate-fade-in">
                     <label for="familyCodigo">Código de Invitación</label>
                     <div class="input-wrapper">
                         <input type="text" id="familyCodigo" [(ngModel)]="driver.familyCodigo" name="familyCodigo" 
                                placeholder="Ej: A1B2C3" required style="text-transform: uppercase;">
                     </div>
+                </div>
+            </div>
+
+            <div class="family-section animate-fade-in" *ngIf="driver.role === 'leader'">
+                <div class="licenses-header">
+                    <h3>Tu Nueva Familia</h3>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="familyNombre">Nombre de la Familia</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="familyNombre" [(ngModel)]="driver.familyNombre" name="familyNombre" 
+                               placeholder="Ej: Los Pérez" required>
+                    </div>
+                    <small class="form-hint">Se generará un código único para que otros conductores se unan a ti.</small>
                 </div>
             </div>
 

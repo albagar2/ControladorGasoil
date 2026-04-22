@@ -64,6 +64,16 @@ export class RegisterComponent implements OnInit {
         this.showConfirmPassword = !this.showConfirmPassword;
     }
 
+    onRoleChange() {
+        if (this.driver.role === 'leader') {
+            this.familyOption = 'create';
+            this.driver.familyCodigo = '';
+        } else {
+            this.familyOption = 'none';
+            this.driver.familyNombre = '';
+        }
+    }
+
     register() {
         if (this.isLoading) return;
 
@@ -92,13 +102,29 @@ export class RegisterComponent implements OnInit {
         this.driver.fechaRenovacionCarnet = minDate;
 
         const registrationData = { ...this.driver };
-        if (this.familyOption === 'create') {
+        
+        // Final sanity check for roles and family data
+        if (registrationData.role === 'leader') {
+            if (!registrationData.familyNombre) {
+                this.errorMessage = 'Debes indicar un nombre para tu familia.';
+                this.isLoading = false;
+                return;
+            }
             delete registrationData.familyCodigo;
-        } else if (this.familyOption === 'join') {
-            delete registrationData.familyNombre;
         } else {
-            delete registrationData.familyNombre;
-            delete registrationData.familyCodigo;
+            // Conductor logic
+            if (this.familyOption === 'join') {
+                if (!registrationData.familyCodigo) {
+                    this.errorMessage = 'Debes introducir un código de familia.';
+                    this.isLoading = false;
+                    return;
+                }
+                delete registrationData.familyNombre;
+            } else {
+                // Sin familia
+                delete registrationData.familyNombre;
+                delete registrationData.familyCodigo;
+            }
         }
 
         this.authService.register(registrationData).subscribe({

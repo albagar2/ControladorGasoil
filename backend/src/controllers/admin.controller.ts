@@ -146,8 +146,9 @@ export const migratePhotos = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const matchTicketsFolder = asyncHandler(async (req: Request, res: Response) => {
-    // Temporary bypass for local triggering
-    const ticketsPath = 'c:/Users/bacia/Desktop/controlGasoilFamiliar/tickets';
+    // Path where the admin stores local tickets for matching
+    const ticketsPath = process.env.LOCAL_TICKETS_PATH || path.join(process.cwd(), 'uploads', 'tickets');
+    
     const monthsMap: { [key: string]: number } = {
         'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
         'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
@@ -187,20 +188,30 @@ export const matchTicketsFolder = asyncHandler(async (req: Request, res: Respons
         let matchDay: number | null = null;
         let matchMonth: number | null = null;
 
-        const parts = basename.split(/[\sde]+/);
+        const parts = basename.split(/[\sde\-_/]+/);
         for (const part of parts) {
+            if (!part || part === 'de') continue;
             const num = parseInt(part);
-            if (!isNaN(num) && matchDay === null) {
-                matchDay = num;
+            if (!isNaN(num)) {
+                // If the number looks like a year, skip it to avoid picking it as a day
+                if (num > 31 && num < 2100) continue; 
+                if (matchDay === null) matchDay = num;
             } else if (monthsMap[part] !== undefined) {
                 matchMonth = monthsMap[part];
             }
         }
 
         if (matchDay !== null && matchMonth !== null) {
+            // Further refine by checking if the matrícula is mentioned in the filename
             const matches = allRefuels.filter(r => {
                 const d = new Date(r.fecha);
-                return d.getDate() === matchDay && d.getMonth() === matchMonth;
+                const isDateMatch = d.getDate() === matchDay && d.getMonth() === matchMonth;
+                
+                if (!isDateMatch) return false;
+
+                // Check if matrícula is in filename for higher accuracy
+                const cleanMatricula = r.vehiculo?.matricula.replace(/\s+/g, '').toLowerCase() || '';
+                return cleanMatricula !== '' && basename.includes(cleanMatricula);
             });
 
             if (matches.length === 1) {
@@ -211,7 +222,11 @@ export const matchTicketsFolder = asyncHandler(async (req: Request, res: Respons
                     const timestamp = `${dt.getFullYear()}-${(dt.getMonth() + 1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}_${dt.getHours().toString().padStart(2, '0')}-${dt.getMinutes().toString().padStart(2, '0')}`;
                     const customName = `${timestamp}_${refuel.vehiculo?.matricula.replace(/\s+/g, '').toUpperCase() || 'UNKNOWN'}${path.extname(file)}`;
 
-                    const driveUrl = await DriveService.uploadFile(file, customName);
+                    // IMPORTANT: Copy to a temp path because DriveService deletes the local file on upload
+                    const tmpPath = file + '.tmp';
+                    fs.copyFileSync(file, tmpPath);
+
+                    const driveUrl = await DriveService.uploadFile(tmpPath, customName);
                     if (driveUrl) {
                         refuel.ticketImageUrl = driveUrl;
                         await refuelRepository.save(refuel);
