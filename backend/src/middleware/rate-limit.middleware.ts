@@ -1,3 +1,4 @@
+// @ts-ignore
 import { rateLimit } from 'express-rate-limit';
 
 export const globalLimiter = rateLimit({
