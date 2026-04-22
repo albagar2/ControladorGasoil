@@ -106,22 +106,11 @@
                 </div>
             </div>
 
-            <div class="grid-2">
-                <div class="form-group">
-                    <label for="role">Rol</label>
-                    <div class="input-wrapper">
-                        <select id="role" [(ngModel)]="driver.role" name="role" class="styled-select">
-                            <option value="conductor">Conductor</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="puntos">Puntos Carnet</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="puntos" [(ngModel)]="driver.puntos" name="puntos" min="0" max="15"
-                            required placeholder="15">
-                    </div>
+            <div class="form-group">
+                <label for="puntos">Puntos Carnet</label>
+                <div class="input-wrapper">
+                    <input type="number" id="puntos" [(ngModel)]="driver.puntos" name="puntos" min="0" max="15"
+                        required placeholder="15">
                 </div>
             </div>
 

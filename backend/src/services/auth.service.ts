@@ -49,7 +49,12 @@ export class AuthService {
         if (existing) throw new Error('El DNI o Email ya están registrados.');
 
         let assignedFamilyId: number | undefined;
-        let assignedRole = role || 'conductor';
+        let assignedRole = 'conductor'; // Default role
+
+        // Security: Prevent registering as admin
+        if (role === 'admin') {
+            throw new Error('No se permite el registro de nuevos administradores.');
+        }
 
         // 1. Handle Family Logic
         if (familyNombre) {
