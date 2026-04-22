@@ -1,7 +1,9 @@
 import { AppDataSource } from '../data-source';
 import { Driver } from '../entities/Driver';
+import { Family } from '../entities/Family';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
 
@@ -28,14 +30,43 @@ export class AuthService {
         return AppDataSource.getRepository(Driver);
     }
 
+    private static getFamilyRepo() {
+        return AppDataSource.getRepository(Family);
+    }
+
     static async register(data: any) {
         await ensureDbConnected();
         const driverRepository = this.getDriverRepo();
+        const familyRepository = this.getFamilyRepo();
 
-        const { nombre, dni, telefono, fechaRenovacionCarnet, email, password, role, licenses, puntos } = data;
+        const { 
+            nombre, dni, telefono, fechaRenovacionCarnet, email, 
+            password, role, licenses, puntos, 
+            familyNombre, familyCodigo 
+        } = data;
 
         const existing = await driverRepository.findOne({ where: [{ dni }, { email }] });
-        if (existing) throw new Error('Driver or Email already exists');
+        if (existing) throw new Error('El DNI o Email ya están registrados.');
+
+        let assignedFamilyId: number | undefined;
+        let assignedRole = role || 'conductor';
+
+        // 1. Handle Family Logic
+        if (familyNombre) {
+            // Create new family
+            const newFamily = familyRepository.create({
+                nombre: familyNombre,
+                codigo: crypto.randomBytes(3).toString('hex').toUpperCase() // 6 chars unique code
+            });
+            const savedFamily = await familyRepository.save(newFamily);
+            assignedFamilyId = savedFamily.id;
+            assignedRole = 'leader'; // First user of a family is the leader
+        } else if (familyCodigo) {
+            // Join existing family
+            const existingFamily = await familyRepository.findOne({ where: { codigo: familyCodigo.toUpperCase() } });
+            if (!existingFamily) throw new Error('Código de familia no válido.');
+            assignedFamilyId = existingFamily.id;
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const driver = driverRepository.create({
@@ -45,14 +76,18 @@ export class AuthService {
             fechaRenovacionCarnet,
             email,
             password: hashedPassword,
-            role,
+            role: assignedRole as any,
             puntos: puntos || 15,
             puntosMaximos: 15,
+            familyId: assignedFamilyId,
             licenses: licenses || []
         });
 
         await driverRepository.save(driver as any);
-        return { message: 'User created successfully' };
+        return { 
+            message: 'Usuario registrado correctamente.',
+            familyCode: familyNombre ? (await familyRepository.findOneBy({ id: assignedFamilyId! }))?.codigo : undefined
+        };
     }
 
     static async login(email: string, password: string) {

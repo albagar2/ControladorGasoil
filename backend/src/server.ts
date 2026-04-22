@@ -13,6 +13,7 @@ import { setupCronJobs } from './config/cron';
 import { startKeepAlive } from './services/keep-alive.service';
 import { errorMiddleware } from './middleware/error.middleware';
 import { emailService } from './services/email.service';
+import { globalLimiter } from './middleware/rate-limit.middleware';
 
 // 1. Configuration & Setup
 dotenv.config();
@@ -58,6 +59,9 @@ function configureMiddleware() {
     }));
 
     app.use(express.json());
+    
+    // Apply rate limiting to all requests
+    app.use(globalLimiter);
     
     // Static assets
     const uploadsDir = path.join(__dirname, '../uploads');

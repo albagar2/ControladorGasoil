@@ -159,6 +159,53 @@
                 </small>
             </div>
 
+            <div class="family-section">
+                <div class="licenses-header">
+                    <h3>Gestión de Familia</h3>
+                </div>
+                
+                <div class="family-options">
+                    <label class="radio-card" [class.active]="familyOption === 'none'">
+                        <input type="radio" name="familyOption" value="none" [(ngModel)]="familyOption">
+                        <div class="radio-content">
+                            <span class="material-icons">person</span>
+                            <span>Sin familia</span>
+                        </div>
+                    </label>
+                    <label class="radio-card" [class.active]="familyOption === 'create'">
+                        <input type="radio" name="familyOption" value="create" [(ngModel)]="familyOption">
+                        <div class="radio-content">
+                            <span class="material-icons">group_add</span>
+                            <span>Crear nueva</span>
+                        </div>
+                    </label>
+                    <label class="radio-card" [class.active]="familyOption === 'join'">
+                        <input type="radio" name="familyOption" value="join" [(ngModel)]="familyOption">
+                        <div class="radio-content">
+                            <span class="material-icons">groups</span>
+                            <span>Unirme a una</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div *ngIf="familyOption === 'create'" class="form-group mt-3 animate-fade-in">
+                    <label for="familyNombre">Nombre de la Familia</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="familyNombre" [(ngModel)]="driver.familyNombre" name="familyNombre" 
+                               placeholder="Ej: Los Pérez" required>
+                    </div>
+                    <small class="form-hint">Se generará un código único para que otros se unan.</small>
+                </div>
+
+                <div *ngIf="familyOption === 'join'" class="form-group mt-3 animate-fade-in">
+                    <label for="familyCodigo">Código de Invitación</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="familyCodigo" [(ngModel)]="driver.familyCodigo" name="familyCodigo" 
+                               placeholder="Ej: A1B2C3" required style="text-transform: uppercase;">
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="btn-submit btn-register" [disabled]="isLoading" [class.loading]="isLoading">
                 <span *ngIf="!isLoading">Crear Mi Cuenta</span>
                 <span *ngIf="isLoading">Registrando...</span>

@@ -22,8 +22,11 @@ export class RegisterComponent implements OnInit {
         puntos: 15,
         licenses: [
             { type: 'B', expirationDate: '' }
-        ]
+        ],
+        familyNombre: '',
+        familyCodigo: ''
     };
+    familyOption: 'none' | 'create' | 'join' = 'none';
     confirmPassword = '';
     errorMessage = '';
 
@@ -88,8 +91,21 @@ export class RegisterComponent implements OnInit {
         const minDate = dates.length > 0 ? new Date(Math.min(...dates)) : new Date();
         this.driver.fechaRenovacionCarnet = minDate;
 
-        this.authService.register(this.driver).subscribe({
-            next: (res) => {
+        const registrationData = { ...this.driver };
+        if (this.familyOption === 'create') {
+            delete registrationData.familyCodigo;
+        } else if (this.familyOption === 'join') {
+            delete registrationData.familyNombre;
+        } else {
+            delete registrationData.familyNombre;
+            delete registrationData.familyCodigo;
+        }
+
+        this.authService.register(registrationData).subscribe({
+            next: (res: any) => {
+                if (res.familyCode) {
+                    alert(`¡Cuenta creada! Código de tu nueva familia: ${res.familyCode}`);
+                }
                 this.router.navigate(['/login']);
                 this.isLoading = false;
             },

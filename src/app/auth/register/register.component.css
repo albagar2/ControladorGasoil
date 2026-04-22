@@ -399,3 +399,81 @@
 :host-context(.dark) .licenses-section {
     background: rgba(255, 255, 255, 0.03);
 }
+
+/* Family Section Styles */
+.family-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(79, 70, 229, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(79, 70, 229, 0.1);
+    margin-bottom: 2rem;
+}
+
+.family-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.radio-card {
+    cursor: pointer;
+    position: relative;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.radio-card input {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio-card.active {
+    border-color: #4f46e5;
+    background-color: #f5f3ff;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
+}
+
+.radio-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.radio-content .material-icons {
+    font-size: 24px;
+    color: #64748b;
+}
+
+.radio-card.active .radio-content .material-icons {
+    color: #4f46e5;
+}
+
+.radio-content span:not(.material-icons) {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+.radio-card.active .radio-content span {
+    color: #4338ca;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mt-3 { margin-top: 1rem; }
+.form-hint { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; display: block; }
