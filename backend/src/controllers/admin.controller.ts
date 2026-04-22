@@ -68,7 +68,18 @@ export const migratePhotos = asyncHandler(async (req: Request, res: Response) =>
                 if (ext.length > 4 || ext.includes('/')) ext = 'jpg';
 
                 const tempPath = path.join(os.tmpdir(), `temp_refuel_${Date.now()}.${ext}`);
-                await downloadFile(url, tempPath);
+                
+                if (url.startsWith('http')) {
+                    await downloadFile(url, tempPath);
+                } else {
+                    // Handle local paths (e.g. 'uploads/...')
+                    const localPath = path.isAbsolute(url) ? url : path.join(process.cwd(), url);
+                    if (fs.existsSync(localPath)) {
+                        fs.copyFileSync(localPath, tempPath);
+                    } else {
+                        throw new Error(`Archivo local no encontrado: ${localPath}`);
+                    }
+                }
 
                 const vehicle = refuel.vehiculo;
                 const dt = new Date(refuel.fecha);
@@ -99,7 +110,18 @@ export const migratePhotos = asyncHandler(async (req: Request, res: Response) =>
                 if (ext.length > 4 || ext.includes('/')) ext = 'jpg';
 
                 const tempPath = path.join(os.tmpdir(), `temp_mnt_${Date.now()}.${ext}`);
-                await downloadFile(url, tempPath);
+                
+                if (url.startsWith('http')) {
+                    await downloadFile(url, tempPath);
+                } else {
+                    // Handle local paths
+                    const localPath = path.isAbsolute(url) ? url : path.join(process.cwd(), url);
+                    if (fs.existsSync(localPath)) {
+                        fs.copyFileSync(localPath, tempPath);
+                    } else {
+                        throw new Error(`Archivo local no encontrado: ${localPath}`);
+                    }
+                }
 
                 const vehicle = maint.vehiculo;
                 const dt = new Date(maint.fecha);
