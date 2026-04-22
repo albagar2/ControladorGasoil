@@ -241,3 +241,26 @@
         </div>
     </div>
 </div>
+
+<app-modal [show]="showSuccessModal" title="¡Registro Completado!" (close)="closeSuccessModal()">
+    <div modal-body class="success-body">
+        <div class="success-icon">
+            <span class="material-icons">verified</span>
+        </div>
+        <h3>¡Bienvenido!</h3>
+        <p>Tu registro se ha completado con éxito.</p>
+        <div class="family-code-box" *ngIf="createdFamilyCode">
+            <p class="code-label">CÓDIGO DE FAMILIA</p>
+            <div class="code-row">
+                <span class="code">{{ createdFamilyCode }}</span>
+                <button (click)="copyFamilyCode()" class="btn-copy">
+                    <span class="material-icons">content_copy</span>
+                </button>
+            </div>
+            <p class="code-help">Comparte este código con tu familia para que puedan unirse.</p>
+        </div>
+    </div>
+    <div modal-footer>
+        <button class="btn-primary" (click)="closeSuccessModal()">Entendido</button>
+    </div>
+</app-modal>

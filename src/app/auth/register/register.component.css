@@ -493,3 +493,15 @@
     background: rgba(255, 255, 255, 0.05);
     color: #cbd5e1;
 }
+/* Success Modal Styles */
+.success-body { text-align: center; padding: 1rem 0; }
+.success-icon { color: var(--success); margin-bottom: 1rem; }
+.success-icon .material-icons { font-size: 64px; }
+.family-code-box { margin-top: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; }
+:host-context(.dark) .family-code-box { background: rgba(255, 255, 255, 0.03); border-color: #475569; }
+.code-label { font-size: 0.75rem; font-weight: 700; color: #64748b; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+.code-row { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+.code { font-family: " Monaco\, \Consolas\, monospace; font-size: 2rem; font-weight: 800; color: var(--primary-color); letter-spacing: 4px; }
+.btn-copy { background: var(--card-bg); border: 1px solid #e2e8f0; padding: 8px; border-radius: 8px; cursor: pointer; color: #64748b; transition: all 0.2s; display: inline-flex; }
+.btn-copy:hover { color: var(--primary-color); border-color: var(--primary-color); transform: scale(1.05); }
+.code-help { font-size: 0.85rem; color: #64748b; margin: 0; }

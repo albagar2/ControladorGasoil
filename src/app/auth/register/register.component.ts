@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { ModalComponent } from '../../shared/components/modal/modal.component';
 
 @Component({
     selector: 'app-register',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, ModalComponent],
     templateUrl: './register.component.html',
     styleUrls: ['./register.component.css']
 })
@@ -35,6 +36,9 @@ export class RegisterComponent implements OnInit {
     isLoading = false;
     showPassword = false;
     showConfirmPassword = false;
+
+    showSuccessModal = false;
+    createdFamilyCode = '';
 
     constructor(private authService: AuthService, private router: Router) { }
 
@@ -72,6 +76,16 @@ export class RegisterComponent implements OnInit {
             this.familyOption = 'none';
             this.driver.familyNombre = '';
         }
+    }
+
+    copyFamilyCode() {
+        navigator.clipboard.writeText(this.createdFamilyCode);
+        // We can use a toast here if available, or just change the button text
+    }
+
+    closeSuccessModal() {
+        this.showSuccessModal = false;
+        this.router.navigate(['/login']);
     }
 
     register() {
@@ -129,11 +143,13 @@ export class RegisterComponent implements OnInit {
 
         this.authService.register(registrationData).subscribe({
             next: (res: any) => {
-                if (res.familyCode) {
-                    alert(`¡Cuenta creada! Código de tu nueva familia: ${res.familyCode}`);
-                }
-                this.router.navigate(['/login']);
                 this.isLoading = false;
+                if (res.familyCode) {
+                    this.createdFamilyCode = res.familyCode;
+                    this.showSuccessModal = true;
+                } else {
+                    this.router.navigate(['/login']);
+                }
             },
             error: (err) => {
                 this.errorMessage = 'Error en el registro: ' + (err.error?.message || err.message);
