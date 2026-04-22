@@ -12,17 +12,32 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secretKey';
  * If the DataSource was never initialized (e.g. missing env vars on Render)
  * it will try to initialize it once before giving up.
  */
+let initializationPromise: Promise<void> | null = null;
+
+/**
+ * Helper: ensures the database is connected before any query.
+ * Uses a singleton promise to prevent concurrent initialization attempts.
+ */
 async function ensureDbConnected(): Promise<void> {
     if (AppDataSource.isInitialized) return;
 
-    console.warn('[AuthService] DataSource not initialized – attempting reconnection…');
-    try {
-        await AppDataSource.initialize();
-        console.log('[AuthService] DataSource reconnected successfully');
-    } catch (err) {
-        console.error('[AuthService] DataSource reconnection failed:', err);
-        throw new Error('El servidor no puede conectar con la base de datos. Contacta al administrador.');
+    if (initializationPromise) {
+        return initializationPromise;
     }
+
+    console.warn('[AuthService] DataSource not initialized – attempting connection…');
+    initializationPromise = (async () => {
+        try {
+            await AppDataSource.initialize();
+            console.log('[AuthService] DataSource connected successfully');
+        } catch (err) {
+            console.error('[AuthService] DataSource connection failed:', err);
+            initializationPromise = null;
+            throw new Error('El servidor no puede conectar con la base de datos. Contacta al administrador.');
+        }
+    })();
+
+    return initializationPromise;
 }
 
 export class AuthService {
@@ -51,9 +66,15 @@ export class AuthService {
         let assignedFamilyId: number | undefined;
         let assignedRole = 'conductor'; // Default role
 
-        // Security: Prevent registering as admin
+        // Security: Prevent registering as admin unless no admins exist
         if (role === 'admin') {
-            throw new Error('No se permite el registro de nuevos administradores.');
+            const adminCount = await driverRepository.count({ where: { role: 'admin' as any } });
+            if (adminCount > 0) {
+                console.warn(`[AuthService] Rejected admin registration attempt for ${email}. Admin already exists.`);
+                throw new Error('No se permite el registro de nuevos administradores. El sistema ya tiene un administrador configurado.');
+            }
+            console.log(`[AuthService] Allowing first-time admin registration for ${email}`);
+            assignedRole = 'admin';
         }
 
         // 1. Handle Family Logic

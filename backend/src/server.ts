@@ -148,9 +148,16 @@ app.get('/', (req, res) => {
 app.use(errorMiddleware);
 
 // 3. Execution
-app.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`🚀 Server successfully started on http://0.0.0.0:${PORT}`);
-    bootstrap();
-});
+(async () => {
+    try {
+        await bootstrap();
+        app.listen(Number(PORT), '0.0.0.0', () => {
+            console.log(`🚀 Server successfully started on http://0.0.0.0:${PORT}`);
+        });
+    } catch (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
+})();
 
 export { dbError };
