@@ -22,6 +22,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 let dbError: string | null = null;
 
+// Enable trust proxy for rate limiting (needed for Render/proxies)
+app.set('trust proxy', 1);
+
 /**
  * Configure Express middleware & basic settings
  */
