@@ -4,7 +4,7 @@
     "description": "Backend for Vehicle Management System",
     "main": "src/server.ts",
     "scripts": {
-        "build": "tsc",
+        "build": "node ./node_modules/typescript/lib/tsc.js",
         "start": "node dist/server.js",
         "dev": "ts-node src/server.ts",
         "upload-tickets": "ts-node match_tickets.ts"
@@ -26,7 +26,8 @@
         "nodemailer": "^6.9.13",
         "pg": "^8.19.0",
         "reflect-metadata": "^0.2.2",
-        "typeorm": "^0.3.20"
+        "typeorm": "^0.3.20",
+        "typescript": "^5.4.5"
     },
     "devDependencies": {
         "@types/cors": "^2.8.17",
@@ -37,7 +38,6 @@
         "@types/node-cron": "^3.0.11",
         "@types/nodemailer": "^6.4.14",
         "@types/pg": "^8.11.5",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.4.5"
+        "ts-node": "^10.9.2"
     }
 }
