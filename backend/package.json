@@ -4,7 +4,7 @@
     "description": "Backend for Vehicle Management System",
     "main": "src/server.ts",
     "scripts": {
-        "build": "node ./node_modules/typescript/lib/tsc.js",
+        "build": "npm install && node ./node_modules/typescript/lib/tsc.js",
         "start": "node dist/server.js",
         "dev": "ts-node src/server.ts",
         "upload-tickets": "ts-node match_tickets.ts"
