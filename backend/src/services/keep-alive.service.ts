@@ -9,7 +9,13 @@ import https from 'https';
 const PING_INTERVAL = 14 * 60 * 1000; // 14 minutes
 
 export const startKeepAlive = () => {
-    const url = process.env.RENDER_EXTERNAL_URL || 'https://familydrive.onrender.com';
+    let url = process.env.PUBLIC_URL || process.env.APP_URL || process.env.RENDER_EXTERNAL_URL;
+    if (!url && process.env.RAILWAY_STATIC_URL) {
+        url = `https://${process.env.RAILWAY_STATIC_URL}`;
+    }
+    if (!url) {
+        url = 'https://familydrive.onrender.com';
+    }
     const statusUrl = `${url}/api/status`;
 
     console.log(`[Keep-Alive] Starting self-ping service for ${statusUrl}`);

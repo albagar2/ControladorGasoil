@@ -3,6 +3,7 @@ import { Maintenance } from '../entities/Maintenance';
 import { Vehicle } from '../entities/Vehicle';
 import { DriveService } from './drive.service';
 import { alertService } from './alert.service';
+import { ExternalSyncService } from './external-sync.service';
 import fs from 'fs';
 
 export class MaintenanceService {
@@ -48,6 +49,16 @@ export class MaintenanceService {
         if (ticketImageUrl) maintenanceEntity.ticketImageUrl = ticketImageUrl;
 
         const maintenance = await this.maintenanceRepository.save(maintenanceEntity) as any as Maintenance;
+
+        // Sync with GastosFamiliares
+        ExternalSyncService.syncExpense({
+            amount: (Number(maintenance.costePieza) || 0) + (Number(maintenance.costeTaller) || 0),
+            description: `Mantenimiento ${vehicle.modelo}: ${maintenance.tipo}`,
+            category: 'SCENI',
+            userId: user.id,
+            familyId: user.familyId,
+            date: maintenance.fecha
+        }).catch(console.error);
 
         // Update mileage
         if (sanitized.kilometraje > vehicle.kilometrajeActual) {

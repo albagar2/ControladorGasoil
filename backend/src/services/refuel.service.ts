@@ -4,6 +4,7 @@ import { Vehicle } from '../entities/Vehicle';
 import { Maintenance } from '../entities/Maintenance';
 import { DriveService } from './drive.service';
 import { alertService } from './alert.service';
+import { ExternalSyncService } from './external-sync.service';
 import fs from 'fs';
 
 export class RefuelService {
@@ -49,6 +50,16 @@ export class RefuelService {
 
         const newRefuel = this.refuelRepository.create(sanitizedData as any) as any;
         const savedRefuel = await this.refuelRepository.save(newRefuel) as any as Refuel;
+
+        // Sync with GastosFamiliares (Mejora: Mejora de control centralizado)
+        ExternalSyncService.syncExpense({
+            amount: savedRefuel.costeTotal,
+            description: `Repostaje ${vehicle.modelo} (${savedRefuel.litros}L)`,
+            category: 'GASOIL / IBI',
+            userId: user.id,
+            familyId: user.familyId,
+            date: savedRefuel.fecha
+        }).catch(console.error);
 
         // Update Mileage
         if (savedRefuel.kilometraje > vehicle.kilometrajeActual) {

@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://familydrive-backend.onrender.com/api'
+  // Reemplazar con la URL generada en Railway para tu backend (ejemplo: https://tu-backend.up.railway.app/api)
+  apiUrl: 'https://familydrive-backend.up.railway.app/api'
 };
