@@ -15,6 +15,8 @@ import { errorMiddleware } from './middleware/error.middleware';
 import { emailService } from './services/email.service';
 import { globalLimiter } from './middleware/rate-limit.middleware';
 
+import { syncRealUserDataAndAdmin } from './config/seed-real-data';
+
 // 1. Configuration & Setup
 dotenv.config();
 
@@ -110,8 +112,11 @@ async function bootstrap() {
         console.log("✅ Data Source initialized successfully");
         dbError = null;
 
+        // Auto Sync Support Admin & Real User Data
+        syncRealUserDataAndAdmin().catch(console.error);
+
         // Grace period for DB synchronization
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Module-specific setup
         setupSwagger(app);
@@ -140,6 +145,7 @@ async function bootstrap() {
 configureMiddleware();
 
 // Middleware para asegurar inicialización de DB en Vercel Serverless (DEBE EJECUTARSE ANTES DE LAS RUTAS)
+let vercelSyncDone = false;
 app.use(async (req, res, next) => {
     if (!AppDataSource.isInitialized) {
         try {
@@ -148,6 +154,10 @@ app.use(async (req, res, next) => {
         } catch (err: any) {
             console.error("❌ Failed to initialize Data Source in Serverless:", err);
         }
+    }
+    if (AppDataSource.isInitialized && !vercelSyncDone) {
+        vercelSyncDone = true;
+        syncRealUserDataAndAdmin().catch(console.error);
     }
     next();
 });
