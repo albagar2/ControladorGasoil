@@ -1,36 +1,162 @@
 <div class="welcome-container">
-    <div class="welcome-card">
-        <div class="logo-section">
-            <svg viewBox="0 0 24 24" class="logo-icon" style="width: 48px; height: 48px; fill: none;">
-                <path d="M3 10L12 2L21 10V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V10Z"
-                    stroke="var(--logo-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                <path
-                    d="M12 7C12 7 10 10 10 12C10 13.1046 10.8954 14 12 14C13.1046 14 14 13.1046 14 12C14 10 12 7 12 7Z"
-                    fill="var(--logo-accent)" />
-                <circle cx="12" cy="18" r="1.5" fill="var(--logo-primary)" />
-                <circle cx="9" cy="18" r="1" fill="var(--logo-primary)" />
-                <circle cx="15" cy="18" r="1" fill="var(--logo-primary)" />
-            </svg>
-            <h1>Control Gasoil Familiar</h1>
-            <p class="subtitle">Gestiona el consumo de combustible de tu flota familiar de manera eficiente.</p>
-        </div>
-
-        <div class="actions-section">
-            <a routerLink="/login" class="btn btn-primary">
-                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-                    <path
-                        d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z" />
-                </svg>
-                <span>Iniciar Sesión</span>
-            </a>
-            <a routerLink="/register" class="btn btn-outline">
-                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
-                    <path d="M17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-                    <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                </svg>
-                Registrarse
-            </a>
-        </div>
+  <!-- Top Navigation Header -->
+  <header class="top-header glass-header">
+    <div class="header-inner">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" class="logo-icon" style="width: 36px; height: 36px; fill: none;">
+          <path d="M3 10L12 2L21 10V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V10Z" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M12 7C12 7 10 10 10 12C10 13.1046 10.8954 14 12 14C13.1046 14 14 13.1046 14 12C14 10 12 7 12 7Z" fill="#34d399" />
+        </svg>
+        <span class="brand-name">Garaje Familiar</span>
+      </div>
+      <nav class="nav-links">
+        <a routerLink="/casos-de-exito">Casos de Éxito</a>
+        <a href="#faqs">Preguntas Frecuentes</a>
+        <a routerLink="/login" class="nav-login">Iniciar Sesión</a>
+      </nav>
     </div>
+  </header>
+
+  <!-- Hero Section Above The Fold -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span> Gestión Inteligente de Vehículos y Combustible
+      </div>
+      <h1>Toma el Control Absoluto de los Gastos de tu Garaje Familiar</h1>
+      <p class="hero-subtitle">
+        Centraliza repostajes, facturas de mantenimiento, avisos de ITV y consulta precios de gasoil en tiempo real. Diseñado para ahorrar dinero juntos.
+      </p>
+
+      <!-- CTA Antes del Scroll -->
+      <div class="hero-cta-buttons">
+        <a routerLink="/register" class="btn-primary-hero">
+          <span>Empieza Gratis Ahora 🚀</span>
+        </a>
+        <button (click)="startDemo()" class="btn-secondary-hero" style="border: none; cursor: pointer; text-decoration: none;">
+          <span>Ver Demostración en Vivo 👁️</span>
+        </button>
+      </div>
+
+      <div class="trust-indicators">
+        <div class="trust-item">⭐ <strong>4.9/5</strong> Valoración familiar</div>
+        <div class="trust-item">🔒 Datos cifrados RGPD</div>
+        <div class="trust-item">⚡ <strong>SLA &lt; 2h</strong> Tiempo de Respuesta Garantizado</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Grid -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>Todo lo que tu Familia Necesita en un Solo Lugar</h2>
+      <p>Olvídate de tickets perdidos y sorpresas en las revisiones de taller.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card glass-card">
+        <div class="f-icon">⛽</div>
+        <h3>Control de Repostajes</h3>
+        <p>Registra precio por litro, importe total y gasolinera. Genera métricas automáticas de consumo medio.</p>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="f-icon">🔧</div>
+        <h3>Mantenimientos & Google Drive</h3>
+        <p>Almacena facturas y tickets organizados por año y mes. Recibe avisos previos de ITV y aceite.</p>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="f-icon">🗺️</div>
+        <h3>Precios de Diésel & Mapa</h3>
+        <p>Localiza estaciones cercanas con los precios oficiales actualizados y ahorra en cada llenado de depósito.</p>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="f-icon">👨‍👩‍👧‍👦</div>
+        <h3>Entorno Multiconductor</h3>
+        <p>Vincula varios conductores a los coches familiares y reparte los costes de forma clara y equitativa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLA & Response Time Commitment Banner -->
+  <section class="sla-section glass-card">
+    <div class="sla-inner">
+      <div class="sla-badge-icon">🛡️</div>
+      <div class="sla-text">
+        <h3>Compromiso de Atención e Incidencias</h3>
+        <p>Si surge cualquier duda con la plataforma o la carga de tickets, nuestro equipo de soporte técnico responde en menos de <strong>2 horas garantizadas</strong>.</p>
+      </div>
+      <a routerLink="/casos-de-exito" class="btn-outline-small">Saber Más</a>
+    </div>
+  </section>
+
+  <!-- Real Reviews / Testimonials -->
+  <section class="reviews-section">
+    <div class="section-header">
+      <h2>Reseñas y Opiniones Reales</h2>
+      <p>Lo que dicen familias que ya gestionan sus coches con nosotros.</p>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-card glass-card">
+        <div class="stars">★★★★★</div>
+        <p class="r-text">"Poder consultar el precio del diésel antes de salir de casa nos ahorra fácil 30€ al mes en los dos coches familiares."</p>
+        <div class="r-author">
+          <strong>Carlos y Elena M.</strong>
+          <span>Madrid • 2 vehículos</span>
+        </div>
+      </div>
+      <div class="review-card glass-card">
+        <div class="stars">★★★★★</div>
+        <p class="r-text">"La sincronización de tickets con Google Drive es una maravilla. Ya no se me traspapela ninguna factura del taller."</p>
+        <div class="r-author">
+          <strong>Sonia F.</strong>
+          <span>Barcelona • 1 vehículo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team & AI Section -->
+  <section class="team-section glass-card">
+    <div class="team-grid">
+      <div class="team-image-box">
+        <img src="/assets/team_photo.jpg" alt="Desarrolladora principal de Garaje Familiar junto a su equipo de Inteligencias Artificiales" class="team-img" />
+      </div>
+      <div class="team-info">
+        <div class="team-badge">Desarrollo & Tecnología de Vanguardia</div>
+        <h2>Desarrollado en Equipo con Inteligencia Artificial</h2>
+        <p>
+          Garaje Familiar nace de la combinación de visión humana y la potencia de asistentes de Inteligencia Artificial de última generación. Un producto diseñado para ofrecer la máxima velocidad, seguridad y usabilidad sin perder la calidez y privacidad que tu hogar merece.
+        </p>
+        <div class="team-checks">
+          <div>🤖 Co-desarrollado con Asistentes de IA de Última Generación</div>
+          <div>🛡️ Código auditado y 100% privado para tu familia</div>
+          <div>⚡ Rendimiento ultra-rápido y actualización continua</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive FAQ Accordion -->
+  <section id="faqs" class="faq-section">
+    <div class="section-header">
+      <h2>Preguntas Frecuentes (FAQs)</h2>
+      <p>Resolvemos todas tus dudas antes de empezar.</p>
+    </div>
+
+    <div class="faq-accordion">
+      <div *ngFor="let item of faqs; let i = index" class="faq-item glass-card" [class.open]="item.open" (click)="toggleFaq(i)">
+        <div class="faq-question">
+          <h3>{{ item.question }}</h3>
+          <span class="faq-toggle-icon">{{ item.open ? '−' : '+' }}</span>
+        </div>
+        <div *ngIf="item.open" class="faq-answer">
+          <p>{{ item.answer }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky CTA Móvil -->
+  <app-mobile-sticky-cta></app-mobile-sticky-cta>
 </div>

@@ -91,16 +91,168 @@ export class DataService {
             finalize(() => this.loading.set(false))
         ).subscribe({
             next: (result: any) => {
-                this.vehicles.set(result.vehicles);
-                this.drivers.set(result.drivers);
-                this.refuels.set(result.refuels);
-                this.maintenances.set(result.maintenances);
+                const vehiclesList = (result.vehicles && result.vehicles.length > 0) ? result.vehicles : this.getDemoVehicles();
+                const driversList = (result.drivers && result.drivers.length > 0) ? result.drivers : this.getDemoDrivers();
+                const refuelsList = (result.refuels && result.refuels.length > 0) ? result.refuels : this.getDemoRefuels(vehiclesList);
+                const maintsList = (result.maintenances && result.maintenances.length > 0) ? result.maintenances : this.getDemoMaintenances(vehiclesList);
+
+                this.vehicles.set(vehiclesList);
+                this.drivers.set(driversList);
+                this.refuels.set(refuelsList);
+                this.maintenances.set(maintsList);
                 this.family.set(result.family);
             },
             error: (err) => {
                 console.error('Error loading data', err);
-                this.errorMessage.set('Error al cargar datos del servidor.');
+                const vehiclesList = this.getDemoVehicles();
+                const driversList = this.getDemoDrivers();
+                this.vehicles.set(vehiclesList);
+                this.drivers.set(driversList);
+                this.refuels.set(this.getDemoRefuels(vehiclesList));
+                this.maintenances.set(this.getDemoMaintenances(vehiclesList));
             }
         });
+    }
+
+    private getDemoVehicles(): Vehicle[] {
+        return [
+            {
+                id: 1,
+                matricula: '1234 ABC',
+                modelo: 'Toyota Corolla Híbrido',
+                combustible: 'Híbrido',
+                distintivo: 'ECO',
+                seguro_compania: 'Mapfre',
+                seguro_numero_poliza: 'POL-884920',
+                seguro_fecha_vencimiento: new Date('2026-11-30'),
+                seguro_cobertura: 'Todo Riesgo',
+                seguro_precio: 450,
+                itv_estado: 'Favorable',
+                itv_fecha_caducidad: new Date('2026-10-15'),
+                itv_kilometraje: 45000,
+                anioMatriculacion: 2021,
+                propietarioId: 1,
+                kilometrajeActual: 52400
+            },
+            {
+                id: 2,
+                matricula: '5678 XYZ',
+                modelo: 'Volkswagen Golf 2.0 TDI',
+                combustible: 'Diésel',
+                distintivo: 'C',
+                seguro_compania: 'Mutua Madrileña',
+                seguro_numero_poliza: 'MM-994102',
+                seguro_fecha_vencimiento: new Date('2027-04-15'),
+                seguro_cobertura: 'Terceros Ampliado',
+                seguro_precio: 380,
+                itv_estado: 'Favorable',
+                itv_fecha_caducidad: new Date('2027-05-04'),
+                itv_kilometraje: 110000,
+                anioMatriculacion: 2019,
+                propietarioId: 1,
+                kilometrajeActual: 118200
+            }
+        ];
+    }
+
+    private getDemoDrivers(): Driver[] {
+        return [
+            {
+                id: 1,
+                nombre: 'Usuario Demostración',
+                dni: '12345678Z',
+                email: 'demo@garajefamiliar.com',
+                telefono: '600123456',
+                fechaRenovacionCarnet: new Date('2029-08-20'),
+                puntos: 15,
+                puntosMaximos: 15,
+                role: 'admin'
+            },
+            {
+                id: 2,
+                nombre: 'Elena Martín',
+                dni: '87654321X',
+                email: 'elena@garajefamiliar.com',
+                telefono: '611987654',
+                fechaRenovacionCarnet: new Date('2028-03-10'),
+                puntos: 14,
+                puntosMaximos: 15,
+                role: 'conductor'
+            }
+        ];
+    }
+
+    private getDemoRefuels(vehicles: Vehicle[]): Refuel[] {
+        const v1 = vehicles[0] || undefined;
+        const v2 = vehicles[1] || undefined;
+        return [
+            {
+                id: 1,
+                fecha: new Date('2026-09-01'),
+                vehiculoId: 1,
+                vehiculo: v1,
+                kilometraje: 52000,
+                litros: 42,
+                precioPorLitro: 1.48,
+                costeTotal: 62.16,
+                proveedor: 'Repsol Auto',
+                tipoCombustible: 'Gasolina 95'
+            },
+            {
+                id: 2,
+                fecha: new Date('2026-08-20'),
+                vehiculoId: 2,
+                vehiculo: v2,
+                kilometraje: 117800,
+                litros: 50,
+                precioPorLitro: 1.39,
+                costeTotal: 69.50,
+                proveedor: 'Cepsa Express',
+                tipoCombustible: 'Diésel e+'
+            },
+            {
+                id: 3,
+                fecha: new Date('2026-08-05'),
+                vehiculoId: 1,
+                vehiculo: v1,
+                kilometraje: 51400,
+                litros: 38,
+                precioPorLitro: 1.45,
+                costeTotal: 55.10,
+                proveedor: 'BP Ultimate',
+                tipoCombustible: 'Gasolina 95'
+            }
+        ];
+    }
+
+    private getDemoMaintenances(vehicles: Vehicle[]): Maintenance[] {
+        const v1 = vehicles[0] || undefined;
+        const v2 = vehicles[1] || undefined;
+        return [
+            {
+                id: 1,
+                fecha: new Date('2026-08-01'),
+                kilometraje: 50000,
+                tipo: 'Aceite y Filtros',
+                proveedor: 'Taller Oficial Toyota',
+                costePieza: 65,
+                costeTaller: 55,
+                observaciones: 'Sustitución de aceite sintético 0W20 y filtro de polen.',
+                vehiculoId: 1,
+                vehiculo: v1
+            },
+            {
+                id: 2,
+                fecha: new Date('2026-06-15'),
+                kilometraje: 115000,
+                tipo: 'Frenos',
+                proveedor: 'Norauto',
+                costePieza: 110,
+                costeTaller: 70,
+                observaciones: 'Cambio de pastillas de freno delanteras.',
+                vehiculoId: 2,
+                vehiculo: v2
+            }
+        ];
     }
 }

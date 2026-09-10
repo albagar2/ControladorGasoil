@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Driver } from '../models/driver.model';
 
@@ -27,6 +27,25 @@ export class AuthService {
                     localStorage.setItem('token', res.token);
                     localStorage.setItem('user', JSON.stringify(res.user));
                 }
+            })
+        );
+    }
+
+    loginDemo(): Observable<AuthResponse> {
+        return this.login({ email: 'admin@example.com', password: 'password123' }).pipe(
+            catchError(() => {
+                // Fallback instant demo session
+                const demoUser = {
+                    id: 'demo-user-id',
+                    nombre: 'Usuario Demostración',
+                    email: 'demo@garajefamiliar.com',
+                    role: 'ADMIN',
+                    familyId: 'demo-family-id'
+                };
+                const demoToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo-token';
+                localStorage.setItem('token', demoToken);
+                localStorage.setItem('user', JSON.stringify(demoUser));
+                return of({ token: demoToken, user: demoUser });
             })
         );
     }

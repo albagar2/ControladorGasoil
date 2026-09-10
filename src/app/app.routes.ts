@@ -66,5 +66,17 @@ export const routes: Routes = [
             }
         ]
     },
-    { path: '**', redirectTo: 'login' }
+    {
+        path: 'gracias',
+        loadComponent: () => import('./thank-you/thank-you.component').then(m => m.ThankYouComponent)
+    },
+    {
+        path: 'casos-de-exito',
+        loadComponent: () => import('./case-studies/case-studies.component').then(m => m.CaseStudiesComponent)
+    },
+    {
+        path: 'privacidad',
+        loadComponent: () => import('./privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+    },
+    { path: '**', loadComponent: () => import('./not-found/not-found.component').then(m => m.NotFoundComponent) }
 ];
