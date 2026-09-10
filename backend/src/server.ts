@@ -56,7 +56,14 @@ function configureMiddleware() {
 
     app.use(cors({
         origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.up.railway.app') || origin.endsWith('.railway.app')) {
+            if (
+                !origin || 
+                allowedOrigins.includes(origin) || 
+                origin.endsWith('.up.railway.app') || 
+                origin.endsWith('.railway.app') ||
+                origin.endsWith('.vercel.app') ||
+                origin.endsWith('.onrender.com')
+            ) {
                 return callback(null, true);
             }
             // In development or debugging, we might allow others
@@ -155,20 +162,39 @@ app.get('/', (req, res) => {
     `);
 });
 
+// Middleware para asegurar inicialización de DB en Vercel Serverless
+app.use(async (req, res, next) => {
+    if (!AppDataSource.isInitialized) {
+        try {
+            await AppDataSource.initialize();
+            console.log("✅ Data Source initialized in Vercel Serverless");
+        } catch (err: any) {
+            console.error("❌ Failed to initialize Data Source in Serverless:", err);
+        }
+    }
+    next();
+});
+
 // Error handling must be last
 app.use(errorMiddleware);
 
 // 3. Execution
-(async () => {
-    try {
-        await bootstrap();
-        app.listen(Number(PORT), '0.0.0.0', () => {
-            console.log(`🚀 Server successfully started on http://0.0.0.0:${PORT}`);
-        });
-    } catch (err) {
-        console.error('Failed to start server:', err);
-        process.exit(1);
-    }
-})();
+if (process.env.VERCEL !== '1') {
+    (async () => {
+        try {
+            await bootstrap();
+            app.listen(Number(PORT), '0.0.0.0', () => {
+                console.log(`🚀 Server successfully started on http://0.0.0.0:${PORT}`);
+            });
+        } catch (err) {
+            console.error('Failed to start server:', err);
+            process.exit(1);
+        }
+    })();
+} else {
+    // Empezar inicialización en segundo plano en Vercel
+    bootstrap().catch(console.error);
+}
 
+export default app;
 export { dbError };
