@@ -139,8 +139,22 @@ async function bootstrap() {
 // 2. Application Routes & Flow
 configureMiddleware();
 
-// API Base Routes
+// Middleware para asegurar inicialización de DB en Vercel Serverless (DEBE EJECUTARSE ANTES DE LAS RUTAS)
+app.use(async (req, res, next) => {
+    if (!AppDataSource.isInitialized) {
+        try {
+            await AppDataSource.initialize();
+            console.log("✅ Data Source initialized in Vercel Serverless");
+        } catch (err: any) {
+            console.error("❌ Failed to initialize Data Source in Serverless:", err);
+        }
+    }
+    next();
+});
+
+// API Base Routes (Soporta /api y rutas relativas para Serverless en Vercel)
 app.use('/api', apiRoutes);
+app.use('/', apiRoutes);
 
 // Root Landing Page
 app.get('/', (req, res) => {
@@ -160,19 +174,6 @@ app.get('/', (req, res) => {
             <p style="margin-top: 40px; color: #94a3b8; font-size: 0.85rem;">&copy; ${new Date().getFullYear()} Garaje Familiar</p>
         </div>
     `);
-});
-
-// Middleware para asegurar inicialización de DB en Vercel Serverless
-app.use(async (req, res, next) => {
-    if (!AppDataSource.isInitialized) {
-        try {
-            await AppDataSource.initialize();
-            console.log("✅ Data Source initialized in Vercel Serverless");
-        } catch (err: any) {
-            console.error("❌ Failed to initialize Data Source in Serverless:", err);
-        }
-    }
-    next();
 });
 
 // Error handling must be last
