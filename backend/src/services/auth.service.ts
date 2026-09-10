@@ -120,8 +120,14 @@ export class AuthService {
         await ensureDbConnected();
         const driverRepository = this.getDriverRepo();
 
+        const cleanEmail = email ? email.trim().toLowerCase() : '';
+        const rawEmail = email ? email.trim() : '';
+
         const driver = await driverRepository.findOne({
-            where: { email },
+            where: [
+                { email: cleanEmail },
+                { email: rawEmail }
+            ],
             relations: ['licenses']
         });
 
