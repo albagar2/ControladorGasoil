@@ -6,6 +6,7 @@
  * permitiendo que las rutas internas de Express (/auth/login, /vehicles, etc.) procesen las
  * solicitudes correctamente en el entorno de despliegue de Vercel.
  */
+import 'reflect-metadata';
 import app from '../backend/src/server';
 
 export default async function handler(req: any, res: any) {
