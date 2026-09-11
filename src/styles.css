@@ -562,6 +562,7 @@ label {
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   /* Overlay color */
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   /* Blur effect */
   display: flex;

@@ -21,6 +21,7 @@
 /* Header */
 .page-header {
     background: #ffffff;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 1.5rem 2rem;
@@ -36,8 +37,8 @@
 /* Month Navigation: Premium Float Bar */
 .month-navigation {
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 20px;
     padding: 0.75rem 1.5rem;
@@ -152,8 +153,8 @@
 /* Notification Center: Lean & Premium */
 .notification-center {
     background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.4);
     overflow: hidden;
@@ -397,8 +398,8 @@
 /* Vehicle Group Header */
 .vehicle-header-group {
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
+    backdrop-filter: blur(25px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 30px;
     padding: 1.5rem 2.5rem;
@@ -592,8 +593,8 @@
 
 .record-content-wrapper {
     background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(35px) saturate(160%);
     -webkit-backdrop-filter: blur(35px) saturate(160%);
+    backdrop-filter: blur(35px) saturate(160%);
     border-radius: 39px;
     padding: 2.5rem;
     height: 100%;
@@ -1308,6 +1309,7 @@
 .modal-overlay {
     background: rgba(0, 0, 0, 0.3);
     /* Lighter overlay */
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     /* Blur effect behind modal */
 }
@@ -1362,6 +1364,7 @@
     background: var(--card-bg);
     border-left: 5px solid #F59E0B;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
     border-radius: 12px;
 }
@@ -1513,8 +1516,8 @@
 
 .stat-card.premium-card {
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
+    backdrop-filter: blur(25px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 28px;
     padding: 1.75rem;
@@ -1600,8 +1603,8 @@
 
 .filters-container {
     background: var(--card-bg);
-    backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
     border-radius: 20px;
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
