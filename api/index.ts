@@ -8,13 +8,22 @@
  */
 import app from '../backend/src/server';
 
-export default function handler(req: any, res: any) {
-    // Si la ruta comienza por /api/, se remueve el prefijo para coincidir con las rutas internas
-    if (req.url && req.url.startsWith('/api/')) {
-        req.url = req.url.substring(4);
-    } else if (req.url === '/api') {
-        req.url = '/';
+export default async function handler(req: any, res: any) {
+    try {
+        // Si la ruta comienza por /api/, se remueve el prefijo para coincidir con las rutas internas
+        if (req.url && req.url.startsWith('/api/')) {
+            req.url = req.url.substring(4);
+        } else if (req.url === '/api') {
+            req.url = '/';
+        }
+        // Delega el procesamiento de la solicitud HTTP a la aplicación Express
+        return app(req, res);
+    } catch (error: any) {
+        console.error('[Vercel Serverless Handler Error]:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Error en la ejecución de la función Serverless',
+            details: error?.message || String(error)
+        });
     }
-    // Delega el procesamiento de la solicitud HTTP a la aplicación Express
-    return app(req, res);
 }

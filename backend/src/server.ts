@@ -108,40 +108,48 @@ async function bootstrap() {
     console.log('[System] Iniciando servicios del servidor backend...');
     
     try {
-        // Asegurar la existencia del directorio de uploads
-        const uploadsDir = path.join(__dirname, '../uploads');
-        if (!fs.existsSync(uploadsDir)) {
-            console.log(`[Startup] Creando directorio de descargas en ${uploadsDir}`);
-            fs.mkdirSync(uploadsDir, { recursive: true });
+        // Asegurar la existencia del directorio de uploads (compatible con Vercel /tmp)
+        const uploadsDir = process.env.VERCEL === '1' 
+            ? path.join('/tmp', 'uploads')
+            : path.join(__dirname, '../uploads');
+        try {
+            if (!fs.existsSync(uploadsDir)) {
+                console.log(`[Startup] Creando directorio de descargas en ${uploadsDir}`);
+                fs.mkdirSync(uploadsDir, { recursive: true });
+            }
+        } catch (dirErr) {
+            console.warn('[Startup] Aviso al crear directorio de descargas:', dirErr);
         }
 
         // Inicializar la conexión a PostgreSQL Supabase
-        await AppDataSource.initialize();
-        console.log("✅ Base de datos PostgreSQL Supabase inicializada con éxito");
+        if (!AppDataSource.isInitialized) {
+            await AppDataSource.initialize();
+            console.log("✅ Base de datos PostgreSQL Supabase inicializada con éxito");
+        }
         dbError = null;
 
-        // Sincronizar cuenta de soporte técnico y datos de usuarios reales
+        // Sincronizar cuenta de soporte técnico y datos de usuarios reales en segundo plano
         syncRealUserDataAndAdmin().catch(console.error);
 
-        // Período de espera para sincronización completa
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Configuración de módulos adicionales
+        // Configuración de Swagger
         setupSwagger(app);
-        setupCronJobs();
-        startKeepAlive();
 
-        // Verificación de conectividad del servicio de correo SMTP
-        const isEmailReady = await emailService.verifyConnection();
-        if (isEmailReady) {
-            console.log("📧 Servicio de correo electrónico listo.");
-        } else {
-            console.warn("⚠️ Servicio de correo sin verificar. Revisa credenciales.");
+        // Módulos solo para servidor persistente (Node tradicional), omitidos en Serverless Vercel
+        if (process.env.VERCEL !== '1') {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            setupCronJobs();
+            startKeepAlive();
+
+            // Verificación de correo en background tradicional
+            emailService.verifyConnection().then(isReady => {
+                if (isReady) console.log("📧 Servicio de correo electrónico listo.");
+                else console.warn("⚠️ Servicio de correo sin verificar. Revisa credenciales.");
+            }).catch(console.error);
+
+            // Preparación de carpetas en Google Drive
+            const { DriveService } = require('./services/drive.service');
+            DriveService.prepareMonthlyFolders().catch(console.error);
         }
-
-        // Preparación de carpetas en Google Drive
-        const { DriveService } = require('./services/drive.service');
-        DriveService.prepareMonthlyFolders().catch(console.error);
 
     } catch (err: any) {
         console.error("❌ Error crítico en el inicio de servicios:", err);
