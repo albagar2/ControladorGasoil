@@ -1,3 +1,13 @@
+/**
+ * Servicio de Sincronización e Inicialización de Datos Reales y Cuentas Administradoras.
+ * 
+ * Este módulo garantiza la existencia y correcta configuración en Supabase PostgreSQL de:
+ * 1. Cuenta Administradora de Soporte Técnico (controlgasoilfamiliar@gmail.com).
+ * 2. Cuenta Administradora por defecto (admin@example.com).
+ * 3. Familias registradas (Familia García, Familia Pérez, Familia López).
+ * 4. Usuarios reales sincronizados (Alba García López - baciapez@gmail.com, Jose Antonio Carrao - jacarrao72@gmail.com).
+ * 5. Vehículos reales asignados (Peugeot 308 4182HZR, Peugeot 208 4182HZL).
+ */
 import { AppDataSource } from '../data-source';
 import { Driver } from '../entities/Driver';
 import { Vehicle } from '../entities/Vehicle';
@@ -7,11 +17,11 @@ import bcrypt from 'bcryptjs';
 export async function syncRealUserDataAndAdmin(): Promise<void> {
     try {
         if (!AppDataSource.isInitialized) {
-            console.log('[SeedSync] AppDataSource is not initialized yet. Skipping sync.');
+            console.log('[SeedSync] AppDataSource no está inicializado todavía. Omitiendo sincronización.');
             return;
         }
 
-        console.log('[SeedSync] Starting synchronization of real user data & support admin...');
+        console.log('[SeedSync] Iniciando sincronización de datos de usuario reales y administrador de soporte...');
 
         const driverRepo = AppDataSource.getRepository(Driver);
         const vehicleRepo = AppDataSource.getRepository(Vehicle);
@@ -19,7 +29,7 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
 
         const passwordHash = await bcrypt.hash("123456", 10);
 
-        // 1. Sync Support Admin (controlgasoilfamiliar@gmail.com)
+        // 1. Sincronización del Administrador de Soporte Técnico (controlgasoilfamiliar@gmail.com)
         let supportAdmin = await driverRepo.findOne({ where: [{ email: 'controlgasoilfamiliar@gmail.com' }, { dni: '00000000X' }] });
         if (!supportAdmin) {
             supportAdmin = driverRepo.create({
@@ -34,16 +44,16 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                 puntosMaximos: 15
             });
             await driverRepo.save(supportAdmin);
-            console.log('✅ Support Admin (controlgasoilfamiliar@gmail.com) created');
+            console.log('✅ Administrador de Soporte (controlgasoilfamiliar@gmail.com) creado');
         } else {
-            // Ensure role is admin
+            // Garantiza que el rol sea 'admin'
             if (supportAdmin.role !== 'admin') {
                 supportAdmin.role = 'admin';
                 await driverRepo.save(supportAdmin);
             }
         }
 
-        // 2. Sync Default Admin (admin@example.com)
+        // 2. Sincronización del Administrador por Defecto (admin@example.com)
         let defaultAdmin = await driverRepo.findOne({ where: [{ email: 'admin@example.com' }, { dni: '00000000A' }] });
         if (!defaultAdmin) {
             defaultAdmin = driverRepo.create({
@@ -58,10 +68,10 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                 puntosMaximos: 15
             });
             await driverRepo.save(defaultAdmin);
-            console.log('✅ Default Admin (admin@example.com) created');
+            console.log('✅ Administrador por defecto (admin@example.com) creado');
         }
 
-        // 3. Sync Families
+        // 3. Sincronización de Grupos Familiares
         const familyData = [
             { nombre: 'Familia García', codigo: 'GARCIA2024' },
             { nombre: 'Familia Pérez', codigo: 'PEREZ2024' },
@@ -77,13 +87,13 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                     codigo: fam.codigo
                 });
                 existingFam = await familyRepo.save(existingFam);
-                console.log(`✅ Family created: ${fam.nombre} (${fam.codigo})`);
+                console.log(`✅ Familia creada: ${fam.nombre} (${fam.codigo})`);
             }
             createdFamilies[fam.codigo] = existingFam;
         }
 
-        // 4. Sync Real Users from mi_base_de_datos.sql
-        let userAlbaGarcia = await driverRepo.findOne({ where: [{ email: 'baciapez@gmail.com' }, { dni: '12345678A' }] });
+        // 4. Sincronización de Usuarios Reales
+        let userAlbaGarcia = await driverRepo.findOne({ where: [{ email: 'baciapez@gmail.com' }, { dni: '51183452B' }] });
         if (!userAlbaGarcia) {
             userAlbaGarcia = driverRepo.create({
                 nombre: 'Alba García López',
@@ -98,7 +108,7 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                 familyId: createdFamilies['GARCIA2024']?.id
             });
             userAlbaGarcia = await driverRepo.save(userAlbaGarcia);
-            console.log('✅ Real User Alba García López (baciapez@gmail.com) synced');
+            console.log('✅ Usuario real Alba García López (baciapez@gmail.com) sincronizado');
         }
 
         let userJoseAntonio = await driverRepo.findOne({ where: [{ email: 'jacarrao72@gmail.com' }, { dni: '74906437A' }] });
@@ -116,10 +126,10 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                 familyId: createdFamilies['GARCIA2024']?.id
             });
             userJoseAntonio = await driverRepo.save(userJoseAntonio);
-            console.log('✅ Real User Jose Antonio Carrao (jacarrao72@gmail.com) synced');
+            console.log('✅ Usuario real Jose Antonio Carrao (jacarrao72@gmail.com) sincronizado');
         }
 
-        // 5. Sync Vehicles from mi_base_de_datos.sql
+        // 5. Sincronización de Vehículos Reales
         const vehiclesToSync = [
             {
                 matricula: '4182HZR',
@@ -141,7 +151,6 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                 propietario: userJoseAntonio || userAlbaGarcia || defaultAdmin,
                 familyId: createdFamilies['GARCIA2024']?.id
             }
-
         ];
 
         for (const vData of vehiclesToSync) {
@@ -165,12 +174,12 @@ export async function syncRealUserDataAndAdmin(): Promise<void> {
                     familyId: vData.familyId
                 });
                 await vehicleRepo.save(existingV);
-                console.log(`✅ Real Vehicle synced: ${vData.modelo} (${vData.matricula})`);
+                console.log(`✅ Vehículo real sincronizado: ${vData.modelo} (${vData.matricula})`);
             }
         }
 
-        console.log('🎉 Data synchronization complete!');
+        console.log('🎉 Sincronización de datos completada con éxito.');
     } catch (err) {
-        console.error('[SeedSync] Error syncing real data:', err);
+        console.error('[SeedSync] Error durante la sincronización de datos:', err);
     }
 }
