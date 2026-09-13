@@ -16,16 +16,21 @@ import { dbError } from '../server';
 const router = Router();
 
 // API Status Route
-router.get('/status', async (req, res) => {
+const statusHandler = async (req: any, res: any) => {
     const dbStatus = AppDataSource.isInitialized ? 'connected' : 'disconnected';
-    res.json({
+    return res.status(200).json({
         message: 'Welcome to the Vehicle Management API',
         status: 'operational',
         database: dbStatus,
         error: dbStatus === 'disconnected' ? dbError : null,
         timestamp: new Date()
     });
-});
+};
+
+router.get('/', statusHandler);
+router.get('/status', statusHandler);
+router.get('/api', statusHandler);
+router.get('/api/status', statusHandler);
 
 router.use('/auth', authRoutes);
 router.use('/vehicles', vehicleRoutes);
