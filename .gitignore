@@ -9,7 +9,6 @@
 # Node
 /node_modules
 dist
-MIS_ACCESOS_PRIVADOS.md
 npm-debug.log
 yarn-error.log
 
@@ -52,6 +51,7 @@ backend/.env
 !tsconfig*.json
 !angular.json
 !project.json
+!vercel.json
 *.key
 *.pem
 MIS_ACCESOS_PRIVADOS.md
