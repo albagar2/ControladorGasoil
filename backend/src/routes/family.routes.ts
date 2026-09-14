@@ -11,6 +11,7 @@ router.post('/', FamilyController.createFamily);
 router.get('/', FamilyController.getAllFamilies); // Supports GET /api/families
 router.post('/join', FamilyController.joinFamily);
 router.get('/my-family', FamilyController.getMyFamily);
+router.get('/my_family', FamilyController.getMyFamily);
 
 // Admin routes
 router.get('/admin/all', checkAdmin, FamilyController.getAllFamilies);

@@ -4,8 +4,8 @@ import { Driver } from '../entities/Driver';
 import { alertService } from './alert.service';
 
 export class VehicleService {
-    private static vehicleRepository = AppDataSource.getRepository(Vehicle);
-    private static driverRepository = AppDataSource.getRepository(Driver);
+    private static get vehicleRepository() { return AppDataSource.getRepository(Vehicle); }
+    private static get driverRepository() { return AppDataSource.getRepository(Driver); }
 
     static async getAll(user: any) {
         const { userId, role, familyId } = user;

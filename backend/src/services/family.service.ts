@@ -4,8 +4,8 @@ import { Driver } from '../entities/Driver';
 import { DriveService } from './drive.service';
 
 export class FamilyService {
-    private static familyRepository = AppDataSource.getRepository(Family);
-    private static driverRepository = AppDataSource.getRepository(Driver);
+    private static get familyRepository() { return AppDataSource.getRepository(Family); }
+    private static get driverRepository() { return AppDataSource.getRepository(Driver); }
 
     static async create(nombre: string, userId: number) {
         if (!nombre) throw new Error('Family name is required');

@@ -8,9 +8,9 @@ import { ExternalSyncService } from './external-sync.service';
 import fs from 'fs';
 
 export class RefuelService {
-    private static refuelRepository = AppDataSource.getRepository(Refuel);
-    private static vehicleRepository = AppDataSource.getRepository(Vehicle);
-    private static maintenanceRepository = AppDataSource.getRepository(Maintenance);
+    private static get refuelRepository() { return AppDataSource.getRepository(Refuel); }
+    private static get vehicleRepository() { return AppDataSource.getRepository(Vehicle); }
+    private static get maintenanceRepository() { return AppDataSource.getRepository(Maintenance); }
 
     static async getAll(role: string, familyId?: number) {
         const query = this.refuelRepository.createQueryBuilder("refuel")
